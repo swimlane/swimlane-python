@@ -2,6 +2,18 @@
 
 A Python library for the Swimlane API.
 
+# Using
+
+Install `swimlane`:
+
+```
+$ pip install swimlane
+```
+
+Read the docs at http://swimlane-python-client.readthedocs.org.
+
+# Developing
+
 ## Toolchain
 
 * [pyenv](https://github.com/yyuu/pyenv)
