@@ -1,6 +1,6 @@
-# Swimlane Driver
+# Swimlane Python Client
 
-A Python library and CLI for the Swimlane API.
+A Python library for the Swimlane API.
 
 ## Toolchain
 
@@ -15,8 +15,8 @@ A Python library and CLI for the Swimlane API.
 Clone the repository, create a virtualenv, and install the requirements:
 
 ```
-$ git clone ssh://git@stash.swimlane.local:7999/swim/python-driver.git
-$ cd python-driver
+$ git clone git@github.com:Swimlane/sw-python-client.git
+$ cd sw-python-client
 $ mkvirtualenv <YOUR_ENV_NAME>
 $ pip install -r requirements.txt
 ```
