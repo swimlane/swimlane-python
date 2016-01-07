@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 *******************************************
-``swimlane`` - A Python driver for Swimlane
+``swimlane`` - A Python client for Swimlane
 *******************************************
 
 This package provies an API for accessing Swimlane instances. The ``swimlane``
@@ -16,6 +16,16 @@ package supports the following Python versions:
 * 3.4
 * 3.5
 * PyPy
+
+**********
+Installing
+**********
+
+Install swimlane using pip:
+
+.. code-block:: none
+
+  $ pip install swimlane
 
 ********
 Contents
