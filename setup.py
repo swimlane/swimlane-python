@@ -4,10 +4,10 @@ setup(
     name="swimlane",
     author="Swimlane LLC",
     author_email="info@swimlane.com",
-    version="0.0.1",
+    version="0.0.2",
     url="https://github.com/Swimlane/sw-python-client",
     packages=find_packages(),
-    description="A Python driver for Swimlane.",
+    description="A Python client for Swimlane.",
     install_requires=[
         "requests==2.8.1",
         "ordereddict==1.1",
@@ -21,6 +21,7 @@ setup(
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5"
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: Implementation :: PyPy"
     ]
 )

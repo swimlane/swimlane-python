@@ -1,4 +1,4 @@
-.PHONY: local test docs show_docs pythons
+.PHONY: local test docs show_docs pythons release
 
 local:
 	pip install -e .
@@ -14,3 +14,6 @@ show_docs:
 
 pythons:
 	while read v; do pyenv install -s $$v; done < .python-version
+
+release:
+	python setup.py sdist bdist_wheel upload

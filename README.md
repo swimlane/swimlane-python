@@ -2,6 +2,18 @@
 
 A Python library for the Swimlane API.
 
+![version](https://img.shields.io/pypi/v/swimlane.svg)
+
+![license](https://img.shields.io/pypi/l/swimlane.svg)
+
+![format](https://img.shields.io/pypi/format/swimlane.svg)
+
+![py-versions](https://img.shields.io/pypi/pyversions/swimlane.svg)
+
+![py-impl](https://img.shields.io/pypi/implementation/swimlane.svg)
+
+![status](https://img.shields.io/pypi/status/swimlane.svg)
+
 # Using
 
 Install `swimlane`:
