@@ -22,18 +22,20 @@ class Client():
     default = None
 
     @classmethod
-    def set_default(cls, base_url, username, password):
+    def set_default(cls, base_url, username, password, verify_ssl=True):
         """Init a client that can make REST requests to Swimlane.
 
         Args:
             base_url (str): The base URL for Swimlane
             username (str): A Swimlane username
             password (str): The password
+            verify_ssl (bool): Whether or not to verify SSL certs when calling
+                Swimlane (default is True).
 
         Returns:
             Client: An instance of a Client
         """
-        cls.default = Client(base_url, username, password)
+        cls.default = Client(base_url, username, password, verify_ssl)
         cls.default.connect()
 
     @classmethod
@@ -43,20 +45,25 @@ class Client():
             raise Exception("There is no default client set. Call set_default "
                             "to establish a default client.")
 
-    def __init__(self, base_url, username, password):
+    def __init__(self, base_url, username, password, verify_ssl=True):
         """Init a client that can make REST requests to Swimlane.
 
         Args:
             base_url (str): The base URL for Swimlane
             username (str): A Swimlane username
             password (str): The password
+            verify_ssl (bool): Whether or not to verify SSL certs when calling
+                Swimlane (default is True).
 
         Returns:
             Client: An instance of a Client
         """
         self.headers = {}
+        self.username = username
+        self.verify_ssl = verify_ssl
         self.base_url = urljoin(base_url, "api/")
-        self.provider = UserPassAuthProvider(self.base_url, username, password)
+        self.provider = UserPassAuthProvider(self.base_url, username, password,
+                                             self.verify_ssl)
 
     def connect(self):
         """Connect to the Swimlane server."""
@@ -78,7 +85,8 @@ class Client():
             return cls.default.get(url)
 
         full_url = urljoin(self.base_url, url)
-        resp = requests.get(full_url, headers=self.headers)
+        resp = requests.get(full_url, headers=self.headers,
+                            verify=self.verify_ssl)
         resp.raise_for_status()
         return self.build_payload(resp)
 
@@ -132,7 +140,8 @@ class Client():
         full_url = urljoin(self.base_url, url)
         self.headers.update({"content-type": "application/json"})
         data = resource._fields if hasattr(resource, "_fields") else resource
-        resp = func(full_url, data=json.dumps(data), headers=self.headers)
+        resp = func(full_url, data=json.dumps(data), headers=self.headers,
+                    verify=self.verify_ssl)
         resp.raise_for_status()
         return self.build_payload(resp)
 

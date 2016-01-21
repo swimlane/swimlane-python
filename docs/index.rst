@@ -35,6 +35,7 @@ Contents
   :maxdepth: 2
 
   using_swimlane
+  recipes
   modules
 
 Indices and tables

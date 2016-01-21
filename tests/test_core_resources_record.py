@@ -56,3 +56,4 @@ def test_references(default_client):
     refs = record.references(field_id, [remote_rec_id], [remote_field_id])
     ref_rec = list(refs)[0]
     assert ref_rec.values[remote_field_id][0] == rec_id
+

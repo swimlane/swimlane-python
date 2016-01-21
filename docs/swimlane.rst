@@ -8,6 +8,18 @@ Subpackages
 
     swimlane.core
 
+Submodules
+----------
+
+swimlane.records module
+-----------------------
+
+.. automodule:: swimlane.records
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 Module contents
 ---------------
 
