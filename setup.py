@@ -4,7 +4,7 @@ setup(
     name="swimlane",
     author="Swimlane LLC",
     author_email="info@swimlane.com",
-    version="0.0.2",
+    version="0.0.3",
     url="https://github.com/Swimlane/sw-python-client",
     packages=find_packages(),
     description="A Python client for Swimlane.",
