@@ -3,7 +3,7 @@ from swimlane.records import add_references
 
 
 def test_add_references():
-    Client.set_default("https://swimlane.com", "usr", "pwd", False)
+    Client.set_default(server", "usr", "pwd", False)
 
     print add_references(
         record_id="5670dcec0e23ab0e4c363e12",
