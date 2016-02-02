@@ -1,4 +1,4 @@
-# Swimlane Python Client ![version](https://img.shields.io/pypi/v/swimlane.svg) ![license](https://img.shields.io/pypi/l/swimlane.svg) ![format](https://img.shields.io/pypi/format/swimlane.svg) ![py-versions](https://img.shields.io/pypi/pyversions/swimlane.svg) ![py-impl](https://img.shields.io/pypi/implementation/swimlane.svg) 
+# Swimlane Python Client ![version](https://img.shields.io/pypi/v/swimlane.svg) ![py-versions](https://img.shields.io/pypi/pyversions/swimlane.svg) ![py-impl](https://img.shields.io/pypi/implementation/swimlane.svg) 
 
 A Python library for the Swimlane API.
 
