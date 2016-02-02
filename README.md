@@ -2,7 +2,7 @@
 
 A Python library for the Swimlane API.
 
-# Using
+## Using
 
 Install `swimlane`:
 
@@ -12,9 +12,9 @@ $ pip install swimlane
 
 Read the docs at http://swimlane-python-client.readthedocs.org.
 
-# Developing
+## Developing
 
-## Toolchain
+### Toolchain
 
 * [pyenv](https://github.com/yyuu/pyenv)
     * [pyenv-virtualenv](https://github.com/yyuu/pyenv-virtualenv)
@@ -22,7 +22,7 @@ Read the docs at http://swimlane-python-client.readthedocs.org.
 * [virtualenv](https://virtualenv.readthedocs.org/en/latest/)
 * [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)
 
-## Initial Setup
+### Initial Setup
 
 Clone the repository, create a virtualenv, and install the requirements:
 
@@ -45,7 +45,7 @@ Install all supported Pythons:
 $ make pythons
 ```
 
-## Tests
+### Tests
 
 Run the tests:
 
@@ -53,7 +53,7 @@ Run the tests:
 $ make test
 ```
 
-## Docs
+### Docs
 
 Build the docs:
 
@@ -61,7 +61,7 @@ Build the docs:
 $ make docs
 ```
 
-## Tox
+### Tox
 
 Run `tox` as usual - keep in mind that everything in `requirements.txt` will
 be installed in each virtualenv that Tox creates.
