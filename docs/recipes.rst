@@ -21,12 +21,10 @@ App into a field on a record in another App by searching with keywords:
       # The keywords for searching. Any records that match these keywords will
       # be added as references and returned from this function.
       keywords="chisrv7008",
-      # The acronym of the App of record_id. You can also specify this app by
-      # passing app_id or app_name. 
-      app_acronym="SOC",
-      # The acronym of the App that will be searched against. You can also 
-      # specify this app by passing remote_app_id or remote_app_name. 
-      remote_app_acronym="CMDB",
+      #  You specify the app by passing app_id or app_name.
+      app_name="Standard Operation",
+      # specify remote app by passing remote_app_id or remote_app_name.
+      remote_app_name="Common incidents",
       # The name of the field on record_id that will hold the references. You
       # can also specify this field by passing field_id.
       field_name="References"

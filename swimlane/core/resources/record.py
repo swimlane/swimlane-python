@@ -59,17 +59,6 @@ class Record(Resource):
                    ",".join(ref_field_ids)))
         return (Record(r) for r in Client.get(url))
 
-    def add_references(other_app_id, query):
-        """Add references to this record by querying.
-
-        Args:
-            other_app_id (str): The ID of the APP to query.
-            query (str): The query to search with.
-
-        Returns:
-            A list of the Record IDs that were referenced.
-        """
-
     @classmethod
     def new_for(cls, app_id):
         """Get a prefilled Record for the App designated by app_id.
