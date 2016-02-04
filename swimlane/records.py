@@ -39,7 +39,7 @@ def add_references(record_id,
 
     if not field_id and field_name:
         field_id = app.field_id(field_name)
-    else:
+    if not field_id:
         raise Exception("field_id or field_name must be supplied")
 
     remote_app = App.find(app_id=remote_app_id, name=remote_app_name)
