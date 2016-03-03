@@ -230,7 +230,7 @@ results.
   field_id = app.field_id("Some Field Name")
 
   # Create a new Report
-  stats_report = Report.new_for(APP_ID, USER_ID, "A Report")
+  report = Report.new_for(APP_ID, USER_ID, "A Report")
   report.columns = [field_id]
   report.pageSize = 10
   report.filters = [filtering.create_filter(field_id, filtering.CONTAINS, "a")]
