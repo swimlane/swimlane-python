@@ -1,5 +1,15 @@
+import unittest
+
 from swimlane.core.resources import Group
 
+
+class GroupTestCase(unittest.TestCase):
+    def test_init(self):
+        g = Group({'id': '123', 'name': 'Some Group'})
+        self.assertEqual(g.id, '123')
+        self.assertEqual(g.name, 'Some Group')
+
+"""
 GROUP_ID = "568496a855d95f26400864bb"
 
 
@@ -28,3 +38,4 @@ def test_find_by_name(default_client):
 def test_find_multiple_by_name(default_client):
     groups = list(Group.find(name="E"))
     assert len(groups) == 2
+"""
