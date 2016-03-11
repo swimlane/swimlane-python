@@ -50,8 +50,6 @@ class RecordTestCase(unittest.TestCase):
         mock_client.get.assert_called_once_with(
             'app/456/record/123/references?recordIds=456&fieldIds=789')
 
-        pass
-
     @mock.patch('swimlane.core.resources.record.Client', autospec=True)
     def test_new_for(self, mock_client):
         Record.new_for('123')

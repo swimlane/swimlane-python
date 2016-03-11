@@ -1,62 +1,44 @@
+import mock
 import unittest
 
-from swimlane.core.resources import App, Record, Report
+from swimlane.core.resources import Report
 from swimlane.core.search.filtering import create_filter, EQ
+MOCK_REPORT = {
+    'id': '123',
+    'name': 'Mock Report'
+}
+
 
 class ReportTestCase(unittest.TestCase):
-    pass
+    def test_init(self):
+        report = Report(MOCK_REPORT)
+        for key, value in MOCK_REPORT.items():
+            self.assertEqual(getattr(report, key), value)
 
-"""
-APP_ID = "567490ad55d95d5c30d02266"
-USER_ID = "5674909d55d95d5c30d02200"
-NAME = "A Test Report"
-REPORT_ID = "5686d8f755d95d19bcd60664"
+    @mock.patch('swimlane.core.resources.report.Client', autospec=True)
+    def test_insert(self, mock_client):
+        report = Report(MOCK_REPORT)
+        report.insert()
+        mock_client.post.assert_called_once_with(report, 'reports')
 
+    @mock.patch('swimlane.core.resources.report.Client', autospec=True)
+    def test_update(self, mock_client):
+        report = Report(MOCK_REPORT)
+        report.update()
+        mock_client.put.assert_called_once_with(report, 'reports')
 
-def test_new_for():
-    report = Report.new_for(APP_ID, USER_ID, NAME)
-    assert report.offset == 0
-    assert not report.disabled
-    assert APP_ID in report.applicationIds
-    assert report.createdByUser
-    assert report.modifiedByUser
-    assert report.createdDate
-    assert report.modifiedDate
-    assert report.name == NAME
+    def test_new_for(self):
+        report = Report.new_for('123', '456', 'New Report')
+        self.assertIsInstance(report, Report)
 
+    @mock.patch('swimlane.core.resources.report.Client', autospec=True)
+    def test_find_all(self, mock_client):
+        Report.find_all()
+        mock_client.get.assert_called_with('reports/all')
+        Report.find_all('123')
+        mock_client.get.assert_called_with('reports/all?appId=123')
 
-def test_find_all(default_client):
-    reports = Report.find_all()
-    assert reports
-    assert len(list(reports)) > 0
-    reports = Report.find_all(app_id=APP_ID)
-    assert reports
-    assert len(list(reports)) > 0
-
-
-def test_find(default_client):
-    report = Report.find(REPORT_ID)
-    assert report
-    assert not report.disabled
-
-
-def test_insert(default_client):
-    app = App.find(app_id=APP_ID)
-    assert app
-    report = Report.new_for(APP_ID, USER_ID, NAME)
-    report.filters.append(create_filter(app.fields[0]["id"], EQ, "nothing"))
-    report.insert()
-
-
-def test_update(default_client):
-    app = App.find(app_id=APP_ID)
-    assert app
-    report = Report.find(REPORT_ID)
-    assert report
-    filter_count = len(report.filters)
-    report.filters.append(create_filter(app.fields[0]["id"], EQ, "nothing"))
-    report.update()
-    report = Report.find(REPORT_ID)
-    assert report
-    assert len(report.filters) == (filter_count + 1)
-"""
+    @mock.patch('swimlane.core.resources.report.Client', autospec=True)
+    def test_find(self, mock_client):
+        Report.find('123')
+        mock_client.get.assert_called_once_with('reports/123')

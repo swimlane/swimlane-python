@@ -13,6 +13,8 @@ setup(
         "ordereddict==1.1",
         "combomethod==1.0.6"
     ],
+    test_suite='nose.collector',
+    tests_require=['coverage', 'mock', 'nose'],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Development Status :: 4 - Beta",
