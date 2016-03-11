@@ -1,6 +1,12 @@
-from swimlane.core.resources import Record, Report, App
+import unittest
+
+from swimlane.core.resources import App, Record, Report
 from swimlane.core.search.filtering import create_filter, EQ
 
+class ReportTestCase(unittest.TestCase):
+    pass
+
+"""
 APP_ID = "567490ad55d95d5c30d02266"
 USER_ID = "5674909d55d95d5c30d02200"
 NAME = "A Test Report"
@@ -53,3 +59,4 @@ def test_update(default_client):
     report = Report.find(REPORT_ID)
     assert report
     assert len(report.filters) == (filter_count + 1)
+"""

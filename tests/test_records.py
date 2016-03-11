@@ -1,7 +1,13 @@
+import unittest
+
 from swimlane.core.auth import Client
 from swimlane.records import add_references
 
 
+class RecordsTestCase(unittest.TestCase):
+    pass
+
+"""
 def test_add_references():
     Client.set_default("server", "usr", "pwd", False)
 
@@ -12,3 +18,4 @@ def test_add_references():
         remote_app_acronym="CMDB",
         field_name="CMDB"
     )
+"""

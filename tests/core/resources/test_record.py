@@ -1,59 +1,64 @@
-from swimlane.core.resources import Record, App
+import mock
+import unittest
 
-APP_ID = "567490ad55d95d5c30d02266"
-RECORD_ID = "567490e955d95d5c30d022bf"
-USER_ID = "5674909d55d95d5c30d02200"
-
-
-def test_new_for(default_client):
-    assert Record.new_for(APP_ID)
+from swimlane.core.resources import Record
 
 
-def test_find(default_client):
-    assert Record.find(APP_ID, RECORD_ID)
+MOCK_RECORD = {
+    'id': '123',
+    'applicationId': '456',
+    'values': {
+        'foo': 'bar'
+    }
+}
 
 
-def test_insert(default_client):
-    record = Record.new_for(APP_ID)
-    assert record.isNew
-    record.values["foo"] = "123456"
-    record.insert()
-    assert not record.isNew
+class RecordTestCase(unittest.TestCase):
+    def test_init(self):
+        record = Record(MOCK_RECORD)
+        for key, value in MOCK_RECORD.items():
+            self.assertEqual(getattr(record, key), value)
 
+    @mock.patch('swimlane.core.resources.record.Client', autospec=True)
+    def test_insert(self, mock_client):
+        mock_client.post.return_value = MOCK_RECORD
+        record = Record(MOCK_RECORD)
+        record.insert()
+        mock_client.post.assert_called_once_with(record, 'app/456/record')
 
-def test_update(default_client):
-    record = Record.new_for(APP_ID)
-    record.values["foo"] = "123456"
-    record.insert()
-    assert not record.isNew
-    record.values["foo"] = "abcdef"
-    record.update()
+    @mock.patch('swimlane.core.resources.record.Client', autospec=True)
+    def test_update(self, mock_client):
+        mock_client.put.return_value = MOCK_RECORD
+        record = Record(MOCK_RECORD)
+        record.update()
+        mock_client.put.assert_called_once_with(record, 'app/456/record')
 
+    @mock.patch('swimlane.core.resources.record.Client', autospec=True)
+    def test_add_comment(self, mock_client):
+        record = Record(MOCK_RECORD)
+        record.add_comment('123', '456', 'Test Comment')
+        mock_client.post.assert_called_once_with({
+            'message': 'Test Comment',
+            'createdDate': mock.ANY,
+            'createdByUser': '456'
+        }, 'app/456/record/123/123/comment')
 
-def test_add_comment(default_client):
-    app = App.find(app_id=APP_ID)
-    field_id = app.field_id("One")
-    record = Record.new_for(APP_ID)
-    record.values[field_id] = "abc123"
-    record.insert()
+    @mock.patch('swimlane.core.resources.record.Client', autospec=True)
+    def test_references(self, mock_client):
+        record = Record(MOCK_RECORD)
+        record.references('123', ['456'], ['789'])
+        mock_client.get.assert_called_once_with(
+            'app/456/record/123/references?recordIds=456&fieldIds=789')
 
-    assert len(record.comments) == 1
+        pass
 
-    record.add_comment(field_id, USER_ID, "A test comment")
+    @mock.patch('swimlane.core.resources.record.Client', autospec=True)
+    def test_new_for(self, mock_client):
+        Record.new_for('123')
+        mock_client.get.assert_called_once_with(
+            'app/123/record')
 
-    record = Record.find(APP_ID, record.id)
-    assert len(record.comments) == 2
-
-
-def test_references(default_client):
-    app_ref_id = "56881bd655d95d4e00871284"
-    rec_id = "568825cb55d95d2a005f2ef7"
-    remote_rec_id = "568825d555d95d2a005f2f11"
-    remote_field_id = "56881c1c848714d8b6d70683"
-    field_id = "567490b554929bf5dbe7021e"
-
-    record = Record.find(APP_ID, rec_id)
-    refs = record.references(field_id, [remote_rec_id], [remote_field_id])
-    ref_rec = list(refs)[0]
-    assert ref_rec.values[remote_field_id][0] == rec_id
-
+    @mock.patch('swimlane.core.resources.record.Client', autospec=True)
+    def test_find(self, mock_client):
+        Record.find('123', '456')
+        mock_client.get.assert_called_once_with('app/123/record/456')

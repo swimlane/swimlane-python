@@ -1,5 +1,12 @@
-from swimlane.core.resources import Task, App, Record
+import unittest
 
+from swimlane.core.resources import App, Record, Task
+
+
+class TaskTestCase(unittest.TestCase):
+    pass
+
+"""
 APP_ID = "567490ad55d95d5c30d02266"
 
 
@@ -16,4 +23,4 @@ def test_run(default_client):
     record = Record.new_for(APP_ID)
     record.insert()
     task.run(record=record)
-
+"""
