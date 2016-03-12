@@ -11,3 +11,6 @@ class ResourceTestCase(unittest.TestCase):
         self.assertTrue(r.bar)
         self.assertIsNone(r.baz)
         self.assertRaises(AttributeError, lambda: r.doesnotexist)
+        r.bar = False
+        self.assertFalse(r.bar)
+        self.assertIn('foo', str(r))
