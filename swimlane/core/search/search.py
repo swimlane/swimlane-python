@@ -43,5 +43,3 @@ class Search:
             A SearchResult.
         """
         return self.execute()
-
-

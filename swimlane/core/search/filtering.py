@@ -11,7 +11,7 @@ def create_filter(field_id, filter_type, value):
 
     Args:
         field_id (str): The field ID.
-        filer_type (str): The type of filter.
+        filter_type (str): The type of filter.
         value (str): The value to filter on.
 
     Returns:
@@ -22,4 +22,3 @@ def create_filter(field_id, filter_type, value):
         "filterType": filter_type,
         "value": value,
     }
-
