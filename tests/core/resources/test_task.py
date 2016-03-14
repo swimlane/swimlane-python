@@ -1,26 +1,38 @@
+import mock
 import unittest
 
-from swimlane.core.resources import App, Record, Task
+from swimlane.core.resources import Task
+
+
+MOCK_TASK = {
+    'id': '123',
+    'name': 'Mock Task'
+}
 
 
 class TaskTestCase(unittest.TestCase):
-    pass
+    def test_init(self):
+        task = Task(MOCK_TASK)
+        for key, value in MOCK_TASK.items():
+            self.assertEqual(getattr(task, key), value)
 
-"""
-APP_ID = "567490ad55d95d5c30d02266"
+    @mock.patch('swimlane.core.resources.task.Client', autospec=True)
+    def test_run(self, mock_client):
+        mock_record = mock.MagicMock()
+        mock_record._fields = {'foo': 'bar'}
+        task = Task(MOCK_TASK)
+        task.run(mock_record)
+        mock_client.post.assert_called_once_with({
+            'taskId': task.id,
+            'record': mock_record._fields},
+            'task/execute/record')
 
+    @mock.patch('swimlane.core.resources.task.Client', autospec=True)
+    def test_find_all(self, mock_client):
+        Task.find_all()
+        mock_client.get.assert_called_once_with('task/light')
 
-def test_find_all(default_client):
-    assert len(list(Task.find_all())) == 2
-
-
-def test_find_by_name(default_client):
-    assert Task.find(name="Print some stuff")
-
-
-def test_run(default_client):
-    task = Task.find(name="Print some stuff")
-    record = Record.new_for(APP_ID)
-    record.insert()
-    task.run(record=record)
-"""
+    @mock.patch('swimlane.core.resources.task.Client', autospec=True)
+    def test_find(self, mock_client):
+        Task.find('Mock Task')
+        mock_client.get.assert_called_once_with('task/light')

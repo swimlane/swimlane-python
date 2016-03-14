@@ -1,39 +1,48 @@
+import mock
 import unittest
 
 from swimlane.core.resources import User
 
 
+MOCK_USER = {
+    'id': '123',
+    'name': 'Mock User'
+}
+
+MOCK_USERS = {
+    'users': [MOCK_USER]
+}
+
+
 class UserTestCase(unittest.TestCase):
-    pass
+    def test_init(self):
+        user = User(MOCK_USER)
+        for key, value in MOCK_USER.items():
+            self.assertEqual(getattr(user, key), value)
 
-"""
-USER_ID = "5674909d55d95d5c30d02200"
+    @mock.patch('swimlane.core.resources.user.Client', autospec=True)
+    def test_find_all(self, mock_client):
+        mock_client.get.return_value = MOCK_USERS
+        users = list(User.find_all())
+        self.assertEqual(len(users), 1)
+        self.assertIsInstance(users[0], User)
 
+    @mock.patch('swimlane.core.resources.user.Client', autospec=True)
+    def test_find_by_id(self, mock_client):
+        mock_client.get.return_value = MOCK_USER
+        user = User.find(user_id='123')
+        self.assertIsInstance(user, User)
+        self.assertEqual(user.id, '123')
 
-def test_find_all(default_client):
-    users = list(User.find_all())
-    assert len(users) > 0
-    assert any(u.isMe for u in users)
+    @mock.patch('swimlane.core.resources.user.Client', autospec=True)
+    def test_find_by_name(self, mock_client):
+        mock_client.get.return_value = MOCK_USERS
+        users = list(User.find(name='Mock User'))
+        self.assertEqual(len(users), 1)
+        self.assertIsInstance(users[0], User)
 
-
-def test_find_by_id(default_client):
-    user = User.find(user_id=USER_ID)
-    assert user
-    assert user.isMe
-    assert user.userName == "admin"
-
-
-def test_find_by_name(default_client):
-    users = list(User.find(name="sam"))
-    assert users
-    assert len(users) == 1
-    sam = users[0]
-    assert sam
-    assert not sam.disabled
-    assert sam.name == "sspade"
-
-
-def test_find_multiple_by_name(default_client):
-    users = list(User.find(name="a"))
-    assert len(users) == 2
-"""
+    @mock.patch('swimlane.core.resources.user.Client', autospec=True)
+    def test_find_by_name_does_not_exist(self, mock_client):
+        mock_client.get.return_value = []
+        users = User.find(name='Some Other User')
+        self.assertEqual(list(users), [])
