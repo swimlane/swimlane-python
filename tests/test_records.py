@@ -1,21 +1,24 @@
+import mock
 import unittest
 
-from swimlane.core.auth import Client
 from swimlane.records import add_references
 
 
 class RecordsTestCase(unittest.TestCase):
-    pass
+    @mock.patch('swimlane.records.App', autospec=True)
+    def test_add_references_app_not_found(self, mock_app):
+        mock_app.find.return_value = None
+        self.assertRaises(
+            Exception,
+            lambda: add_references('123', 'keywords'))
+        mock_app.find.assert_called_once_with(app_id=None, name=None)
 
-"""
-def test_add_references():
-    Client.set_default("server", "usr", "pwd", False)
-
-    print add_references(
-        record_id="5670dcec0e23ab0e4c363e12",
-        keywords="chisrv7008",
-        app_acronym="SOC",
-        remote_app_acronym="CMDB",
-        field_name="CMDB"
-    )
-"""
+    @mock.patch('swimlane.records.App', autospec=True)
+    def test_add_references_field_id_not_found(self, mock_app):
+        mock_app_instance = mock.MagicMock()
+        mock_app_instance.field_id.return_value = None
+        mock_app.find.return_value = mock_app_instance
+        self.assertRaises(
+            Exception,
+            lambda: add_references('123', 'keywords', field_name='foo'))
+        mock_app_instance.field_id.assert_called_once_with('foo')
