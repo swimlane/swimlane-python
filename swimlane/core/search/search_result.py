@@ -29,4 +29,3 @@ class SearchResult:
             results = (resp["results"][report.applicationIds[0]]
                        if resp["results"] else [])
             self.records = (Record(SwimlaneDict(r)) for r in results)
-

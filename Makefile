@@ -4,7 +4,7 @@ local:
 	pip install -e .
 
 test:
-	@cd tests; PYTHONPATH=.. py.test --tb=short
+	python setup.py test
 
 docs:
 	sphinx-apidoc -f -o docs swimlane; cd docs; make html

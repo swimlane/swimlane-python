@@ -23,12 +23,12 @@ class Client():
 
     @classmethod
     def set_default(cls, base_url, username, password, verify_ssl=True):
-        """Init a client that can make REST requests to Swimlane.
+        """Initialize a client that can make REST requests to Swimlane.
 
         Args:
             base_url (str): The base URL for Swimlane
             username (str): A Swimlane username
-            password (str): The password
+            password (str): The Swimlane user's password
             verify_ssl (bool): Whether or not to verify SSL certs when calling
                 Swimlane (default is True).
 
@@ -46,12 +46,12 @@ class Client():
                             "to establish a default client.")
 
     def __init__(self, base_url, username, password, verify_ssl=True):
-        """Init a client that can make REST requests to Swimlane.
+        """Initialize a client that can make REST requests to Swimlane.
 
         Args:
             base_url (str): The base URL for Swimlane
             username (str): A Swimlane username
-            password (str): The password
+            password (str): The Swimlane user's password
             verify_ssl (bool): Whether or not to verify SSL certs when calling
                 Swimlane (default is True).
 
@@ -146,7 +146,7 @@ class Client():
         return self.build_payload(resp)
 
     def build_payload(self, resp):
-        """Build a SwilaneDict or list of SwimlaneDicts from the reponse.
+        """Build a SwimlaneDict or a list of SwimlaneDicts from the response.
 
         Args:
             resp (requests.Response): The response.
