@@ -26,6 +26,7 @@ class SearchResult:
             self.count = resp["count"]
             self.offset = resp["offset"]
             self.limit = resp["limit"]
-            results = (resp["results"][report.applicationIds[0]]
-                       if resp["results"] else [])
+            results = []
+            if report.applicationIds[0] in resp['results']:
+                results = resp["results"][report.applicationIds[0]]
             self.records = (Record(SwimlaneDict(r)) for r in results)
