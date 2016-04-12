@@ -1,6 +1,6 @@
-![swimlane](https://avatars0.githubusercontent.com/u/10552812?v=3&s=200)
+![swimlane](https://raw.githubusercontent.com/Swimlane/sw-python-client/master/docs/logo.png)
 
-A Python library for the Swimlane API.
+Python driver for the [Swimlane](http://www.swimlane.com) API
 
 ![version](https://img.shields.io/pypi/v/swimlane.svg) ![py-versions](https://img.shields.io/pypi/pyversions/swimlane.svg) ![py-impl](https://img.shields.io/pypi/implementation/swimlane.svg) ![travis](https://travis-ci.org/Swimlane/sw-python-client.svg?branch=master)
 
