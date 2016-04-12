@@ -6,13 +6,13 @@ Python driver for the [Swimlane](http://www.swimlane.com) API
 
 ## Using
 
-Install `swimlane`:
+Install `swimlane` via pip:
 
 ```
 $ pip install swimlane
 ```
 
-Read the docs at http://swimlane-python-client.readthedocs.org.
+or download [release package](https://github.com/Swimlane/sw-python-client/releases). For more information [visit the docs](http://swimlane-python-client.readthedocs.org).
 
 ## Developing
 
@@ -67,3 +67,6 @@ $ make docs
 
 Run `tox` as usual - keep in mind that everything in `requirements.txt` will
 be installed in each virtualenv that Tox creates.
+
+## Support
+Visit http://support.swimlane.com to log bugs or feature requests.
