@@ -109,6 +109,15 @@ many fields that need to be prefilled.
   # Update a record
   record.values[field_id] = "An even newer value"
   record.update()
+  
+  # Update a Values List field in a record
+  app = App.find(app_id=APP_ID)
+  field_id = app.field_id("Colors")
+  field_def = app.fields[field_id]
+  value = field_def.values[0] # list of value defs
+  record.values[field_id] = value.id # single select
+  # record.values[field_id] = [value.id] # multi-select
+  record.update()
 
   # Add a comment to a record
   user_id = "5674909d55d95d5c30d02200"
