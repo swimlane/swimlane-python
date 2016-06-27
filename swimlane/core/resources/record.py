@@ -2,7 +2,9 @@
 
 from datetime import datetime
 from ..auth import Client
+from .group import Group
 from .resource import Resource
+from .user import User
 
 
 class Record(Resource):
@@ -85,3 +87,13 @@ class Record(Resource):
         return Record(Client.get("app/{0}/record/{1}".format(app_id,
                                                              record_id)))
 
+    def restrict(self, *user_groups):
+        """
+        Restrict the record to specific users and/or groups.
+
+        :param user_groups: One or more User/Group instances.
+        :type user_groups: :class:`Group` or :class:`User`
+        """
+        self.allowed = [ug._fields for ug in user_groups
+                        if isinstance(ug, (Group, User))]
+        self.update()

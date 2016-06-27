@@ -22,7 +22,7 @@ class Group(Resource):
         Returns:
             A generator that yields all groups in the system.
         """
-        return (Group(g) for g in Client.get("groups"))
+        return (Group(g) for g in Client.get("groups").get('groups', []))
 
     @classmethod
     def find(cls, group_id=None, name=None):

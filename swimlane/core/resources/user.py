@@ -22,7 +22,7 @@ class User(Resource):
         Returns:
             A generator that yields all users in the system.
         """
-        return (User(u) for u in Client.get("user"))
+        return (User(u) for u in Client.get("user").get('users', []))
 
     @classmethod
     def find(cls, user_id=None, name=None):
