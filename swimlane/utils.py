@@ -69,6 +69,8 @@ def copy_field_values(src_app, src_field_name, dest_app, dest_field_name):
     :type dest_app: :class:`App`
     :param dest_field_name: The name of the field to copy to.
     :type dest_field_name: str
+    :returns: A list of values added to destination field.
+    :rtype: list
     """
     if not isinstance(src_app, App):
         raise TypeError('The src_app must be an instance of App')
@@ -85,10 +87,14 @@ def copy_field_values(src_app, src_field_name, dest_app, dest_field_name):
     if src_field['fieldType'] != 'valuesList' or \
             dest_field['fieldType'] != 'valuesList':
         raise TypeError('Source and destination fields must be valuesList')
+    added_values = []
     for src_value in src_field['values']:
         dest_value = get_by_key_value(dest_field, 'name', src_value['name'])
         if not dest_value:
             dest_value = copy.deepcopy(src_value)
             dest_value['id'] = random_objectid()
             dest_field['values'].append(dest_value)
-    dest_app.save()
+            added_values.append(dest_value)
+    if added_values:
+        dest_app.save()
+    return added_values
