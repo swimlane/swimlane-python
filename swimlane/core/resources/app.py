@@ -26,6 +26,13 @@ class App(Resource):
         """
         return next((f["id"] for f in self.fields if f["name"] == name), None)
 
+    def save(self):
+        """Create/update the app."""
+        if hasattr(self, 'id') and self.id:
+            self._fields = Client.put(self, 'app/{}'.format(self.id))
+        else:
+            self._fields = Client.post(self, 'app')
+
     @classmethod
     def find_all(cls):
         """List all apps.
