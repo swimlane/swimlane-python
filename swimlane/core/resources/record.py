@@ -1,6 +1,8 @@
 """Provides a Record class."""
 
 from datetime import datetime
+from warnings import warn
+
 from ..auth import Client
 from .group import Group
 from .resource import Resource
@@ -20,13 +22,34 @@ class Record(Resource):
 
     def insert(self):
         """Insert the current record."""
-        self._fields = Client.post(
-            self, "app/{0}/record".format(self.applicationId))
+        warn(
+            'Record.insert method will be deleted in v0.1.0, use Record.save',
+            category=DeprecationWarning)
+        self.save()
 
     def update(self):
         """Update the current record."""
-        self._fields = Client.put(
-            self, "app/{0}/record".format(self.applicationId))
+        warn(
+            'Record.update method will be deleted in v0.1.0, use Record.save',
+            category=DeprecationWarning)
+        self.save()
+
+    def save(self):
+        """Create/update a record."""
+        if not hasattr(self, 'isNew') or self.isNew is True:
+            self._fields = Client.post(
+                self, "app/{0}/record".format(self.applicationId))
+        else:
+            self._fields = Client.put(
+                self, "app/{0}/record".format(self.applicationId))
+
+    def reload(self):
+        """Reload a record instance."""
+        if not hasattr(self, 'isNew') or self.isNew is True:
+            raise Exception(
+                'Cannot reload an unsaved record, call save() first')
+        r = Record.find(self.applicationId, self.id)
+        self._fields.update(**r._fields)
 
     def add_comment(self, field_id, user_id, message):
         """Add a comment to a field.
@@ -87,13 +110,19 @@ class Record(Resource):
         return Record(Client.get("app/{0}/record/{1}".format(app_id,
                                                              record_id)))
 
-    def restrict(self, *user_groups):
+    def restrict(self, *user_groups, **kwargs):
         """
         Restrict the record to specific users and/or groups.
 
         :param user_groups: One or more User/Group instances.
         :type user_groups: :class:`Group` or :class:`User`
+        :param append: Append users/groups to existing restriction.
+        :type append: bool
         """
-        self.allowed = [ug._fields for ug in user_groups
-                        if isinstance(ug, (Group, User))]
-        self.update()
+        allowed = [ug.summary for ug in user_groups
+                   if isinstance(ug, (Group, User))]
+        if 'append' in kwargs and kwargs['append']:
+            allowed = self.allowed + allowed
+        Client.put(allowed, 'app/{0}/record/{1}/restrict'.format(
+            self.applicationId, self.id))
+        return allowed

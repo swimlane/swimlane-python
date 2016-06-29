@@ -1,9 +1,7 @@
 """This module provides a simple resource class."""
 
-__metaclass__ = type
 
-
-class Resource:
+class Resource(object):
     """A simple abstraction over a Swimlane resource."""
 
     def __init__(self, fields):
@@ -41,3 +39,8 @@ class Resource:
     def __str__(self):
         """A string version."""
         return str(self._fields)
+
+    @property
+    def summary(self):
+        return {k: v for k, v in self._fields.items()
+                if k in ['id', 'name']}

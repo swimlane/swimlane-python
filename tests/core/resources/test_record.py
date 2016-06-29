@@ -30,6 +30,7 @@ class RecordTestCase(unittest.TestCase):
     def test_update(self, mock_client):
         mock_client.put.return_value = MOCK_RECORD
         record = Record(MOCK_RECORD)
+        record.isNew = False
         record.update()
         mock_client.put.assert_called_once_with(record, 'app/456/record')
 
