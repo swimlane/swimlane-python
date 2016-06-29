@@ -7,6 +7,7 @@ test:
 	python setup.py test
 
 docs:
+	pip install -r requirements/docs.txt
 	sphinx-apidoc -f -o docs swimlane; cd docs; make html
 
 show_docs:
