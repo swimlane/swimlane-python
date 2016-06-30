@@ -53,7 +53,7 @@ def get_by_key_value(obj, key, value, default=None):
     :returns: The object if it exists, otherwise the default value.
     :rtype: dict
     """
-    return next((o for o in obj if o[key] == value), default)
+    return next((o for o in obj if key in o and o[key] == value), default)
 
 
 def copy_field_values(src_app, src_field_name, dest_app, dest_field_name):
@@ -89,7 +89,8 @@ def copy_field_values(src_app, src_field_name, dest_app, dest_field_name):
         raise TypeError('Source and destination fields must be valuesList')
     added_values = []
     for src_value in src_field['values']:
-        dest_value = get_by_key_value(dest_field, 'name', src_value['name'])
+        dest_value = get_by_key_value(dest_field['values'], 'name',
+                                      src_value['name'])
         if not dest_value:
             dest_value = copy.deepcopy(src_value)
             dest_value['id'] = random_objectid()
