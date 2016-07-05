@@ -12,7 +12,7 @@ Install `swimlane` via pip:
 $ pip install swimlane
 ```
 
-or download [release package](https://github.com/Swimlane/swwimlane-python/releases). See the  [documentation](http://swimlane-python.readthedocs.org) for more information.
+or download [release package](https://github.com/Swimlane/swimlane-python/releases). See the  [documentation](http://swimlane-python.readthedocs.org) for more information.
 
 ## Developing
 
