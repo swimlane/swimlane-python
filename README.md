@@ -5,6 +5,4 @@
 Python driver for the [Swimlane](http://www.swimlane.com) API
 
 Install via `pip install swimlane` or download [release package](https://github.com/swimlane/swimlane-python/releases).
-See the  [documentation](https://swimlane.gitbooks.io/python-api-client/content/) for more information.
-
-Visit [http://support.swimlane.com](http://support.swimlane.com) to log bugs or feature requests.
+See the  [documentation](https://swimlane.gitbooks.io/swimlane-python/content/) for more information. Visit [http://support.swimlane.com](http://support.swimlane.com) to log bugs or feature requests.
