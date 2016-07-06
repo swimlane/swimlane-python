@@ -1,0 +1,24 @@
+{
+    "gitbook": "3.x.x",
+    "title": "Swimlane Python Library",
+    "root": "/docs",
+    "plugins": [
+        "highlight",
+        "github",
+        "edit-link",
+        "gistrun",
+        "theme-api"
+    ],
+    "pluginsConfig": {
+        "github": {
+            "url": "https://github.com/swimlane/swimlane-python/"
+        },
+        "edit-link": {
+            "base": "https://github.com/swimlane/swimlane-python/tree/master",
+            "label": "Edit"
+        },
+        "theme-api": {
+            "theme": "dark"
+        }
+    }
+}
