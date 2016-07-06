@@ -59,7 +59,8 @@ def get_by_key_value(obj, key, value, default=None):
 def copy_field_values(src_app, src_field_name, dest_app, dest_field_name):
     """
     Copy a field's values from one field to another, only copying values
-    that don't exist in the destination field.
+    that don't exist in the destination field. A best effort to preserve value
+    order is made between the source and destination.
 
     :param src_app: The source app to copy from.
     :type src_app: :class:`App`
@@ -69,8 +70,8 @@ def copy_field_values(src_app, src_field_name, dest_app, dest_field_name):
     :type dest_app: :class:`App`
     :param dest_field_name: The name of the field to copy to.
     :type dest_field_name: str
-    :returns: A list of values added to destination field.
-    :rtype: list
+    :returns: A tuple of added and moved values.
+    :rtype: tuple
     """
     if not isinstance(src_app, App):
         raise TypeError('The src_app must be an instance of App')
@@ -78,24 +79,31 @@ def copy_field_values(src_app, src_field_name, dest_app, dest_field_name):
         raise TypeError('The dest_app must be an instance of App')
     src_field = get_by_key_value(src_app.fields, 'name', src_field_name)
     if not src_field:
-        raise ValueError('Field %s does not existin source app' %
+        raise ValueError('Field %s does not exist in source app' %
                          src_field_name)
     dest_field = get_by_key_value(dest_app.fields, 'name', dest_field_name)
     if not dest_field:
-        raise ValueError('Field %s does not existin destination app' %
+        raise ValueError('Field %s does not exist in destination app' %
                          dest_field_name)
     if src_field['fieldType'] != 'valuesList' or \
             dest_field['fieldType'] != 'valuesList':
         raise TypeError('Source and destination fields must be valuesList')
     added_values = []
-    for src_value in src_field['values']:
+    moved_values= []
+    for src_index, src_value in enumerate(src_field['values']):
         dest_value = get_by_key_value(dest_field['values'], 'name',
                                       src_value['name'])
         if not dest_value:
-            dest_value = copy.deepcopy(src_value)
+            dest_value = src_value.copy()
             dest_value['id'] = random_objectid()
-            dest_field['values'].append(dest_value)
+            dest_field['values'].insert(src_index, dest_value)
             added_values.append(dest_value)
-    if added_values:
+        else:
+            dest_index = dest_field['values'].index(dest_value)
+            if src_index != dest_index:
+                dest_value = dest_field['values'].pop(dest_index)
+                dest_field['values'].insert(src_index, dest_value)
+                moved_values.append(dest_value)
+    if added_values or moved_values:
         dest_app.save()
-    return added_values
+    return added_values, moved_values
