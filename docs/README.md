@@ -1,5 +1,4 @@
 # Swimlane Python Library
-
 ![version](https://img.shields.io/pypi/v/swimlane.svg) ![py-versions](https://img.shields.io/pypi/pyversions/swimlane.svg) ![py-impl](https://img.shields.io/pypi/implementation/swimlane.svg) ![travis](https://travis-ci.org/swimlane/swimlane-python.svg?branch=master) [![Code Climate](https://codeclimate.com/github/swimlane/swimlane-python/badges/gpa.svg)](https://codeclimate.com/github/swimlane/swimlane-python) [![Test Coverage](https://codeclimate.com/github/swimlane/swimlane-python/badges/coverage.svg)](https://codeclimate.com/github/swimlane/swimlane-python/coverage)
 ---
 Official Python driver for the [Swimlane](http://www.swimlane.com) API
