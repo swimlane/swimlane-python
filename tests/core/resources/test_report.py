@@ -1,12 +1,18 @@
 import mock
 import unittest
 
-from swimlane.core.resources import Report
+from swimlane.core.resources import Report, User
 from swimlane.core.search.filtering import create_filter, EQ
 MOCK_REPORT = {
     'id': '123',
     'name': 'Mock Report'
 }
+
+
+MOCK_USER = User(fields={
+    'id': '123',
+    'name': 'Mock User'
+})
 
 
 class ReportTestCase(unittest.TestCase):
@@ -27,7 +33,9 @@ class ReportTestCase(unittest.TestCase):
         report.update()
         mock_client.put.assert_called_once_with(report, 'reports')
 
-    def test_new_for(self):
+    @mock.patch('swimlane.core.resources.report.User', autospec=True)
+    def test_new_for(self, mock_user):
+        mock_user.find.return_value = MOCK_USER
         report = Report.new_for('123', '456', 'New Report')
         self.assertIsInstance(report, Report)
 
