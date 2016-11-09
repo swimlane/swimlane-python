@@ -40,8 +40,7 @@ class RecordTestCase(unittest.TestCase):
         record.add_comment('123', '456', 'Test Comment')
         mock_client.post.assert_called_once_with({
             'message': 'Test Comment',
-            'createdDate': mock.ANY,
-            'createdByUser': '456'
+            'createdDate': mock.ANY
         }, 'app/456/record/123/123/comment')
 
     @mock.patch('swimlane.core.resources.record.Client', autospec=True)

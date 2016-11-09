@@ -14,15 +14,15 @@ class UserPassAuthProviderTestCase(unittest.TestCase):
 
     @patch('swimlane.core.auth.user_pass_auth_provider.requests', autospec=True)
     def test_auth_header(self, mock_requests):
-        mock_cookie = {'.AspNet.ApplicationCookie': 'testcookie'}
+        mock_cookie = {'.AspNetCore.Identity.Application': 'testcookie'}
         mock_requests.post.return_value.cookies = mock_cookie
 
         u = UserPassAuthProvider('server', 'user', 'pass')
         h = u.auth_header()
 
-        self.assertEqual(h, {'Cookie': '.AspNet.ApplicationCookie=testcookie'})
+        self.assertEqual(h, {'Cookie': '.AspNetCore.Identity.Application=testcookie'})
         mock_requests.post.assert_called_once_with(
             'user/login',
-            data={'username': 'user', 'password': 'pass'},
+            json={'username': 'user', 'password': 'pass'},
             verify=True)
         mock_requests.post.return_value.raise_for_status.assert_called_once_with()  # noqa

@@ -34,9 +34,9 @@ class ReportTestCase(unittest.TestCase):
     @mock.patch('swimlane.core.resources.report.Client', autospec=True)
     def test_find_all(self, mock_client):
         Report.find_all()
-        mock_client.get.assert_called_with('reports/all')
+        mock_client.get.assert_called_with('reports')
         Report.find_all('123')
-        mock_client.get.assert_called_with('reports/all?appId=123')
+        mock_client.get.assert_called_with('reports?appId=123')
 
     @mock.patch('swimlane.core.resources.report.Client', autospec=True)
     def test_find(self, mock_client):
