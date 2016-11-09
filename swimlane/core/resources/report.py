@@ -4,6 +4,7 @@ from datetime import datetime
 from ..auth import Client
 from .. import SwimlaneDict
 from .resource import Resource
+from .user import User
 
 
 class Report(Resource):
@@ -38,6 +39,13 @@ class Report(Resource):
             A prefilled Report.
         """
         created = datetime.utcnow().isoformat() + "Z"
+        user = User.find(user_id)
+        user_model = {
+            "$type": "Core.Models.Utilities.UserGroupSelection, Core",
+            "id": user_id,
+            "name": user.name
+        }
+
         return Report(SwimlaneDict({
             "$type": "Core.Models.Search.Report, Core",
             "groupBys": [],
@@ -59,8 +67,8 @@ class Report(Resource):
             },
             "createdDate": created,
             "modifiedDate": created,
-            "createdByUser": user_id,
-            "modifiedByUser": user_id,
+            "createdByUser": user_model,
+            "modifiedByUser": user_model,
             "id": None,
             "name": name,
             "disabled": False,
@@ -82,7 +90,7 @@ class Report(Resource):
         Returns:
             A generator that yields Reports.
         """
-        url = "reports/all"
+        url = "reports"
         if app_id:
             url += "?appId={0}".format(app_id)
 

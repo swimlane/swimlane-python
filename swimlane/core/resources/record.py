@@ -61,8 +61,7 @@ class Record(Resource):
         """
         Client.post({
             "message": message,
-            "createdDate": datetime.utcnow().isoformat() + "Z",
-            "createdByUser": user_id
+            "createdDate": datetime.utcnow().isoformat() + "Z"
         }, "app/{0}/record/{1}/{2}/comment".format(
             self.applicationId, self.id, field_id))
 

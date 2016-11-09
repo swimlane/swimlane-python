@@ -60,5 +60,5 @@ def add_references(record_id,
             raise Exception("Unable to find record")
         record.values[field_id] = [r.id for r in records]
         record.update()
+        yield record
 
-    return records

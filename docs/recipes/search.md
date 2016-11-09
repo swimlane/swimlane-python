@@ -53,7 +53,7 @@ from swimlane.core.search.groupby import create_groupby, HOUR
 report.groupBys = [create_groupby(field_id, HOUR)]
 
 # Add aggregation to a report
-from swimlane.core.search.aggregates import create_aggregate, AVG
+from swimlane.core.search.aggregate import create_aggregate, AVG
 report.aggregates = [create_aggregate(field_id, AVG)]
 ```
 
@@ -61,8 +61,8 @@ report.aggregates = [create_aggregate(field_id, AVG)]
 ```python
 stats_report = StatsReport.new_for(APP_ID, USER_ID, "A Stats Report")
 stats_report.groupBys = [groupby.create_groupby(field_id, groupby.HOUR)]
-result = Search(report).execute()
-result.stats # This is the generator that yeilds stats
+result = Search(stats_report).execute()
+result.stats # This is the generator that yields stats
 Searching with a Report has a bit more options on the SearchResult that you get back from Search - but the main option is to paginate the results.
 
 from swimlane.core.search import Search, filtering

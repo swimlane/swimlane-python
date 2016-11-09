@@ -56,5 +56,6 @@ refs = add_references(
     field_name="References"
 )
 
-print refs # This is a list of the records that were added as references.
+for ref in refs: # This is a list of the records that were added as references.
+    print refs
 ```

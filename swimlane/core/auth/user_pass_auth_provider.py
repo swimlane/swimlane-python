@@ -10,7 +10,7 @@ except ImportError:
     from urlparse import urljoin
 
 
-COOKIE_NAME = ".AspNet.ApplicationCookie"
+COOKIE_NAME = ".AspNetCore.Identity.Application"
 
 
 class UserPassAuthProvider(object):
@@ -42,7 +42,7 @@ class UserPassAuthProvider(object):
             dict: A dict that can be converted to an HTTP request header.
         """
         creds = {"username": self.username, "password": self.password}
-        resp = requests.post(self.base_url, data=creds, verify=self.verify_ssl)
+        resp = requests.post(self.base_url, json=creds, verify=self.verify_ssl)
 
         # Raise any underlying HTTPErrors if they occured
         resp.raise_for_status()

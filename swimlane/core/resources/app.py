@@ -40,7 +40,7 @@ class App(Resource):
         Returns:
             A generator that yields all apps in the system.
         """
-        return (App(x) for x in Client.get("apps/"))
+        return (App(x) for x in Client.get("app/"))
 
     @classmethod
     def find(cls, app_id=None, name=None, acronym=None):
