@@ -20,6 +20,10 @@ class Record(Resource):
         """
         super(Record, self).__init__(fields)
 
+    def _is_new(self):
+        """Returns True if Record has not been created"""
+        return not hasattr(self, 'isNew') or self.isNew is True
+
     def insert(self):
         """Insert the current record."""
         warn(
@@ -36,7 +40,7 @@ class Record(Resource):
 
     def save(self):
         """Create/update a record."""
-        if not hasattr(self, 'isNew') or self.isNew is True:
+        if self._is_new():
             self._fields = Client.post(
                 self, "app/{0}/record".format(self.applicationId))
         else:
@@ -45,7 +49,7 @@ class Record(Resource):
 
     def reload(self):
         """Reload a record instance."""
-        if not hasattr(self, 'isNew') or self.isNew is True:
+        if self._is_new():
             raise Exception(
                 'Cannot reload an unsaved record, call save() first')
         r = Record.find(self.applicationId, self.id)
@@ -64,6 +68,9 @@ class Record(Resource):
             "createdDate": datetime.utcnow().isoformat() + "Z"
         }, "app/{0}/record/{1}/{2}/comment".format(
             self.applicationId, self.id, field_id))
+
+        if not self._is_new():
+            self.reload()
 
     def references(self, field_id, record_ids, ref_field_ids):
         """Get referenced Records.
