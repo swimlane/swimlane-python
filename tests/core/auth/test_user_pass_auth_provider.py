@@ -26,3 +26,25 @@ class UserPassAuthProviderTestCase(unittest.TestCase):
             json={'username': 'user', 'password': 'pass'},
             verify=True)
         mock_requests.post.return_value.raise_for_status.assert_called_once_with()  # noqa
+
+    @patch('swimlane.core.auth.user_pass_auth_provider.requests', autospec=True)
+    def test_multiple_cookies(self, mock_requests):
+        mock_requests.post.return_value.cookies = {
+            'cookie_1': 'value_1',
+            'cookie_2': 'value_2',
+        }
+
+        u = UserPassAuthProvider('server', 'user', 'pass')
+        header = u.auth_header()
+
+        self.assertIn('Cookie', header) 
+        self.assertIn('cookie_1=value_1', header['Cookie'])
+        self.assertIn('cookie_2=value_2', header['Cookie'])
+        # test that cookies are separated with semicolon
+        self.assertIn(';', header['Cookie'])
+
+        mock_requests.post.assert_called_once_with(
+            'user/login',
+            json={'username': 'user', 'password': 'pass'},
+            verify=True)
+        mock_requests.post.return_value.raise_for_status.assert_called_once_with()  # noqa
