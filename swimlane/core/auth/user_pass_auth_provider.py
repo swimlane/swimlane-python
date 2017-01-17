@@ -1,5 +1,4 @@
-"""
-This module provides a username/password-based authentication provider to be
+"""This module provides a username/password-based authentication provider to be
 used by Client.
 """
 
@@ -8,9 +7,6 @@ try:
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
-
-
-COOKIE_NAME = ".AspNetCore.Identity.Application"
 
 
 class UserPassAuthProvider(object):
@@ -39,7 +35,7 @@ class UserPassAuthProvider(object):
         """Get an auth header that can be used for HTTP requests.
 
         Returns:
-            dict: A dict that can be converted to an HTTP request header.
+            dict: A dict that contains session cookies used in every futher HTTP request.
         """
         creds = {"username": self.username, "password": self.password}
         resp = requests.post(self.base_url, json=creds, verify=self.verify_ssl)
@@ -47,4 +43,6 @@ class UserPassAuthProvider(object):
         # Raise any underlying HTTPErrors if they occured
         resp.raise_for_status()
 
-        return {"Cookie": COOKIE_NAME + "=" + resp.cookies[COOKIE_NAME]}
+        return {'Cookie': ';'.join(
+            ["%s=%s" % cookie for cookie in resp.cookies.items()]
+        )}
