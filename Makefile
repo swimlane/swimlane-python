@@ -1,4 +1,4 @@
-.PHONY: local test docs show_docs pythons release
+.PHONY: local test docs show_docs release
 
 local:
 	pip install -e .
@@ -12,9 +12,6 @@ docs:
 
 show_docs:
 	open docs/_build/html/index.html
-
-pythons:
-	while read v; do pyenv install -s $$v; done < .python-version
 
 release:
 	python setup.py sdist bdist_wheel upload -r swimlane

@@ -4,8 +4,8 @@ setup(
     name="swimlane",
     author="Swimlane LLC",
     author_email="info@swimlane.com",
-    version="0.1.0",
-    url="https://github.com/Swimlane/sw-python-client",
+    version="0.1.1",
+    url="https://github.com/swimlane/swimlane-python",
     packages=find_packages(),
     description="A Python client for Swimlane.",
     install_requires=[
