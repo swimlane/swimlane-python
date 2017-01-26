@@ -41,3 +41,12 @@ class User(Resource):
 
         return (User(u) for u
                 in Client.get("user/search?query={0}".format(name)))
+
+    @classmethod
+    def get_user_selection(cls, user):
+        """
+        Converts User to UserSelection for populating record.
+        :param user: The user object
+        :return: User selection object
+        """
+        return {'id': user.id, 'name': user.name}

@@ -20,6 +20,12 @@ class UserTestCase(unittest.TestCase):
         for key, value in MOCK_USER.items():
             self.assertEqual(getattr(user, key), value)
 
+    def test_get_user_selection(self):
+        user = User(MOCK_USER)
+        user_selection = User.get_user_selection(user)
+        self.assertEqual(user_selection['id'], '123')
+        self.assertEqual(user_selection['name'], 'Mock User')
+
     @mock.patch('swimlane.core.resources.user.Client', autospec=True)
     def test_find_all(self, mock_client):
         mock_client.get.return_value = MOCK_USERS
