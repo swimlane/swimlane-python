@@ -49,4 +49,5 @@ class User(Resource):
         :param user: The user object
         :return: User selection object
         """
-        return {'id': user.id, 'name': user.name}
+        return {'$type': 'Core.Models.Utilities.UserGroupSelection, Core',
+                'id': user.id, 'name': user.displayName}
