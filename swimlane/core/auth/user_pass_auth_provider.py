@@ -45,10 +45,10 @@ class UserPassAuthProvider(object):
 
         json_content = resp.json()
 
-        try:
-            # Check for token in response content
-            token = json_content['token']
-        except KeyError:
+        # Check for token in response content
+        token = json_content.get('token')
+
+        if token is None:
             # Legacy cookie authentication (2.13-)
             headers ={'Cookie': ';'.join(
                 ["%s=%s" % cookie for cookie in resp.cookies.items()]

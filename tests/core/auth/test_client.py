@@ -10,9 +10,8 @@ class ClientTestCase(unittest.TestCase):
     def test_init(self):
         c = Client('server', 'user', 'pass')
 
-        self.assertEqual(c.headers, {})
         self.assertEqual(c.username, 'user')
-        self.assertEqual(c.verify_ssl, True)
+        self.assertEqual(c.session.verify, True)
         self.assertEqual(c.base_url, 'api/')
         self.assertIsInstance(c.provider, UserPassAuthProvider)
 
@@ -24,7 +23,7 @@ class ClientTestCase(unittest.TestCase):
         c = Client('server', 'user', 'pass')
         c.connect()
 
-        self.assertEqual(c.headers, mock_cookie)
+        self.assertTrue(all(item in c.session.headers.items() for item in mock_cookie.items()))
 
     @mock.patch('swimlane.core.auth.client.UserPassAuthProvider', autospec=True)
     def test_set_default(self, mock_provider):
@@ -34,95 +33,82 @@ class ClientTestCase(unittest.TestCase):
     def test_check_default_is_set(self):
         self.assertRaises(Exception, Client.check_default_is_set)
 
-    @mock.patch('swimlane.core.auth.client.requests', autospec=True)
-    def test_get(self, mock_requests):
+    def test_get(self):
         mock_response = mock.MagicMock()
-        mock_requests.get.return_value = mock_response
 
         c = Client('server', 'user', 'pass')
-        c.get('test')
+        with mock.patch.object(c.session, 'get', return_value=mock_response) as mock_requests:
+            c.get('test')
 
-        mock_requests.get.assert_called_once_with(
-            'api/test',
-            headers={},
-            verify=True)
-        mock_response.raise_for_status.assert_called_once_with()
+            mock_requests.assert_called_once_with(
+                'api/test'
+            )
+            mock_response.raise_for_status.assert_called_once_with()
 
-    @mock.patch('swimlane.core.auth.client.requests', autospec=True)
-    def test_get_classmethod(self, mock_requests):
+    def test_get_classmethod(self):
         mock_response = mock.MagicMock()
-        mock_requests.get.return_value = mock_response
 
         Client.default = Client('server', 'user', 'pass')
-        Client.get('test')
+        with mock.patch.object(Client.default.session, 'get', return_value=mock_response) as mock_requests:
+            Client.get('test')
 
-        mock_requests.get.assert_called_once_with(
-            'api/test',
-            headers={},
-            verify=True)
-        mock_response.raise_for_status.assert_called_once_with()
+            mock_requests.assert_called_once_with(
+                'api/test'
+            )
+            mock_response.raise_for_status.assert_called_once_with()
 
-    @mock.patch('swimlane.core.auth.client.requests', autospec=True)
-    def test_post(self, mock_requests):
+    def test_post(self):
         mock_response = mock.MagicMock()
-        mock_requests.post.return_value = mock_response
 
         c = Client('server', 'user', 'pass')
-        c.post({}, 'test')
+        with mock.patch.object(c.session, 'post', return_value=mock_response) as mock_requests:
+            c.post({}, 'test')
 
-        mock_requests.post.assert_called_once_with(
-            'api/test',
-            data='{}',
-            headers={'content-type': 'application/json'},
-            verify=True)
-        mock_response.raise_for_status.assert_called_once_with()
+            mock_requests.assert_called_once_with(
+                'api/test',
+                json={}
+            )
+            mock_response.raise_for_status.assert_called_once_with()
 
-    @mock.patch('swimlane.core.auth.client.requests', autospec=True)
-    def test_post(self, mock_requests):
+    def test_post_classmethod(self):
         mock_response = mock.MagicMock()
-        mock_requests.post.return_value = mock_response
 
         Client.default = Client('server', 'user', 'pass')
-        Client.post({}, 'test')
+        with mock.patch.object(Client.default.session, 'post', return_value=mock_response) as mock_requests:
+            Client.post({}, 'test')
 
-        mock_requests.post.assert_called_once_with(
-            'api/test',
-            data='{}',
-            headers={'content-type': 'application/json'},
-            verify=True)
-        mock_response.raise_for_status.assert_called_once_with()
+            mock_requests.assert_called_once_with(
+                'api/test',
+                json={}
+            )
+            mock_response.raise_for_status.assert_called_once_with()
 
-
-    @mock.patch('swimlane.core.auth.client.requests', autospec=True)
-    def test_put(self, mock_requests):
+    def test_put(self):
         mock_response = mock.MagicMock()
-        mock_requests.put.return_value = mock_response
 
         c = Client('server', 'user', 'pass')
-        c.put({}, 'test')
+        with mock.patch.object(c.session, 'put', return_value=mock_response) as mock_requests:
 
-        mock_requests.put.assert_called_once_with(
-            'api/test',
-            data='{}',
-            headers={'content-type': 'application/json'},
-            verify=True)
-        mock_response.raise_for_status.assert_called_once_with()
+            c.put({}, 'test')
 
-    @mock.patch('swimlane.core.auth.client.requests', autospec=True)
-    def test_put_classmethod(self, mock_requests):
+            mock_requests.assert_called_once_with(
+                'api/test',
+                json={}
+            )
+            mock_response.raise_for_status.assert_called_once_with()
+
+    def test_put_classmethod(self):
         mock_response = mock.MagicMock()
-        mock_requests.put.return_value = mock_response
 
         Client.default = Client('server', 'user', 'pass')
-        Client.put({}, 'test')
+        with mock.patch.object(Client.default.session, 'put', return_value=mock_response) as mock_requests:
+            Client.put({}, 'test')
 
-        mock_requests.put.assert_called_once_with(
-            'api/test',
-            data='{}',
-            headers={'content-type': 'application/json'},
-            verify=True)
-        mock_response.raise_for_status.assert_called_once_with()
-
+            mock_requests.assert_called_once_with(
+                'api/test',
+                json={}
+            )
+            mock_response.raise_for_status.assert_called_once_with()
 
     def test_send_data(self):
         mock_requests = mock.MagicMock()
@@ -132,9 +118,8 @@ class ClientTestCase(unittest.TestCase):
 
         mock_requests.assert_called_once_with(
             'api/test',
-            data='{}',
-            headers={'content-type': 'application/json'},
-            verify=True)
+            json={},
+        )
         mock_requests.return_value.raise_for_status.assert_called_once_with()
 
     def test_build_payload(self):

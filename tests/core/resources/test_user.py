@@ -6,7 +6,8 @@ from swimlane.core.resources import User
 
 MOCK_USER = {
     'id': '123',
-    'name': 'Mock User'
+    'name': 'Mock User',
+    'displayName': 'Mock User'
 }
 
 MOCK_USERS = {
