@@ -58,16 +58,17 @@ class Client():
         Returns:
             Client: An instance of a Client
         """
-        self.headers = {}
+        self.session = requests.Session()
+        self.session.verify = verify_ssl
+
         self.username = username
-        self.verify_ssl = verify_ssl
         self.base_url = urljoin(base_url, "api/")
-        self.provider = UserPassAuthProvider(self.base_url, username, password,
-                                             self.verify_ssl)
+
+        self.provider = UserPassAuthProvider(self.base_url, username, password, self.session)
 
     def connect(self):
         """Connect to the Swimlane server."""
-        self.headers.update(self.provider.auth_header())
+        self.session.headers.update(self.provider.auth_header())
 
     @combomethod
     def get(self, url):
@@ -85,8 +86,7 @@ class Client():
             return cls.default.get(url)
 
         full_url = urljoin(self.base_url, url)
-        resp = requests.get(full_url, headers=self.headers,
-                            verify=self.verify_ssl)
+        resp = self.session.get(full_url)
         resp.raise_for_status()
         return self.build_payload(resp)
 
@@ -106,7 +106,7 @@ class Client():
             cls.check_default_is_set()
             return cls.default.post(resource, url)
 
-        return self.send_data(resource, url, requests.post)
+        return self.send_data(resource, url, self.session.post)
 
     @combomethod
     def put(self, resource, url):
@@ -124,7 +124,7 @@ class Client():
             cls.check_default_is_set()
             return cls.default.put(resource, url)
 
-        return self.send_data(resource, url, requests.put)
+        return self.send_data(resource, url, self.session.put)
 
     def send_data(self, resource, url, func):
         """Send data to Swimlane.
@@ -138,10 +138,9 @@ class Client():
             dict: The response JSON as a SwimlaneDict.
         """
         full_url = urljoin(self.base_url, url)
-        self.headers.update({"content-type": "application/json"})
+        self.session.headers.update({"content-type": "application/json"})
         data = resource._fields if hasattr(resource, "_fields") else resource
-        resp = func(full_url, data=json.dumps(data), headers=self.headers,
-                    verify=self.verify_ssl)
+        resp = func(full_url, json=data)
         resp.raise_for_status()
         return self.build_payload(resp)
 

@@ -12,7 +12,7 @@ except ImportError:
 class UserPassAuthProvider(object):
     """An authentication provider based on a username and password."""
 
-    def __init__(self, base_url, username, password, verify_ssl=True):
+    def __init__(self, base_url, username, password, session=None):
         """Initialize a provider that can authenticate with Swimlane using
         a username and a password.
 
@@ -26,10 +26,10 @@ class UserPassAuthProvider(object):
         Returns:
             UserPassAuthProvider: An instance of a UserPassAuthProvider
         """
+        self.session = session or requests.Session()
         self.base_url = urljoin(base_url, "user/login")
         self.username = username
         self.password = password
-        self.verify_ssl = verify_ssl
 
     def auth_header(self):
         """Get an auth header that can be used for HTTP requests.
@@ -38,11 +38,26 @@ class UserPassAuthProvider(object):
             dict: A dict that contains session cookies used in every futher HTTP request.
         """
         creds = {"username": self.username, "password": self.password}
-        resp = requests.post(self.base_url, json=creds, verify=self.verify_ssl)
+        resp = self.session.post(self.base_url, json=creds)
 
-        # Raise any underlying HTTPErrors if they occured
+        # Raise any underlying HTTPErrors if they occurred
         resp.raise_for_status()
 
-        return {'Cookie': ';'.join(
-            ["%s=%s" % cookie for cookie in resp.cookies.items()]
-        )}
+        json_content = resp.json()
+
+        try:
+            # Check for token in response content
+            token = json_content['token']
+        except KeyError:
+            # Legacy cookie authentication (2.13-)
+            headers ={'Cookie': ';'.join(
+                ["%s=%s" % cookie for cookie in resp.cookies.items()]
+            )}
+        else:
+            # JWT auth (2.14+)
+            headers = {
+                'Authorization': 'Bearer {}'.format(token)
+            }
+
+        return headers
+
