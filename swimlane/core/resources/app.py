@@ -57,6 +57,11 @@ class App(Resource):
         if app_id:
             return App(Client.get("app/{0}".format(app_id)))
 
-        return next(
-            (a for a in cls.find_all()
-             if a.name == name or a.acronym == acronym), None)
+        else:
+            apps = cls.find_all()
+            for app in apps:
+                if any([
+                    name and name == getattr(app, 'name', None),
+                    acronym and acronym == getattr(app, 'acronym', None)
+                ]):
+                    return app
