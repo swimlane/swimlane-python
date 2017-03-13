@@ -1,29 +1,31 @@
 from setuptools import setup, find_packages
 
+
+def parse_requirements(requirement_file):
+    with open(requirement_file) as f:
+        return f.readlines()
+
 setup(
     name="swimlane",
     author="Swimlane LLC",
     author_email="info@swimlane.com",
-    version="0.1.4",
     url="https://github.com/swimlane/swimlane-python",
-    packages=find_packages(),
+    packages=find_packages(exclude=('tests', 'tests.*')),
     description="A Python client for Swimlane.",
-    install_requires=[
-        "requests==2.8.1",
-        "ordereddict==1.1",
-        "combomethod==1.0.6"
-    ],
+    install_requires=parse_requirements('./requirements.txt'),
+    setup_requires=['setuptools_scm'],
+    use_scm_version=True,
     test_suite='nose.collector',
-    tests_require=['coverage', 'mock', 'nose'],
+    tests_require=parse_requirements('./test-requirements.txt'),
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Development Status :: 4 - Beta",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: Implementation :: PyPy"
     ]
 )
