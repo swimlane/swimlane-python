@@ -13,9 +13,11 @@ setup(
     packages=find_packages(exclude=('tests', 'tests.*')),
     description="A Python client for Swimlane.",
     install_requires=parse_requirements('./requirements.txt'),
-    setup_requires=['setuptools_scm'],
+    setup_requires=[
+        'setuptools_scm',
+        'pytest-runner'
+    ],
     use_scm_version=True,
-    test_suite='nose.collector',
     tests_require=parse_requirements('./test-requirements.txt'),
     classifiers=[
         "License :: OSI Approved :: MIT License",
