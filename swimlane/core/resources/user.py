@@ -1,53 +1,50 @@
-"""This module provides a User class."""
-
-from ..auth import Client
-from .resource import Resource
+from .base import APIResource, APIResourceAdapter
 
 
-class User(Resource):
-    """A class for working with Swimlane users."""
+class UserAdapter(APIResourceAdapter):
 
-    def __init__(self, fields):
-        """Init a User with fields.
+    def list(self):
+        """Retrieve all users"""
+        response = self.swimlane.api('get', "user")
+        return [User(self.swimlane, raw_user_data) for raw_user_data in response.json().get('users', [])]
 
-        Args:
-            fields (dict): A dict of fields and values.
-        """
-        super(User, self).__init__(fields)
+    def get(self, user_id=None, username=None):
+        """Retrieve single user record"""
+        if user_id is None and username is None:
+            raise ValueError('Must provide either user_id or name')
 
-    @classmethod
-    def find_all(cls):
-        """List all users.
-
-        Returns:
-            A generator that yields all users in the system.
-        """
-        return (User(u) for u in Client.get("user").get('users', []))
-
-    @classmethod
-    def find(cls, user_id=None, name=None):
-        """Find users.
-
-        Args:
-            user_id (str): The user ID.
-            name (str): A name or a fragment of a name to search by.
-
-        Returns:
-            A single User if user_id was specified, otherwise a generator
-            that yields Users for all system users who's username matched.
-        """
         if user_id:
-            return User(Client.get("user/{0}".format(user_id)))
+            response = self.swimlane.api('get', 'user/{}'.format(user_id))
+            return User(self.swimlane, response.json())
 
-        return (User(u) for u
-                in Client.get("user/search?query={0}".format(name)))
+        else:
+            response = self.swimlane.api('get', 'user/search?query={}'.format(username))
+            matched_users = response.json()
 
-    @classmethod
-    def get_user_selection(cls, user):
-        """
-        Converts User to UserSelection for populating record.
-        :param user: The user object
-        :return: User selection object
-        """
-        return {'$type': 'Core.Models.Utilities.UserGroupSelection, Core',
-                'id': user.id, 'name': user.displayName}
+            for user_data in matched_users:
+                if user_data.get('userName') == username:
+                    return User(self.swimlane, user_data)
+            else:
+                raise ValueError('Unable to find user with username "{}"'.format(username))
+
+
+class User(APIResource):
+    """Encapsulates a single Swimlane user record"""
+
+    _type = 'Core.Models.Identity.ApplicationUser, Core'
+
+    def __init__(self, swimlane, raw):
+        super(User, self).__init__(swimlane, raw)
+
+        self.id = self._raw['id']
+        self.username = self._raw['userName']
+        self.display_name = self._raw['displayName']
+        self.name = self._raw['name']
+
+    def get_user_selection(self):
+        """Converts User to UserSelection for populating record"""
+        return {
+            '$type': 'Core.Models.Utilities.UserGroupSelection, Core',
+            'id': self.id,
+            'name': self.name
+        }

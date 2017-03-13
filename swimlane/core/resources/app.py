@@ -1,5 +1,7 @@
-from swimlane.core.resources.record import RecordAdapter
 from .base import APIResourceAdapter, APIResource
+
+from swimlane.core.resources.record import RecordAdapter
+from swimlane.core.resources.report import ReportAdapter
 
 
 class AppAdapter(APIResourceAdapter):
@@ -40,10 +42,18 @@ class App(APIResource):
         self.name = self._raw.get('name')
         self.description = self._raw.get('description')
         self.fields = self._raw.get('fields')
-        self.id_ = self._raw.get('id')
+        self.id = self._raw.get('id')
         self.tracking_id = self._raw.get('trackingFieldId')
 
         self.records = RecordAdapter(self)
+        self.reports = ReportAdapter(self)
 
     def __str__(self):
         return '{}: {}'.format(self.acronym, self.name)
+
+    def get_field_id(self, field_name):
+        for field in self.fields:
+            if field['name'] == field_name:
+                return field['id']
+        else:
+            raise ValueError('Unable to find field "{}"'.format(field_name))

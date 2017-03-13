@@ -1,64 +1,69 @@
 """This module provides a Report class."""
 
 from datetime import datetime
-from ..auth import Client
-from .. import SwimlaneDict
-from .resource import Resource
-from .user import User
+
+from swimlane.core.resources.base import APIResourceAdapter, APIResource
 
 
-class Report(Resource):
-    """A report class used for searching."""
+class ReportAdapter(APIResourceAdapter):
 
-    def __init__(self, fields):
-        """Init a Report with fields.
+    _page_size = 20
 
-        Args:
-            fields (dict): A dict of fields and values.
+    def __init__(self, app):
+        super(ReportAdapter, self).__init__(app.swimlane)
+
+        self.app = app
+
+    def list(self):
+        """Retrieve all reports
+
+        If app is specified, only reports that are a member of that App
+        will be returned. By default, all reports in the system are returned.
         """
-        super(Report, self).__init__(fields)
+        raw_reports = self.swimlane.api('get', "reports?appId={}".format(self.app.id)).json()
+        results = []
+        for raw_report in raw_reports:
+            try:
+                results.append(Report(self.app, raw_report))
+            except TypeError:
+                # Ignore StatsReports for now
+                pass
 
-    def insert(self):
-        """Insert the current Report."""
-        self._fields = Client.post(self, "reports")
+        return results
 
-    def update(self):
-        """Update the current Report."""
-        self._fields = Client.put(self, "reports")
+    def get(self, report_id):
+        """Retrieve report by ID"""
+        return Report(
+            self.app,
+            self.swimlane.api('get', "reports/{0}".format(report_id))
+        )
 
-    @classmethod
-    def new_for(cls, app_id, user_id, name):
-        """Get a prefilled Report for the App designated by app_id.
+    def new(self, name):
+        """Get a new Report for the App designated by app_id.
 
         Args:
-            app_id (str): The ID of the App to search in.
-            user_id (str): The ID of the user creating the report.
+            app (str): The App or app id to search in.
             name (str): The name of the Report.
 
         Return:
             A prefilled Report.
         """
         created = datetime.utcnow().isoformat() + "Z"
-        user = User.find(user_id)
-        user_model = {
-            "$type": "Core.Models.Utilities.UserGroupSelection, Core",
-            "id": user_id,
-            "name": user.name
-        }
+        user_model = self.swimlane.user.get_user_selection()
 
-        return Report(SwimlaneDict({
-            "$type": "Core.Models.Search.Report, Core",
+        return Report(self.app, {
+            "$type": Report._type,
             "groupBys": [],
             "aggregates": [],
-            "applicationIds": [app_id],
-            "columns": [],
+            "applicationIds": [self.app.id],
+            "columns": [f['id'] for f in self.app.fields],
             "sorts": {
                 "$type": "System.Collections.Generic.Dictionary`2"
                          "[[System.String, mscorlib],"
                          "[Core.Models.Search.SortTypes, Core]], mscorlib",
             },
             "filters": [],
-            "pageSize": 18,
+            "pageSize": self._page_size,
             "offset": 0,
             "defaultSearchReport": False,
             "allowed": [],
@@ -73,38 +78,59 @@ class Report(Resource):
             "name": name,
             "disabled": False,
             "keywords": ""
-        }))
+        })
 
-    @classmethod
-    def find_all(cls, app_id=None):
-        """Find all reports.
 
-        If app_id is specified, only reports that are a member of that App
-        will be returned. By default, all reports in the system are returned.
-        This method will return either Reports or StatsReports depending on
-        what Swimlane returns.
+class Report(APIResource):
+    """A report class used for searching."""
 
-        Args:
-            app_id (str): An App ID.
+    _type = "Core.Models.Search.Report, Core"
 
-        Returns:
-            A generator that yields Reports.
-        """
-        url = "reports"
-        if app_id:
-            url += "?appId={0}".format(app_id)
+    EQ = "equals"
+    NOT_EQ = "doesNotEqual"
+    CONTAINS = "contains"
+    EXCLUDES = "excludes"
 
-        return (Report(r) for r in Client.get(url))
+    _OPERANDS = (
+        EQ,
+        NOT_EQ,
+        CONTAINS,
+        EXCLUDES
+    )
 
-    @classmethod
-    def find(cls, report_id):
-        """Find a report by ID.
+    def __init__(self, app, raw):
+        super(Report, self).__init__(app.swimlane, raw)
 
-        Args:
-            report_id (str): A Report ID.
+        self.app = app
 
-        Returns:
-            A Report.
-        """
-        return Report(Client.get("reports/{0}".format(report_id)))
+    def save(self):
+        """Insert the current Report."""
+        return
+        '''if insert:
+            self._fields = self.swimlane.api('post', "reports")
+        else:
+            self._fields = self.swimlane.api('put', "reports")'''
+
+    def add_filter(self, field, operand, value):
+        """Returns a filter object from field name, comparision operand and value"""
+        if operand not in self._OPERANDS:
+            raise ValueError('Operand must be one of {}'.format(', '.join(self._OPERANDS)))
+
+        self._raw['filters'].append({
+            "fieldId": self.app.get_field_id(field),
+            "filterType": operand,
+            "value": value,
+        })
+
+    def delete(self):
+        raise NotImplementedError
+
+    def run(self):
+        # Avoid circular imports
+        from swimlane.core.resources import Record
+        report_data = self.swimlane.api('post', 'search', json=self._raw).json()
+
+        results = report_data['results'].get(self.app.id, [])
+
+        return [Record(self.app, raw_record) for raw_record in results]
 

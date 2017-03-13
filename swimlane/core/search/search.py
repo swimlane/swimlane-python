@@ -1,7 +1,5 @@
 """This module provides a search API."""
 
-from ..auth import Client
-from ..resources import StatsReport
 from .search_result import SearchResult
 
 

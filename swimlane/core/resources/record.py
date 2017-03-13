@@ -13,6 +13,9 @@ class RecordAdapter(APIResourceAdapter):
 
         return Record(self.app, response.json())
 
+    def search(self):
+        raise NotImplementedError
+
 
 class Record(APIResource):
 
@@ -24,7 +27,7 @@ class Record(APIResource):
         self.app = app
 
         self.id = self._raw['id']
-        self.tracking_full = self._raw['trackingFull']
+        #self.tracking_full = self._raw['trackingFull']
 
         self.__fields = {}
         self.__premap_fields()
@@ -35,7 +38,8 @@ class Record(APIResource):
             self.__fields[field_obj['name']] = self._raw['values'].get(field_obj['id'])
 
     def __str__(self):
-        return '{}: {}'.format(self.tracking_full, self.id)
+        #return '{}: {}'.format(self.tracking_full, self.id)
+        return str(self.id)
 
     def __setitem__(self, key, value):
         self.__fields[key] = value

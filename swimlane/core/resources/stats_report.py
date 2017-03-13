@@ -1,6 +1,5 @@
 """This module provides a StatsReport class."""
 
-from .. import SwimlaneDict
 from .report import Report
 
 TEMPLATE = list({
@@ -49,7 +48,7 @@ class StatsReport(Report):
         """
         report = super(StatsReport, cls).new_for(app_id, user_id, name)
         fields = list(report._fields.items())
-        return StatsReport(SwimlaneDict(dict(fields + TEMPLATE)))
+        return StatsReport(dict(fields + TEMPLATE))
 
     @classmethod
     def find_all(cls, app_id=None):
