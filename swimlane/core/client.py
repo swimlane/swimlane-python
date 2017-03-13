@@ -1,18 +1,46 @@
+import weakref
+
 import requests
-from bravado.client import SwaggerClient
-from bravado.requests_client import RequestsClient
 from six.moves.urllib.parse import urljoin
 from pyuri import URI
 
 
-class JWTAuth(object):
+class SwimlaneAuth(object):
 
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, swimlane):
+        self.swimlane = weakref.proxy(swimlane)
+        self.login_headers = self._authenticate()
 
     def __call__(self, request):
-        request.headers['Authorization'] = 'Bearer {}'.format(self.token)
+
+        request.headers.update(self.login_headers)
+
         return request
+
+    def _authenticate(self):
+        """Send login request and return login token"""
+        resp = self.swimlane._api_request('post', 'user/login', json={
+            'userName': self.swimlane.username,
+            'password': self.swimlane.password,
+            'domain': ''
+        })
+        json_content = resp.json()
+
+        # Check for token in response content
+        token = json_content.get('token')
+
+        if token is None:
+            # Legacy cookie authentication (2.13-)
+            headers = {'Cookie': ';'.join(
+                ["%s=%s" % cookie for cookie in resp.cookies.items()]
+            )}
+        else:
+            # JWT auth (2.14+)
+            headers = {
+                'Authorization': 'Bearer {}'.format(token)
+            }
+
+        return headers
 
 
 class Swimlane(object):
@@ -21,45 +49,20 @@ class Swimlane(object):
     api_root = '/api/'
     api_swagger_path = api_root + 'swagger'
 
-    def __init__(self, host, username, password, verify_ssl=False):
+    def __init__(self, host, username, password, verify_ssl=True):
         self.host = URI(host)
+        self.host.scheme = self.host.scheme or 'https'
+        self.host.path = None
+
         self.username = username
         self.password = password
-        self._verify = verify_ssl
 
-        self.client = self._build_swagger_client()
-        self.version = self.client.settings.getAPIVersion().result()
+        self.session = requests.Session()
+        self.session.verify = verify_ssl
+        self.session.auth = SwimlaneAuth(self)
 
-    def _build_swagger_client(self):
-        """Return Bravado Swagger client configured and authenticated for Swimlane host"""
-        transport = RequestsClient()
-        transport.session.verify = self._verify
+    def _api_request(self, method, endpoint, json=None):
+        response = self.session.request(method, urljoin(str(self.host) + self.api_root, endpoint), json=json)
+        response.raise_for_status()
 
-        spec_url = urljoin(self.host, self.api_swagger_path)
-        spec = requests.get(spec_url).json()
-
-        # Force-set basePath to work around Swimlane reverse proxy configuration
-        spec['basePath'] = self.api_root
-
-        # Disable response validation; Our spec seems marginally broken at this point on certain required fields
-        config = {
-            'validate_responses': False,
-            'validate_requests': False
-        }
-
-        client = SwaggerClient.from_spec(spec, http_client=transport, config=config)
-
-        transport.session.auth = self._build_auth(client)
-
-        return client
-
-    def _build_auth(self, client):
-        """Build transport auth for Swimlane API"""
-
-        token = client.user.login(model={
-            'userName': self.username,
-            'password': self.password,
-            'domain': ''
-        }).result().token
-
-        return JWTAuth(token)
+        return response
