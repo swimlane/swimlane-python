@@ -4,6 +4,8 @@ import requests
 from six.moves.urllib.parse import urljoin
 from pyuri import URI
 
+from swimlane.core.resources.app import AppAdapter
+
 
 class SwimlaneAuth(object):
 
@@ -19,7 +21,7 @@ class SwimlaneAuth(object):
 
     def _authenticate(self):
         """Send login request and return login token"""
-        resp = self.swimlane._api_request('post', 'user/login', json={
+        resp = self.swimlane.api('post', 'user/login', json={
             'userName': self.swimlane.username,
             'password': self.swimlane.password,
             'domain': ''
@@ -46,8 +48,7 @@ class SwimlaneAuth(object):
 class Swimlane(object):
     """Swimlane API driver"""
 
-    api_root = '/api/'
-    api_swagger_path = api_root + 'swagger'
+    _api_root = '/api/'
 
     def __init__(self, host, username, password, verify_ssl=True):
         self.host = URI(host)
@@ -61,8 +62,14 @@ class Swimlane(object):
         self.session.verify = verify_ssl
         self.session.auth = SwimlaneAuth(self)
 
-    def _api_request(self, method, endpoint, json=None):
-        response = self.session.request(method, urljoin(str(self.host) + self.api_root, endpoint), json=json)
+        self.apps = AppAdapter(self)
+
+    def api(self, method, endpoint, **kwargs):
+        """Shortcut helper for sending requests to API endpoints"""
+        while endpoint.startswith('/'):
+            endpoint = endpoint[1:]
+
+        response = self.session.request(method, urljoin(str(self.host) + self._api_root, endpoint), **kwargs)
         response.raise_for_status()
 
         return response

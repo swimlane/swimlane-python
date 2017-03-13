@@ -1,67 +1,49 @@
-"""Provides an App class."""
-
-from ..auth import Client
-from .resource import Resource
+from swimlane.core.resources.record import RecordAdapter
+from .base import APIResourceAdapter, APIResource
 
 
-class App(Resource):
-    """A simple abstraction over a Swimlane app."""
+class AppAdapter(APIResourceAdapter):
+    """Abstracts app-level API consumption"""
 
-    def __init__(self, fields):
-        """Init an App with fields.
+    def get(self, tracking_id=None, name=None, acronym=None):
+        if len(list(filter(None, (name, tracking_id, acronym)))) != 1:
+            raise ValueError('Must provide only one of name, tracking_id, or acronym')
 
-        Args:
-            fields (dict): A dict of fields and values
-        """
-        super(App, self).__init__(fields)
-
-    def field_id(self, name):
-        """Get the field ID of a field by name.
-
-        Args:
-            name (str): The name of the field.
-
-        Returns:
-            A field ID as a str.
-        """
-        return next((f["id"] for f in self.fields if f["name"] == name), None)
-
-    def save(self):
-        """Create/update the app."""
-        if hasattr(self, 'id') and self.id:
-            self._fields = Client.put(self, 'app/{}'.format(self.id))
+        if tracking_id:
+            return App(
+                self.swimlane,
+                self.swimlane.api('get', 'app/{}'.format(tracking_id)).json()
+            )
         else:
-            self._fields = Client.post(self, 'app')
-
-    @classmethod
-    def find_all(cls):
-        """List all apps.
-
-        Returns:
-            A generator that yields all apps in the system.
-        """
-        return (App(x) for x in Client.get("app/"))
-
-    @classmethod
-    def find(cls, app_id=None, name=None, acronym=None):
-        """Find an application.
-
-        Args:
-            app_id (str): The app ID
-            name (str): The app name
-            acronym (str): The app acronym
-
-        Returns:
-            A resource that matches the fields
-        """
-        if app_id:
-            return App(Client.get("app/{0}".format(app_id)))
-
-        else:
-            apps = cls.find_all()
-            for app in apps:
+            # Workaround for lack of support for get by name or acronym
+            for app in self.list():
                 if any([
-                    name and name == getattr(app, 'name', None),
-                    acronym and acronym == getattr(app, 'acronym', None)
+                    name and name == app.name,
+                    acronym and acronym == app.acronym
                 ]):
                     return app
+
+    def list(self):
+        response = self.swimlane.api('get', 'app')
+        return [App(self.swimlane, item) for item in response.json()]
+
+
+class App(APIResource):
+    """Represents a single App record"""
+
+    _type = 'Core.Models.Application.Application, Core'
+
+    def __init__(self, swimlane, raw):
+        super(App, self).__init__(swimlane, raw)
+
+        self.acronym = self._raw.get('acronym')
+        self.name = self._raw.get('name')
+        self.description = self._raw.get('description')
+        self.fields = self._raw.get('fields')
+        self.id_ = self._raw.get('id')
+        self.tracking_id = self._raw.get('trackingFieldId')
+
+        self.records = RecordAdapter(self)
+
+    def __str__(self):
+        return '{}: {}'.format(self.acronym, self.name)

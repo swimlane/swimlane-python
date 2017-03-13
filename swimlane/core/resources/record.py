@@ -1,134 +1,48 @@
-"""Provides a Record class."""
-
-from datetime import datetime
-from warnings import warn
-
-from ..auth import Client
-from .group import Group
-from .resource import Resource
-from .user import User
+from swimlane.core.resources.base import APIResource, APIResourceAdapter
 
 
-class Record(Resource):
-    """A simple abstraction over a Swimlane record resource."""
+class RecordAdapter(APIResourceAdapter):
 
-    def __init__(self, fields):
-        """Init a Record with fields.
+    def __init__(self, app):
+        super(RecordAdapter, self).__init__(app.swimlane)
 
-        Args:
-            fields (dict): A dict of fields and values
-        """
-        super(Record, self).__init__(fields)
+        self.app = app
 
-    def _is_new(self):
-        """Returns True if Record has not been created"""
-        return not hasattr(self, 'isNew') or self.isNew is True
+    def get(self, record_id):
+        response = self.swimlane.api('get', "app/{0}/record/{1}".format(self.app.tracking_id, record_id))
 
-    def insert(self):
-        """Insert the current record."""
-        warn(
-            'Record.insert method will be deleted in v0.1.0, use Record.save',
-            category=DeprecationWarning)
-        self.save()
+        return Record(self.app, response.json())
 
-    def update(self):
-        """Update the current record."""
-        warn(
-            'Record.update method will be deleted in v0.1.0, use Record.save',
-            category=DeprecationWarning)
-        self.save()
 
-    def save(self):
-        """Create/update a record."""
-        if self._is_new():
-            self._fields = Client.post(
-                self, "app/{0}/record".format(self.applicationId))
-        else:
-            self._fields = Client.put(
-                self, "app/{0}/record".format(self.applicationId))
+class Record(APIResource):
 
-    def reload(self):
-        """Reload a record instance."""
-        if self._is_new():
-            raise Exception(
-                'Cannot reload an unsaved record, call save() first')
-        r = Record.find(self.applicationId, self.id)
-        self._fields.update(**r._fields)
+    _type = 'Core.Models.Record.Record, Core'
 
-    def add_comment(self, field_id, user_id, message):
-        """Add a comment to a field.
+    def __init__(self, app, raw):
+        super(Record, self).__init__(app.swimlane, raw)
 
-        Args:
-            field_id (str): The field ID.
-            user_id (str): The user ID of the commenting user.
-            message (str): The comment message.
-        """
-        Client.post({
-            "message": message,
-            "createdDate": datetime.utcnow().isoformat() + "Z"
-        }, "app/{0}/record/{1}/{2}/comment".format(
-            self.applicationId, self.id, field_id))
+        self.app = app
 
-        if not self._is_new():
-            self.reload()
+        self.id = self._raw['id']
+        self.tracking_full = self._raw['trackingFull']
 
-    def references(self, field_id, record_ids, ref_field_ids):
-        """Get referenced Records.
+        self.__fields = {}
+        self.__premap_fields()
 
-        Args:
-            field_id (str): The ID of the field on the current record.
-            record_ids (list): The IDs of any records to retrieve.
-            field_ids (list): The IDs of any fields to retrieve.
+    def __premap_fields(self):
+        """Gather field keys from app data and merge with values data from record data"""
+        for field_obj in self.app._raw['fields']:
+            self.__fields[field_obj['name']] = self._raw['values'].get(field_obj['id'])
 
-        Returns:
-            A generator that yields all referenced Records.
-        """
-        url = ("app/{0}/record/{1}/references"
-               "?recordIds={2}&fieldIds={3}".format(
-                   self.applicationId, self.id,
-                   ",".join(record_ids),
-                   ",".join(ref_field_ids)))
-        return (Record(r) for r in Client.get(url))
+    def __str__(self):
+        return '{}: {}'.format(self.tracking_full, self.id)
 
-    @classmethod
-    def new_for(cls, app_id):
-        """Get a prefilled Record for the App designated by app_id.
+    def __setitem__(self, key, value):
+        self.__fields[key] = value
 
-        Args:
-            app_id (str): A valid App ID.
+    def __getitem__(self, item):
+        return self.__fields[item]
 
-        Return:
-            A dict containing default fields and values for a Record.
-        """
-        return Record(Client.get("app/{0}/record".format(app_id)))
+    def __delitem__(self, key):
+        del self.__fields[key]
 
-    @classmethod
-    def find(cls, app_id, record_id):
-        """Find a Record by app_id and record_id.
-
-        Args:
-            app_id (str): A valid App ID
-            record_id (str): A valid Record ID
-
-        Return:
-            A Record
-        """
-        return Record(Client.get("app/{0}/record/{1}".format(app_id,
-                                                             record_id)))
-
-    def restrict(self, *user_groups, **kwargs):
-        """
-        Restrict the record to specific users and/or groups.
-
-        :param user_groups: One or more User/Group instances.
-        :type user_groups: :class:`Group` or :class:`User`
-        :param append: Append users/groups to existing restriction.
-        :type append: bool
-        """
-        allowed = [ug.summary for ug in user_groups
-                   if isinstance(ug, (Group, User))]
-        if 'append' in kwargs and kwargs['append']:
-            allowed = self.allowed + allowed
-        Client.put(allowed, 'app/{0}/record/{1}/restrict'.format(
-            self.applicationId, self.id))
-        return allowed
