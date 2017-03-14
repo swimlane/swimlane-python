@@ -1,43 +1,33 @@
-"""This module provides a Group class."""
-
-from ..auth import Client
-from .resource import Resource
+from swimlane.core.resources.base import APIResourceAdapter, APIResource
 
 
-class Group(Resource):
-    """A class for working with Swimlane groups."""
+class GroupAdapter(APIResourceAdapter):
 
-    def __init__(self, fields):
-        """Init a Group with fields.
+    def list(self):
+        response = self.swimlane.request('get', 'groups')
+        return [Group(self.swimlane, raw_group_data) for raw_group_data in response.json().get('groups', [])]
 
-        Args:
-            fields (dict): A dict of fields and values.
-        """
-        super(Group, self).__init__(fields)
+    def get(self, group_id=None, name=None):
+        """Retrieve single group record"""
+        if group_id is None and name is None:
+            raise ValueError('Must provide either group_id or name')
 
-    @classmethod
-    def find_all(cls):
-        """Get all groups.
-
-        Returns:
-            A generator that yields all groups in the system.
-        """
-        return (Group(g) for g in Client.get("groups").get('groups', []))
-
-    @classmethod
-    def find(cls, group_id=None, name=None):
-        """Find groups.
-
-        Args:
-            group_id (str): The group ID.
-            name (str): A name or a fragment of a name to search by.
-
-        Returns:
-            A single Group if group_id was specified, otherwise a generator
-            that yields Groups for all system groups with matching names..
-        """
         if group_id:
-            return Group(Client.get("groups/{0}".format(group_id)))
+            response = self.swimlane.request('get', 'groups/{}'.format(group_id))
+            return Group(self.swimlane, response.json())
 
-        return (Group(g) for g
-                in Client.get("groups/lookup?name={0}".format(name)))
+        else:
+            response = self.swimlane.request('get', 'groups/lookup?name={}'.format(name))
+            matched_groups = response.json()
+
+            for group_data in matched_groups:
+                if group_data.get('name') == name:
+                    return Group(self.swimlane, group_data)
+            else:
+                raise ValueError('Unable to find group with name "{}"'.format(name))
+
+
+class Group(APIResource):
+    """A class for working with Swimlane groups"""
+
+    _type = 'Core.Models.Groups.Group, Core'

@@ -5,6 +5,7 @@ from six.moves.urllib.parse import urljoin
 from pyuri import URI
 
 from swimlane.core.resources.app import AppAdapter
+from swimlane.core.resources.group import GroupAdapter
 from swimlane.core.resources.user import UserAdapter
 
 
@@ -24,6 +25,7 @@ class Swimlane(object):
 
         self.apps = AppAdapter(self)
         self.users = UserAdapter(self)
+        self.groups = GroupAdapter(self)
 
         self.__settings = None
         self.__user = None
