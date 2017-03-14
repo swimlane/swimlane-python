@@ -1,4 +1,11 @@
+import random
+import string
+
 from swimlane.core.resources.base import APIResource, APIResourceAdapter
+
+
+def random_string(length, source=string.ascii_letters + string.digits):
+    return ''.join(random.choice(source) for _ in range(length))
 
 
 class RecordAdapter(APIResourceAdapter):
@@ -9,12 +16,18 @@ class RecordAdapter(APIResourceAdapter):
         self.app = app
 
     def get(self, record_id):
-        response = self.swimlane.api('get', "app/{0}/record/{1}".format(self.app.tracking_id, record_id))
+        response = self.swimlane.request('get', "app/{0}/record/{1}".format(self.app.tracking_id, record_id))
 
         return Record(self.app, response.json())
 
-    def search(self):
-        raise NotImplementedError
+    def search(self, *filters):
+        """Shortcut to generate a new temporary search report using provided filters"""
+        report = self.app.reports.new('search-' + random_string(8))
+
+        for f in filters:
+            report.filter(*f)
+
+        return report
 
 
 class Record(APIResource):

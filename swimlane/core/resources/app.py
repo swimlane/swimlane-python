@@ -14,7 +14,7 @@ class AppAdapter(APIResourceAdapter):
         if tracking_id:
             return App(
                 self.swimlane,
-                self.swimlane.api('get', 'app/{}'.format(tracking_id)).json()
+                self.swimlane.request('get', 'app/{}'.format(tracking_id)).json()
             )
         else:
             # Workaround for lack of support for get by name or acronym
@@ -26,7 +26,7 @@ class AppAdapter(APIResourceAdapter):
                     return app
 
     def list(self):
-        response = self.swimlane.api('get', 'app')
+        response = self.swimlane.request('get', 'app')
         return [App(self.swimlane, item) for item in response.json()]
 
 

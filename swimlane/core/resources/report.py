@@ -1,13 +1,11 @@
-"""This module provides a Report class."""
-
 from datetime import datetime
+
+import itertools
 
 from swimlane.core.resources.base import APIResourceAdapter, APIResource
 
 
 class ReportAdapter(APIResourceAdapter):
-
-    _page_size = 20
 
     def __init__(self, app):
         super(ReportAdapter, self).__init__(app.swimlane)
@@ -20,7 +18,7 @@ class ReportAdapter(APIResourceAdapter):
         If app is specified, only reports that are a member of that App
         will be returned. By default, all reports in the system are returned.
         """
-        raw_reports = self.swimlane.api('get', "reports?appId={}".format(self.app.id)).json()
+        raw_reports = self.swimlane.request('get', "reports?appId={}".format(self.app.id)).json()
         results = []
         for raw_report in raw_reports:
             try:
@@ -35,7 +33,7 @@ class ReportAdapter(APIResourceAdapter):
         """Retrieve report by ID"""
         return Report(
             self.app,
-            self.swimlane.api('get', "reports/{0}".format(report_id))
+            self.swimlane.request('get', "reports/{0}".format(report_id))
         )
 
     def new(self, name):
@@ -63,7 +61,7 @@ class ReportAdapter(APIResourceAdapter):
                          "[Core.Models.Search.SortTypes, Core]], mscorlib",
             },
             "filters": [],
-            "pageSize": self._page_size,
+            "pageSize": Report._page_size,
             "offset": 0,
             "defaultSearchReport": False,
             "allowed": [],
@@ -91,30 +89,53 @@ class Report(APIResource):
     CONTAINS = "contains"
     EXCLUDES = "excludes"
 
-    _OPERANDS = (
+    _FILTER_OPERANDS = (
         EQ,
         NOT_EQ,
         CONTAINS,
         EXCLUDES
     )
 
+    _page_size = 50
+
     def __init__(self, app, raw):
         super(Report, self).__init__(app.swimlane, raw)
 
         self.app = app
 
+        self.__records = []
+
+    def __iter__(self):
+        if self.__records:
+            for record in self.__records:
+                yield record
+        else:
+            for page in itertools.count():
+                result_data = self._retrieve_report_page(page)
+                count = result_data['count']
+                records = [self._build_record(raw_data) for raw_data in result_data['results'].get(self.app.id, [])]
+
+                for result in records:
+                    self.__records.append(result)
+                    yield result
+
+                if not records or page * self._page_size >= count:
+                    break
+
     def save(self):
-        """Insert the current Report."""
         return
         '''if insert:
             self._fields = self.swimlane.api('post', "reports")
         else:
             self._fields = self.swimlane.api('put', "reports")'''
 
-    def add_filter(self, field, operand, value):
-        """Returns a filter object from field name, comparision operand and value"""
-        if operand not in self._OPERANDS:
-            raise ValueError('Operand must be one of {}'.format(', '.join(self._OPERANDS)))
+    def delete(self):
+        raise NotImplementedError
+
+    def filter(self, field, operand, value):
+        """Adds a filter to report from field name, comparison operand, and value"""
+        if operand not in self._FILTER_OPERANDS:
+            raise ValueError('Operand must be one of {}'.format(', '.join(self._FILTER_OPERANDS)))
 
         self._raw['filters'].append({
             "fieldId": self.app.get_field_id(field),
@@ -122,15 +143,32 @@ class Report(APIResource):
             "value": value,
         })
 
-    def delete(self):
+    def aggregate(self, field, aggregation):
         raise NotImplementedError
 
-    def run(self):
+    def group_by(self, field, period):
+        raise NotImplementedError
+
+    def clear_results(self):
+        """Clear cached results from execution, allowing report to be rerun"""
+        self.__records = []
+
+    def _retrieve_report_page(self, page=0):
+        """Retrieve paginated report results for an individual page"""
+        report_data = self.swimlane.request('post', 'search', json=self._get_paginated_body(page)).json()
+
+        return report_data
+
+    def _build_record(self, raw_record_data):
         # Avoid circular imports
         from swimlane.core.resources import Record
-        report_data = self.swimlane.api('post', 'search', json=self._raw).json()
+        return Record(self.app, raw_record_data)
 
-        results = report_data['results'].get(self.app.id, [])
+    def _get_paginated_body(self, page):
+        """Return raw body content formatted with correct pagination and offset values for provided page"""
+        body = self._raw.copy()
 
-        return [Record(self.app, raw_record) for raw_record in results]
+        body['pageSize'] = self._page_size
+        body['offset'] = page
 
+        return body

@@ -5,7 +5,7 @@ class UserAdapter(APIResourceAdapter):
 
     def list(self):
         """Retrieve all users"""
-        response = self.swimlane.api('get', "user")
+        response = self.swimlane.request('get', "user")
         return [User(self.swimlane, raw_user_data) for raw_user_data in response.json().get('users', [])]
 
     def get(self, user_id=None, username=None):
@@ -14,11 +14,11 @@ class UserAdapter(APIResourceAdapter):
             raise ValueError('Must provide either user_id or name')
 
         if user_id:
-            response = self.swimlane.api('get', 'user/{}'.format(user_id))
+            response = self.swimlane.request('get', 'user/{}'.format(user_id))
             return User(self.swimlane, response.json())
 
         else:
-            response = self.swimlane.api('get', 'user/search?query={}'.format(username))
+            response = self.swimlane.request('get', 'user/search?query={}'.format(username))
             matched_users = response.json()
 
             for user_data in matched_users:

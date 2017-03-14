@@ -24,6 +24,3 @@ class APIResource(object):
 
         if self._type and self._raw['$type'] != self._type:
             raise TypeError('Expected $type = "{}", received "{}"'.format(self._type, self._raw['$type']))
-
-    def save(self):
-        raise NotImplementedError

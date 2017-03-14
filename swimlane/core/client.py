@@ -28,7 +28,7 @@ class Swimlane(object):
         self.__settings = None
         self.__user = None
 
-    def api(self, method, endpoint, **kwargs):
+    def request(self, method, endpoint, **kwargs):
         """Shortcut helper for sending requests to API endpoints
         
         Handles generating full API URL, session reuse and auth, and response status code checks
@@ -45,7 +45,7 @@ class Swimlane(object):
     def settings(self):
         """Retrieve and cache settings from server"""
         if not self.__settings:
-            self.__settings = self.api('get', 'settings').json()
+            self.__settings = self.request('get', 'settings').json()
         return self.__settings
 
     @property
@@ -78,7 +78,7 @@ class SwimlaneAuth(object):
 
     def _authenticate(self):
         """Send login request and return login token"""
-        resp = self._swimlane.api('post', 'user/login', json={
+        resp = self._swimlane.request('post', 'user/login', json={
             'userName': self.username,
             'password': self.password,
             'domain': ''
