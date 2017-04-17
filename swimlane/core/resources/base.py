@@ -5,12 +5,12 @@ class APIResourceAdapter(object):
     """Base class for all API endpoint classes"""
 
     def __init__(self, swimlane):
-        self.__refsw = weakref.ref(swimlane)
+        self.__ref_swimlane = weakref.ref(swimlane)
 
     @property
-    def swimlane(self):
+    def _swimlane(self):
         """Resolve the swimlane weakref"""
-        return self.__refsw()
+        return self.__ref_swimlane()
 
 
 class APIResource(object):
@@ -19,8 +19,18 @@ class APIResource(object):
     _type = None
 
     def __init__(self, swimlane, raw):
-        self.swimlane = swimlane
+        self._swimlane = swimlane
         self._raw = raw
 
         if self._type and self._raw['$type'] != self._type:
             raise TypeError('Expected $type = "{}", received "{}"'.format(self._type, self._raw['$type']))
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}: {self}>'.format(self=self)
+
+    def save(self):
+        raise NotImplementedError
+
+    def permalink(self):
+        """Returns full URL to individual resource in Swimlane"""
+        raise NotImplementedError

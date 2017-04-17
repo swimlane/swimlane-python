@@ -13,8 +13,8 @@ class AppAdapter(APIResourceAdapter):
 
         if tracking_id:
             return App(
-                self.swimlane,
-                self.swimlane.request('get', 'app/{}'.format(tracking_id)).json()
+                self._swimlane,
+                self._swimlane.request('get', 'app/{}'.format(tracking_id)).json()
             )
         else:
             # Workaround for lack of support for get by name or acronym
@@ -26,8 +26,8 @@ class AppAdapter(APIResourceAdapter):
                     return app
 
     def list(self):
-        response = self.swimlane.request('get', 'app')
-        return [App(self.swimlane, item) for item in response.json()]
+        response = self._swimlane.request('get', 'app')
+        return [App(self._swimlane, item) for item in response.json()]
 
 
 class App(APIResource):
@@ -38,21 +38,21 @@ class App(APIResource):
     def __init__(self, swimlane, raw):
         super(App, self).__init__(swimlane, raw)
 
-        self.acronym = self._raw.get('acronym')
-        self.name = self._raw.get('name')
-        self.description = self._raw.get('description')
-        self.fields = self._raw.get('fields')
-        self.id = self._raw.get('id')
+        self.acronym = self._raw['acronym']
+        self.name = self._raw['name']
+        self.description = self._raw.get('description', '')
+        self._fields = self._raw['fields']
+        self.id = self._raw['id']
         self.tracking_id = self._raw.get('trackingFieldId')
 
         self.records = RecordAdapter(self)
         self.reports = ReportAdapter(self)
 
     def __str__(self):
-        return '{}: {}'.format(self.acronym, self.name)
+        return '{self.name} ({self.acronym})'.format(self=self)
 
     def get_field_id(self, field_name):
-        for field in self.fields:
+        for field in self._fields:
             if field['name'] == field_name:
                 return field['id']
         else:

@@ -5,8 +5,8 @@ class UserAdapter(APIResourceAdapter):
 
     def list(self):
         """Retrieve all users"""
-        response = self.swimlane.request('get', "user")
-        return [User(self.swimlane, raw_user_data) for raw_user_data in response.json().get('users', [])]
+        response = self._swimlane.request('get', "user")
+        return [User(self._swimlane, raw_user_data) for raw_user_data in response.json().get('users', [])]
 
     def get(self, user_id=None, username=None):
         """Retrieve single user record"""
@@ -14,16 +14,16 @@ class UserAdapter(APIResourceAdapter):
             raise ValueError('Must provide either user_id or name')
 
         if user_id:
-            response = self.swimlane.request('get', 'user/{}'.format(user_id))
-            return User(self.swimlane, response.json())
+            response = self._swimlane.request('get', 'user/{}'.format(user_id))
+            return User(self._swimlane, response.json())
 
         else:
-            response = self.swimlane.request('get', 'user/search?query={}'.format(username))
+            response = self._swimlane.request('get', 'user/search?query={}'.format(username))
             matched_users = response.json()
 
             for user_data in matched_users:
                 if user_data.get('userName') == username:
-                    return User(self.swimlane, user_data)
+                    return User(self._swimlane, user_data)
             else:
                 raise ValueError('Unable to find user with username "{}"'.format(username))
 

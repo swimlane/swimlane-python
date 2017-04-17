@@ -8,7 +8,7 @@ from swimlane.core.resources.base import APIResourceAdapter, APIResource
 class ReportAdapter(APIResourceAdapter):
 
     def __init__(self, app):
-        super(ReportAdapter, self).__init__(app.swimlane)
+        super(ReportAdapter, self).__init__(app._swimlane)
 
         self.app = app
 
@@ -18,7 +18,7 @@ class ReportAdapter(APIResourceAdapter):
         If app is specified, only reports that are a member of that App
         will be returned. By default, all reports in the system are returned.
         """
-        raw_reports = self.swimlane.request('get', "reports?appId={}".format(self.app.id)).json()
+        raw_reports = self._swimlane.request('get', "reports?appId={}".format(self.app.id)).json()
         results = []
         for raw_report in raw_reports:
             try:
@@ -33,7 +33,7 @@ class ReportAdapter(APIResourceAdapter):
         """Retrieve report by ID"""
         return Report(
             self.app,
-            self.swimlane.request('get', "reports/{0}".format(report_id))
+            self._swimlane.request('get', "reports/{0}".format(report_id))
         )
 
     def new(self, name):
@@ -47,7 +47,7 @@ class ReportAdapter(APIResourceAdapter):
             A prefilled Report.
         """
         created = datetime.utcnow().isoformat() + "Z"
-        user_model = self.swimlane.user.get_user_selection()
+        user_model = self._swimlane.user.get_user_selection()
 
         return Report(self.app, {
             "$type": Report._type,
@@ -99,7 +99,7 @@ class Report(APIResource):
     _page_size = 50
 
     def __init__(self, app, raw):
-        super(Report, self).__init__(app.swimlane, raw)
+        super(Report, self).__init__(app._swimlane, raw)
 
         self.app = app
 
@@ -155,7 +155,7 @@ class Report(APIResource):
 
     def _retrieve_report_page(self, page=0):
         """Retrieve paginated report results for an individual page"""
-        report_data = self.swimlane.request('post', 'search', json=self._get_paginated_body(page)).json()
+        report_data = self._swimlane.request('post', 'search', json=self._get_paginated_body(page)).json()
 
         return report_data
 

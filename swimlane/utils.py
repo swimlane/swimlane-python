@@ -1,9 +1,15 @@
 import binascii
 import copy
 import os
+import random
+import string
 import time
 
 from .core.resources import App
+
+
+def random_string(length, source=string.ascii_letters + string.digits):
+    return ''.join(random.choice(source) for _ in range(length))
 
 
 def random_objectid():
@@ -77,11 +83,11 @@ def copy_field_values(src_app, src_field_name, dest_app, dest_field_name):
         raise TypeError('The src_app must be an instance of App')
     if not isinstance(dest_app, App):
         raise TypeError('The dest_app must be an instance of App')
-    src_field = get_by_key_value(src_app.fields, 'name', src_field_name)
+    src_field = get_by_key_value(src_app._fields, 'name', src_field_name)
     if not src_field:
         raise ValueError('Field %s does not exist in source app' %
                          src_field_name)
-    dest_field = get_by_key_value(dest_app.fields, 'name', dest_field_name)
+    dest_field = get_by_key_value(dest_app._fields, 'name', dest_field_name)
     if not dest_field:
         raise ValueError('Field %s does not exist in destination app' %
                          dest_field_name)
