@@ -51,9 +51,9 @@ class App(APIResource):
     def __str__(self):
         return '{self.name} ({self.acronym})'.format(self=self)
 
-    def get_field_id(self, field_name):
+    def get_field_definition(self, field_name):
         for field in self._fields:
             if field['name'] == field_name:
-                return field['id']
+                return field
         else:
             raise ValueError('Unable to find field "{}"'.format(field_name))

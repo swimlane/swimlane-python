@@ -1,10 +1,16 @@
 """Abstractions for Swimlane app field types to simplify getting/setting values on records"""
-import weakref
 import numbers
+import weakref
 from datetime import datetime
 
 import pendulum
+import six
 
+from swimlane.core.resources.usergroup import UserGroup
+from swimlane.utils import get_recursive_subclasses
+
+
+# Base classes
 
 class Field(object):
     """Base class for abstracting Swimlane complex types"""
@@ -22,21 +28,24 @@ class Field(object):
         self.name = name
         self.record = weakref.proxy(record)
         self.default = default_value
-        self.value = self.default
         self.allow_null = allow_null
+        self._value = self.default
+
+        self.field_definition = self.record._app.get_field_definition(self.name)
+        self.id = self.field_definition['id']
 
     def __repr__(self):
-        return '<{self.__class__.__name__}: {self.value}>'.format(self=self)
+        return '<{class_name}: {py!r}>'.format(class_name=self.__class__.__name__, py=self.get_python())
 
     def _get(self):
         """Default getter used for both representations unless overridden"""
-        return self.value
+        return self._value
 
-    def as_python(self):
+    def get_python(self):
         """Return best python representation of field value"""
         return self._get()
 
-    def as_swimlane(self):
+    def get_swimlane(self):
         """Return best swimlane representation of field value"""
         return self._get()
 
@@ -56,36 +65,79 @@ class Field(object):
     def _set(self, value):
         """Default setter used for both representations unless overridden"""
         self._validate_value(value)
+        self._value = value
 
-        self.value = value
-
-    def set_from_python(self, value):
+    def set_python(self, value):
         """Set field internal value from the python representation of field value"""
         return self._set(value)
 
-    def set_from_swimlane(self, value):
+    def set_swimlane(self, value):
         """Set field internal value from the swimlane representation of field value"""
         return self._set(value)
 
     def unset(self):
         """Marks field as having no particular value"""
-        self.value = self.default
+        self._value = self.default
 
+
+class ReadOnly(object):
+    """Mixin disabling setting value via python"""
+
+    def set_from_python(self, value):
+        raise ValueError('Cannot manually set field "{}"'.format(self.name))
+
+
+# Concrete Fields
 
 class TextField(Field):
 
     _field_type = 'Core.Models.Fields.TextField, Core'
 
+    supported_types = six.string_types
 
-class TrackingField(TextField):
+    def _set(self, value):
+        if value is not None and not isinstance(value, self.supported_types):
+            value = str(value)
+
+        return super(TextField, self)._set(value)
+
+
+class TrackingField(ReadOnly, TextField):
 
     _field_type = 'Core.Models.Fields.TrackingField, Core'
 
-    def _set(self, value):
-        if self.value is not self.default:
-            raise ValueError('Cannot manually set tracking ID')
 
-        return super(TrackingField, self)._set(value)
+class ValuesListField(TextField):
+
+    _field_type = 'Core.Models.Fields.ValuesListField, Core'
+
+    def __init__(self, *args, **kwargs):
+        super(ValuesListField, self).__init__(*args, **kwargs)
+        self.selection_type = self.field_definition['selectionType']
+        self.selection_to_id_map = {f['name']: f['id'] for f in self.field_definition['values']}
+
+    def _validate_value(self, value):
+        super(ValuesListField, self)._validate_value(value)
+
+        if value is not None:
+            if value not in self.selection_to_id_map:
+                raise ValueError('Field "{}" invalid value "{}". Valid options: {}'.format(
+                    self.name,
+                    value,
+                    ', '.join(self.selection_to_id_map.keys())
+                ))
+
+    def set_swimlane(self, value):
+        value = value['value']
+        return super(ValuesListField, self).set_swimlane(value)
+
+    def get_swimlane(self):
+        value = super(ValuesListField, self).get_swimlane()
+        return {
+            '$type': 'Core.Models.Record.ValueSelection, Core',
+            'id': self.selection_to_id_map[value],
+            'value': value
+        }
 
 
 class NumberField(Field):
@@ -110,14 +162,14 @@ class DatetimeField(Field):
 
         return super(DatetimeField, self)._set(value)
 
-    def set_from_swimlane(self, value):
+    def set_swimlane(self, value):
         if value is not None:
             value = pendulum.parse(value)
 
-        return super(DatetimeField, self).set_from_swimlane(value)
+        return super(DatetimeField, self).set_swimlane(value)
 
-    def as_swimlane(self):
-        value = super(DatetimeField, self).as_swimlane()
+    def get_swimlane(self):
+        value = super(DatetimeField, self).get_swimlane()
 
         if value is not None:
             value = value.to_rfc3339_string()
@@ -135,15 +187,29 @@ class UserGroupField(Field):
 
     _field_type = 'Core.Models.Fields.UserGroupField, Core'
 
+    supported_types = [UserGroup]
+
+    def set_swimlane(self, value):
+        """Convert JSON definitions to appropriate User/Group object"""
+        # v2.x does not provide a distinction between users and groups at the field selection level, can only return
+        # UserGroup instances instead of specific User or Group instances
+        if value is not None:
+            value = UserGroup(self.record._swimlane, value)
+
+        return super(UserGroupField, self).set_swimlane(value)
+
+    def get_swimlane(self):
+        value = super(UserGroupField, self).get_swimlane()
+
+        if value is not None:
+            value = value.get_usergroup_selection()
+
+        return value
+
 
 class AttachmentsField(Field):
 
     _field_type = 'Core.Models.Fields.AttachmentField, Core'
-
-
-class ValuesListField(Field):
-
-    _field_type = 'Core.Models.Fields.ValuesListField, Core'
 
 
 class ReferenceField(Field):
@@ -158,17 +224,14 @@ class HistoryField(Field):
 
 # Utilities
 
-def _recursive_subclasses(cls):
-    return cls.__subclasses__() + [g for s in cls.__subclasses__() for g in _recursive_subclasses(s)]
-
 
 # Lookup corresponding field given a Swimlane "$type" key
-type_map = {f._field_type: f for f in _recursive_subclasses(Field)}
+FIELD_TYPE_MAP = {f._field_type: f for f in get_recursive_subclasses(Field)}
 
 
 def get_field_class(field_type):
     """Return field class most fitting of provided Swimlane $type"""
     try:
-        return type_map[field_type]
+        return FIELD_TYPE_MAP[field_type]
     except KeyError:
         raise ValueError('No field available to handle Swimlane $type "{}"'.format(field_type))

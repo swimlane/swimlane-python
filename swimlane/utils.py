@@ -1,15 +1,16 @@
 import binascii
-import copy
 import os
 import random
 import string
 import time
 
-from .core.resources import App
-
 
 def random_string(length, source=string.ascii_letters + string.digits):
     return ''.join(random.choice(source) for _ in range(length))
+
+
+def get_recursive_subclasses(cls):
+    return cls.__subclasses__() + [g for s in cls.__subclasses__() for g in get_recursive_subclasses(s)]
 
 
 def random_objectid():
@@ -79,6 +80,7 @@ def copy_field_values(src_app, src_field_name, dest_app, dest_field_name):
     :returns: A tuple of added and moved values.
     :rtype: tuple
     """
+    from .core.resources import App
     if not isinstance(src_app, App):
         raise TypeError('The src_app must be an instance of App')
     if not isinstance(dest_app, App):

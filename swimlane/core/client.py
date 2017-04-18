@@ -1,15 +1,14 @@
+import re
 import weakref
 
-import re
 import requests
+from pyuri import URI
 from requests import HTTPError
 from six.moves.urllib.parse import urljoin
-from pyuri import URI
 
 from swimlane.core.resources.app import AppAdapter
-from swimlane.core.resources.group import GroupAdapter
-from swimlane.core.resources.user import UserAdapter
-#from swimlane.core.resources.tasks import TaskAdapter
+from swimlane.core.resources.usergroup import UserAdapter, GroupAdapter
+# from swimlane.core.resources.tasks import TaskAdapter
 from swimlane.errors import SwimlaneError
 
 

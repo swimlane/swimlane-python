@@ -47,7 +47,7 @@ class ReportAdapter(APIResourceAdapter):
             A prefilled Report.
         """
         created = datetime.utcnow().isoformat() + "Z"
-        user_model = self._swimlane.user.get_user_selection()
+        user_model = self._swimlane.user.get_usergroup_selection()
 
         return Report(self.app, {
             "$type": Report._type,
@@ -138,7 +138,7 @@ class Report(APIResource):
             raise ValueError('Operand must be one of {}'.format(', '.join(self._FILTER_OPERANDS)))
 
         self._raw['filters'].append({
-            "fieldId": self.app.get_field_id(field),
+            "fieldId": self.app.get_field_definition(field)['id'],
             "filterType": operand,
             "value": value,
         })

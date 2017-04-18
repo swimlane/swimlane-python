@@ -55,13 +55,13 @@ class Record(APIResource):
         if field_name not in self._fields:
             raise KeyError('Unknown field "{}"'.format(field_name))
 
-        self._fields[field_name].set_from_python(value)
+        self._fields[field_name].set_python(value)
 
     def __getitem__(self, field_name):
         if field_name not in self._fields:
             raise KeyError('Unknown field "{}"'.format(field_name))
 
-        return self._fields[field_name].as_python()
+        return self._fields[field_name].get_python()
 
     def __delitem__(self, field_name):
         if field_name not in self._fields:
@@ -71,7 +71,7 @@ class Record(APIResource):
 
     def __iter__(self):
         for field_name, field in six.iteritems(self._fields):
-            yield field_name, field.as_python()
+            yield field_name, field.get_python()
 
     def __premap_fields(self):
         """Build field instances using field definitions in app manifest
@@ -79,17 +79,15 @@ class Record(APIResource):
         Map raw record field data into appropriate field instances with their correct respective types
         """
         for field_obj in self._app._raw['fields']:
-            name = field_obj['name']
-
             field_type = field_obj['$type']
             field_class = get_field_class(field_type)
 
-            field_instance = field_class(name, self)
+            field_instance = field_class(field_obj['name'], self)
             try:
-                value = self._raw['values'].get(field_obj['id'])
+                value = self._raw['values'].get(field_instance.id)
             except KeyError:
                 pass
             else:
-                field_instance.set_from_swimlane(value)
+                field_instance.set_swimlane(value)
 
-            self._fields[name] = field_instance
+            self._fields[field_instance.name] = field_instance

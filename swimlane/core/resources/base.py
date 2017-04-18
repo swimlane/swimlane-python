@@ -9,7 +9,7 @@ class APIResourceAdapter(object):
 
     @property
     def _swimlane(self):
-        """Resolve the swimlane weakref"""
+        """Transparently resolve the swimlane weakref"""
         return self.__ref_swimlane()
 
 
@@ -26,7 +26,7 @@ class APIResource(object):
             raise TypeError('Expected $type = "{}", received "{}"'.format(self._type, self._raw['$type']))
 
     def __repr__(self):
-        return '<{self.__class__.__name__}: {self}>'.format(self=self)
+        return '<{self.__class__.__name__}: {self!s}>'.format(self=self)
 
     def save(self):
         raise NotImplementedError
