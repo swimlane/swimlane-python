@@ -6,6 +6,7 @@ from datetime import datetime
 import pendulum
 import six
 
+from swimlane.core.resources.attachment import Attachment
 from swimlane.core.resources.usergroup import UserGroup
 from swimlane.utils import get_recursive_subclasses
 
@@ -83,7 +84,7 @@ class Field(object):
 class ReadOnly(object):
     """Mixin disabling setting value via python"""
 
-    def set_from_python(self, value):
+    def set_python(self, value):
         raise ValueError('Cannot manually set field "{}"'.format(self.name))
 
 
@@ -177,11 +178,6 @@ class DatetimeField(Field):
         return value
 
 
-class CommentsField(Field):
-
-    _field_type = 'Core.Models.Fields.CommentsField, Core'
-
-
 class UserGroupField(Field):
     """Manages getting/setting users from record User/Group fields"""
 
@@ -190,7 +186,7 @@ class UserGroupField(Field):
     supported_types = [UserGroup]
 
     def set_swimlane(self, value):
-        """Convert JSON definitions to appropriate User/Group object"""
+        """Convert JSON definition to UserGroup object"""
         # v2.x does not provide a distinction between users and groups at the field selection level, can only return
         # UserGroup instances instead of specific User or Group instances
         if value is not None:
@@ -199,6 +195,7 @@ class UserGroupField(Field):
         return super(UserGroupField, self).set_swimlane(value)
 
     def get_swimlane(self):
+        """Dump UserGroup back to JSON representation"""
         value = super(UserGroupField, self).get_swimlane()
 
         if value is not None:
@@ -207,31 +204,41 @@ class UserGroupField(Field):
         return value
 
 
-class AttachmentsField(Field):
+class CommentsField(ReadOnly, Field):
+
+    _field_type = 'Core.Models.Fields.CommentsField, Core'
+
+
+class AttachmentsField(ReadOnly, Field):
 
     _field_type = 'Core.Models.Fields.AttachmentField, Core'
 
+    def set_swimlane(self, value):
+        if value is None:
+            value = []
 
-class ReferenceField(Field):
+        value = [Attachment(self.record._swimlane, raw) for raw in value]
+
+        return super(AttachmentsField, self).set_swimlane(value)
+
+
+class ReferenceField(ReadOnly, Field):
 
     _field_type = 'Core.Models.Fields.Reference.ReferenceField, Core'
 
 
-class HistoryField(Field):
+class HistoryField(ReadOnly, Field):
 
     _field_type = 'Core.Models.Fields.History.HistoryField, Core'
 
 
-# Utilities
-
-
 # Lookup corresponding field given a Swimlane "$type" key
-FIELD_TYPE_MAP = {f._field_type: f for f in get_recursive_subclasses(Field)}
+FIELD_TYPE_MAP = {f._field_type: f for f in get_recursive_subclasses(Field) if f._field_type}
 
 
-def get_field_class(field_type):
-    """Return field class most fitting of provided Swimlane $type"""
+def resolve_field_class(field_definition):
+    """Return field class most fitting of provided Swimlane field definition"""
     try:
-        return FIELD_TYPE_MAP[field_type]
+        return FIELD_TYPE_MAP[field_definition['$type']]
     except KeyError:
-        raise ValueError('No field available to handle Swimlane $type "{}"'.format(field_type))
+        raise ValueError('No field available to handle Swimlane $type "{}"'.format(field_definition))

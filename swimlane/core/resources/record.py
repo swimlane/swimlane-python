@@ -2,7 +2,7 @@ import weakref
 
 import six
 
-from swimlane.core.fields import get_field_class
+from swimlane.core.fields import resolve_field_class
 from swimlane.core.resources.base import APIResource, APIResourceAdapter
 from swimlane.utils import random_string
 
@@ -78,11 +78,10 @@ class Record(APIResource):
         
         Map raw record field data into appropriate field instances with their correct respective types
         """
-        for field_obj in self._app._raw['fields']:
-            field_type = field_obj['$type']
-            field_class = get_field_class(field_type)
+        for field_definition in self._app._raw['fields']:
+            field_class = resolve_field_class(field_definition)
 
-            field_instance = field_class(field_obj['name'], self)
+            field_instance = field_class(field_definition['name'], self)
             try:
                 value = self._raw['values'].get(field_instance.id)
             except KeyError:
