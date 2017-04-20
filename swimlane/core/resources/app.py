@@ -41,9 +41,10 @@ class App(APIResource):
         self.acronym = self._raw['acronym']
         self.name = self._raw['name']
         self.description = self._raw.get('description', '')
-        self._fields = self._raw['fields']
         self.id = self._raw['id']
         self.tracking_id = self._raw.get('trackingFieldId')
+
+        self._fields = {f['name']: f for f in self._raw['fields']}
 
         self.records = RecordAdapter(self)
         self.reports = ReportAdapter(self)
@@ -52,8 +53,8 @@ class App(APIResource):
         return '{self.name} ({self.acronym})'.format(self=self)
 
     def get_field_definition(self, field_name):
-        for field in self._fields:
-            if field['name'] == field_name:
-                return field
-        else:
-            raise ValueError('Unable to find field "{}"'.format(field_name))
+        try:
+            return self._fields[field_name]
+        except KeyError as e:
+            e.message = 'Unable to find field "{}"'.format(field_name)
+            raise

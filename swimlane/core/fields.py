@@ -7,6 +7,8 @@ import pendulum
 import six
 
 from swimlane.core.resources.attachment import Attachment
+from swimlane.core.resources.history import History
+from swimlane.core.resources.comment import Comment
 from swimlane.core.resources.usergroup import UserGroup
 from swimlane.utils import get_recursive_subclasses
 
@@ -81,11 +83,27 @@ class Field(object):
         self._value = self.default
 
 
+class ListField(Field):
+    """Adds support to Field to operate on potentially multiple items
+    
+    Types listed in supported_types will reference child elements instead of top-level list container
+    
+    Setting unique_elements = True will ignore adding duplicate elements, defaults to False 
+    """
+
+    list_types = [list, tuple, set]
+    unique_elements = False
+
+    def __init__(self, *args, **kwargs):
+        super(ListField, self).__init__(*args, **kwargs)
+
+
 class ReadOnly(object):
     """Mixin disabling setting value via python"""
 
     def set_python(self, value):
-        raise ValueError('Cannot manually set field "{}"'.format(self.name))
+        """Disable user updating value. Raises AttributeError to emulate @property/__slots__ behavior"""
+        raise AttributeError('Cannot manually set field "{}"'.format(self.name))
 
 
 # Concrete Fields
@@ -129,7 +147,9 @@ class ValuesListField(TextField):
                 ))
 
     def set_swimlane(self, value):
-        value = value['value']
+        if value is not None:
+            value = value['value']
+
         return super(ValuesListField, self).set_swimlane(value)
 
     def get_swimlane(self):
@@ -204,12 +224,12 @@ class UserGroupField(Field):
         return value
 
 
-class CommentsField(ReadOnly, Field):
+class CommentsField(ReadOnly, ListField):
 
     _field_type = 'Core.Models.Fields.CommentsField, Core'
 
 
-class AttachmentsField(ReadOnly, Field):
+class AttachmentsField(ReadOnly, ListField):
 
     _field_type = 'Core.Models.Fields.AttachmentField, Core'
 
@@ -222,14 +242,18 @@ class AttachmentsField(ReadOnly, Field):
         return super(AttachmentsField, self).set_swimlane(value)
 
 
-class ReferenceField(ReadOnly, Field):
+class ReferenceField(ReadOnly, ListField):
 
     _field_type = 'Core.Models.Fields.Reference.ReferenceField, Core'
 
 
-class HistoryField(ReadOnly, Field):
+class HistoryField(ReadOnly, ListField):
 
     _field_type = 'Core.Models.Fields.History.HistoryField, Core'
+
+    def get_python(self):
+        """Return that automatically retrieves and caches history data from API"""
+        return History(self.record)
 
 
 # Lookup corresponding field given a Swimlane "$type" key
@@ -240,5 +264,6 @@ def resolve_field_class(field_definition):
     """Return field class most fitting of provided Swimlane field definition"""
     try:
         return FIELD_TYPE_MAP[field_definition['$type']]
-    except KeyError:
-        raise ValueError('No field available to handle Swimlane $type "{}"'.format(field_definition))
+    except KeyError as e:
+        e.message = 'No field available to handle Swimlane $type "{}"'.format(field_definition)
+        raise

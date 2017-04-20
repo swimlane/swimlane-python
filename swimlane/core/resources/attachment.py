@@ -17,3 +17,7 @@ class Attachment(APIResource):
 
     def __str__(self):
         return str(self.filename)
+
+    def download(self):
+        """Download attachment. Returns file contents as bytes"""
+        raise NotImplementedError

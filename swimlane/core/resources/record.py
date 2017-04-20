@@ -1,4 +1,5 @@
 import weakref
+from collections import OrderedDict
 
 import six
 
@@ -31,6 +32,10 @@ class RecordAdapter(APIResourceAdapter):
             report.filter(*f)
 
         return report
+
+    def create(self, **fields):
+        """Create a new record in associated app and return the corresponding Record instance"""
+        raise NotImplementedError
 
 
 class Record(APIResource):
@@ -90,3 +95,32 @@ class Record(APIResource):
                 field_instance.set_swimlane(value)
 
             self._fields[field_instance.name] = field_instance
+
+    def serialize(self):
+        """Serialize record for use in Swimlane save call"""
+        # $type MUST come first, use OrderedDict with alphabetically sorted keys
+        return OrderedDict(sorted({
+            '$type': self._type,
+            'values': ...,
+            'comments': [
+                {},
+                {}
+            ]
+        }.items()))
+
+    def _is_new(self):
+        """Returns True if record has not been created in Swimlane yet"""
+        return False
+
+    def save(self):
+        """Create or update record in Swimlane"""
+        if self._is_new():
+            method = 'post'
+        else:
+            method = 'put'
+
+        response = self._swimlane.request(
+            method,
+            'app/{}/record'.format(self._app.id),
+            json=self.serialize()
+        )

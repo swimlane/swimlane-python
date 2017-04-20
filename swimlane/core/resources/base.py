@@ -27,10 +27,3 @@ class APIResource(object):
 
     def __repr__(self):
         return '<{self.__class__.__name__}: {self!s}>'.format(self=self)
-
-    def save(self):
-        raise NotImplementedError
-
-    def permalink(self):
-        """Returns full URL to individual resource in Swimlane"""
-        raise NotImplementedError

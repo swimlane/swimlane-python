@@ -24,6 +24,9 @@ class Swimlane(object):
 
         self._session = requests.Session()
         self._session.verify = verify_ssl
+        self._session.headers = {
+            'Content-Type': 'application/json'
+        }
         self._session.auth = SwimlaneAuth(self, username, password)
 
         self.apps = AppAdapter(self)
