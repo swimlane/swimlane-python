@@ -44,7 +44,8 @@ class App(APIResource):
         self.id = self._raw['id']
         self.tracking_id = self._raw.get('trackingFieldId')
 
-        self._fields = {f['name']: f for f in self._raw['fields']}
+        self._fields_by_name = {f['name']: f for f in self._raw['fields']}
+        self._fields_by_id = {f['id']: f for f in self._raw['fields']}
 
         self.records = RecordAdapter(self)
         self.reports = ReportAdapter(self)
@@ -52,9 +53,16 @@ class App(APIResource):
     def __str__(self):
         return '{self.name} ({self.acronym})'.format(self=self)
 
-    def get_field_definition(self, field_name):
+    def get_field_definition_by_name(self, field_name):
         try:
-            return self._fields[field_name]
+            return self._fields_by_name[field_name]
         except KeyError as e:
-            e.message = 'Unable to find field "{}"'.format(field_name)
+            e.message = 'Unable to find field with name "{}"'.format(field_name)
+            raise
+
+    def get_field_definition_by_id(self, field_id):
+        try:
+            return self._fields_by_id[field_id]
+        except KeyError as e:
+            e.message = 'Unable to find field with ID "{}"'.format(field_id)
             raise

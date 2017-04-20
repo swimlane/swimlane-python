@@ -1,5 +1,8 @@
 """Custom exceptions and errors"""
 
+from requests import HTTPError
+
+
 # Swimlane custom error codes
 codes = {
     -1: 'Unknown',
@@ -47,7 +50,11 @@ codes = {
 
 
 class SwimlaneError(Exception):
-    """Base exception for Swimlane errors from 400 responses"""
+    """Base exception for Swimlane errors"""
+
+
+class SwimlaneHTTP400Error(SwimlaneError, HTTPError):
+    """Exception raised when receiving a 400 response with additional context"""
 
     def __init__(self, http_error):
         self.http_error = http_error
@@ -66,6 +73,6 @@ class SwimlaneError(Exception):
         else:
             message = '{name}({argument})'.format(name=self.name, argument=self.argument)
 
-        super(SwimlaneError, self).__init__(
+        super(SwimlaneHTTP400Error, self).__init__(
             '{message}: Bad Request for url: {url}'.format(message=message, url=self.http_error.response.url)
         )

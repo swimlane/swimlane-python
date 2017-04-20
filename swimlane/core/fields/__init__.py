@@ -1,112 +1,17 @@
 """Abstractions for Swimlane app field types to simplify getting/setting values on records"""
 import numbers
-import weakref
 from datetime import datetime
 
 import pendulum
 import six
 
-from swimlane.core.resources.attachment import Attachment
-from swimlane.core.resources.history import History
-from swimlane.core.resources.comment import Comment
+from swimlane.core.fields.base import Field, ReadOnly
+from swimlane.core.fields.attachment import AttachmentsField
+from swimlane.core.fields.comment import CommentsField
+from swimlane.core.fields.history import HistoryField
 from swimlane.core.resources.usergroup import UserGroup
 from swimlane.utils import get_recursive_subclasses
 
-
-# Base classes
-
-class Field(object):
-    """Base class for abstracting Swimlane complex types"""
-
-    _field_type = None
-    _resource_type = None
-
-    # Sentinel representing a field that has no current value
-    _unset = object()
-
-    # List of supported types, leave blank to disable type validation
-    supported_types = []
-
-    def __init__(self, name, record, default_value=_unset, allow_null=True):
-        self.name = name
-        self.record = weakref.proxy(record)
-        self.default = default_value
-        self.allow_null = allow_null
-        self._value = self.default
-
-        self.field_definition = self.record._app.get_field_definition(self.name)
-        self.id = self.field_definition['id']
-
-    def __repr__(self):
-        return '<{class_name}: {py!r}>'.format(class_name=self.__class__.__name__, py=self.get_python())
-
-    def _get(self):
-        """Default getter used for both representations unless overridden"""
-        return self._value
-
-    def get_python(self):
-        """Return best python representation of field value"""
-        return self._get()
-
-    def get_swimlane(self):
-        """Return best swimlane representation of field value"""
-        return self._get()
-
-    def _validate_value(self, value):
-        """Validate value is an acceptable type"""
-        if value is None:
-            if not self.allow_null:
-                raise ValueError('Field "{}" does not allow null and cannot be set to None')
-        else:
-            if self.supported_types and not isinstance(value, tuple(self.supported_types)):
-                raise TypeError('Field "{}" expects one of "{}", got "{}" instead'.format(
-                    self.name,
-                    ', '.join([t.__name__ for t in self.supported_types]),
-                    type(value).__name__)
-                )
-
-    def _set(self, value):
-        """Default setter used for both representations unless overridden"""
-        self._validate_value(value)
-        self._value = value
-
-    def set_python(self, value):
-        """Set field internal value from the python representation of field value"""
-        return self._set(value)
-
-    def set_swimlane(self, value):
-        """Set field internal value from the swimlane representation of field value"""
-        return self._set(value)
-
-    def unset(self):
-        """Marks field as having no particular value"""
-        self._value = self.default
-
-
-class ListField(Field):
-    """Adds support to Field to operate on potentially multiple items
-    
-    Types listed in supported_types will reference child elements instead of top-level list container
-    
-    Setting unique_elements = True will ignore adding duplicate elements, defaults to False 
-    """
-
-    list_types = [list, tuple, set]
-    unique_elements = False
-
-    def __init__(self, *args, **kwargs):
-        super(ListField, self).__init__(*args, **kwargs)
-
-
-class ReadOnly(object):
-    """Mixin disabling setting value via python"""
-
-    def set_python(self, value):
-        """Disable user updating value. Raises AttributeError to emulate @property/__slots__ behavior"""
-        raise AttributeError('Cannot manually set field "{}"'.format(self.name))
-
-
-# Concrete Fields
 
 class TextField(Field):
 
@@ -224,36 +129,9 @@ class UserGroupField(Field):
         return value
 
 
-class CommentsField(ReadOnly, ListField):
-
-    _field_type = 'Core.Models.Fields.CommentsField, Core'
-
-
-class AttachmentsField(ReadOnly, ListField):
-
-    _field_type = 'Core.Models.Fields.AttachmentField, Core'
-
-    def set_swimlane(self, value):
-        if value is None:
-            value = []
-
-        value = [Attachment(self.record._swimlane, raw) for raw in value]
-
-        return super(AttachmentsField, self).set_swimlane(value)
-
-
-class ReferenceField(ReadOnly, ListField):
+class ReferenceField(ReadOnly, Field):
 
     _field_type = 'Core.Models.Fields.Reference.ReferenceField, Core'
-
-
-class HistoryField(ReadOnly, ListField):
-
-    _field_type = 'Core.Models.Fields.History.HistoryField, Core'
-
-    def get_python(self):
-        """Return that automatically retrieves and caches history data from API"""
-        return History(self.record)
 
 
 # Lookup corresponding field given a Swimlane "$type" key

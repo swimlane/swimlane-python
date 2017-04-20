@@ -1,44 +1,29 @@
 import pendulum
 
 from swimlane.core.resources import APIResource
+from .base import RecordCursor, ReadOnly, CursorField
 from swimlane.core.resources.usergroup import UserGroup
 
 
-class History(APIResource):
-    """An iterable object that automatically retrieves and caches history data for a record from API"""
+class RevisionCursor(RecordCursor):
+    """An iterable object that automatically lazy retrieves and caches history data for a record from API"""
 
-    def __init__(self, record):
-        super(History, self).__init__(record._swimlane, {})
-        self._record = record
-        self.__revisions = []
+    def __init__(self, field):
+        super(RevisionCursor, self).__init__(field)
         self.__retrieved = False
 
-    def __str__(self):
-        return str(self._record)
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and other._record.id == self._record.id
-
-    def __len__(self):
-        return len(self.revisions)
-
-    def __iter__(self):
-        """Iterate and cache across paginated record history results"""
-        for revision in self.revisions:
-            yield revision
-
     @property
-    def revisions(self):
-        """Retrieves, caches, and returns the list of record revisions"""
+    def elements(self):
+        """Lazily retrieves, caches, and returns the list of record _revisions"""
         if not self.__retrieved:
-            self.__revisions = self._retrieve_revisions()
+            self._elements = self._retrieve_revisions()
             self.__retrieved = True
 
-        return self.__revisions
+        return super(RevisionCursor, self).elements
 
     def _retrieve_revisions(self):
         """Retrieve and populate Revision instances from history API endpoint"""
-        response = self._record._swimlane.request(
+        response = self._swimlane.request(
             'get',
             'history',
             params={
@@ -73,3 +58,9 @@ class Revision(APIResource):
 
     def __str__(self):
         return '{} ({})'.format(self.version, self.revision_number)
+
+
+class HistoryField(ReadOnly, CursorField):
+
+    _field_type = 'Core.Models.Fields.History.HistoryField, Core'
+    cursor_class = RevisionCursor

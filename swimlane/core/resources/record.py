@@ -9,6 +9,7 @@ from swimlane.utils import random_string
 
 
 class RecordAdapter(APIResourceAdapter):
+    """Allows retrieval and creation of Swimlane records"""
 
     def __init__(self, app):
         super(RecordAdapter, self).__init__(app._swimlane)

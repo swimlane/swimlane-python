@@ -9,7 +9,7 @@ from six.moves.urllib.parse import urljoin
 from swimlane.core.resources.app import AppAdapter
 from swimlane.core.resources.usergroup import UserAdapter, GroupAdapter
 # from swimlane.core.resources.tasks import TaskAdapter
-from swimlane.errors import SwimlaneError
+from swimlane.errors import SwimlaneHTTP400Error
 
 
 class Swimlane(object):
@@ -41,7 +41,8 @@ class Swimlane(object):
         
         Handles generating full API URL, session reuse and auth, and response status code checks
         
-        Raises HTTPError on 4xx/5xx HTTP responses, or SwimlaneError on 400 responses with 
+        Raises HTTPError on 4xx/5xx HTTP responses, or Swimlane400Error on 400 responses with well-formatted additional
+        context information about the exception
         """
         while endpoint.startswith('/'):
             endpoint = endpoint[1:]
@@ -52,9 +53,9 @@ class Swimlane(object):
             response.raise_for_status()
         except HTTPError as e:
             if e.response.status_code == 400:
-                raise SwimlaneError(e)
+                raise SwimlaneHTTP400Error(e)
             else:
-                raise
+                raise e
 
         return response
 

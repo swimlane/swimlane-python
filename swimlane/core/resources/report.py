@@ -138,7 +138,7 @@ class Report(APIResource):
             raise ValueError('Operand must be one of {}'.format(', '.join(self._FILTER_OPERANDS)))
 
         self._raw['filters'].append({
-            "fieldId": self.app.get_field_definition(field)['id'],
+            "fieldId": self.app.get_field_definition_by_name(field)['id'],
             "filterType": operand,
             "value": value,
         })

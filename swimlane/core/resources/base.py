@@ -2,7 +2,7 @@ import weakref
 
 
 class APIResourceAdapter(object):
-    """Base class for all API endpoint classes"""
+    """Provides automatic weakref resolution for Swimlane client to avoid circular references and memory leaks"""
 
     def __init__(self, swimlane):
         self.__ref_swimlane = weakref.ref(swimlane)
@@ -13,13 +13,13 @@ class APIResourceAdapter(object):
         return self.__ref_swimlane()
 
 
-class APIResource(object):
-    """Base class for all API objects"""
+class APIResource(APIResourceAdapter):
+    """Base class for all API resources with an associated $type and/or raw data"""
 
     _type = None
 
     def __init__(self, swimlane, raw):
-        self._swimlane = swimlane
+        super(APIResource, self).__init__(swimlane)
         self._raw = raw
 
         if self._type and self._raw['$type'] != self._type:

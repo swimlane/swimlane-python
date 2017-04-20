@@ -1,6 +1,6 @@
-from swimlane.core.resources.base import APIResource
+from swimlane.core.resources.base import APIResource, APIResourceAdapter
 
-from swimlane.core.resources.usergroup import User, Group
+from swimlane.core.resources.usergroup import User, Group, UserGroup
 from swimlane.core.resources.app import App
 from swimlane.core.resources.record import Record
 from swimlane.core.resources.report import Report
