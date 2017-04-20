@@ -1,3 +1,5 @@
+from io import BytesIO
+
 import pendulum
 
 from swimlane.core.resources import APIResource
@@ -8,8 +10,8 @@ class Attachment(APIResource):
 
     _type = 'Core.Models.Record.Attachment, Core'
 
-    def __init__(self, *args, **kwargs):
-        super(Attachment, self).__init__(*args, **kwargs)
+    def __init__(self, swimlane, raw):
+        super(Attachment, self).__init__(swimlane, raw)
 
         self.file_id = self._raw['fileId']
         self.filename = self._raw['filename']
@@ -20,4 +22,9 @@ class Attachment(APIResource):
 
     def download(self):
         """Download attachment. Returns file contents as bytes"""
-        raise NotImplementedError
+        response = self._swimlane.request(
+            'get',
+            'attachment/download/{}'.format(self.file_id)
+        )
+
+        return BytesIO(response.content)
