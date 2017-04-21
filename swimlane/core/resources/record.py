@@ -35,13 +35,15 @@ class RecordAdapter(APIResourceAdapter):
         return Record(self._app, response.json())
 
     def search(self, *filters):
-        """Shortcut to generate a new temporary search report using provided filters"""
-        report = self._app.reports.new('search-' + random_string(8))
+        """Shortcut to generate a new temporary search report using provided filters and return the results"""
+        report = self._app.reports.create('search-' + random_string(8))
 
         for f in filters:
             report.filter(*f)
 
-        return report
+        # TODO: Delete report after retrieving results
+
+        return list(report)
 
     def create(self, **fields):
         """Create a new record in associated app and return the corresponding Record instance"""
@@ -58,7 +60,13 @@ class Record(APIResource):
         self._app = app
 
         self.id = self._raw['id']
-        self.tracking_id = self._raw['trackingFull']
+
+        # Combine app acronym + trackingId instead of using trackingFull raw
+        # for guaranteed value (not available through report results)
+        self.tracking_id = '-'.join([
+            self._app.acronym,
+            str(int(self._raw['trackingId']))
+        ])
 
         self._fields = {}
         self.__premap_fields()

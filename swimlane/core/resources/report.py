@@ -1,8 +1,9 @@
-from datetime import datetime
-
 import itertools
 
+import pendulum
+
 from swimlane.core.resources.base import APIResourceAdapter, APIResource
+from swimlane.core.search.filtering import EQ, NOT_EQ, CONTAINS, EXCLUDES
 
 
 class ReportAdapter(APIResourceAdapter):
@@ -36,7 +37,7 @@ class ReportAdapter(APIResourceAdapter):
             self._swimlane.request('get', "reports/{0}".format(report_id))
         )
 
-    def new(self, name):
+    def create(self, name):
         """Get a new Report for the App designated by app_id.
 
         Args:
@@ -46,7 +47,7 @@ class ReportAdapter(APIResourceAdapter):
         Return:
             A prefilled Report.
         """
-        created = datetime.utcnow().isoformat() + "Z"
+        created = pendulum.now().to_rfc3339_string()
         user_model = self._swimlane.user.get_usergroup_selection()
 
         return Report(self.app, {
@@ -54,7 +55,7 @@ class ReportAdapter(APIResourceAdapter):
             "groupBys": [],
             "aggregates": [],
             "applicationIds": [self.app.id],
-            "columns": [f['id'] for f in self.app.fields],
+            "columns": list(self.app._fields_by_id.keys()),
             "sorts": {
                 "$type": "System.Collections.Generic.Dictionary`2"
                          "[[System.String, mscorlib],"
@@ -83,11 +84,6 @@ class Report(APIResource):
     """A report class used for searching."""
 
     _type = "Core.Models.Search.Report, Core"
-
-    EQ = "equals"
-    NOT_EQ = "doesNotEqual"
-    CONTAINS = "contains"
-    EXCLUDES = "excludes"
 
     _FILTER_OPERANDS = (
         EQ,
@@ -123,11 +119,7 @@ class Report(APIResource):
                     break
 
     def save(self):
-        return
-        '''if insert:
-            self._fields = self.swimlane.api('post', "reports")
-        else:
-            self._fields = self.swimlane.api('put', "reports")'''
+        raise NotImplementedError
 
     def delete(self):
         raise NotImplementedError

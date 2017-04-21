@@ -3,58 +3,56 @@
 from requests import HTTPError
 
 
-# Swimlane custom error codes
-codes = {
-    -1: 'Unknown',
-    1000: 'PasswordExpired',
-    1001: 'DuplicateUserName',
-    1002: 'InvalidUserNameOrPassword',
-    1003: 'ConfirmPasswordDoesNotMatch',
-    1004: 'PasswordDoesNotMeetComplexityRequirements',
-    1005: 'PasswordResetRequired',
-    1006: 'NewPasswordCannotMatchCurrent',
-    1007: 'InvalidUser',
-    1051: 'DuplicateGroupName',
-    1061: 'DuplicateRoleName',
-    2000: 'DuplicateFieldName',
-    2001: 'FieldNameEmpty',
-    2002: 'InvalidApplicationExportFile',
-    2003: 'ApplicationNotFound',
-    2004: 'InvalidCalculation',
-    3000: 'DuplicateFieldValue',
-    3001: 'InvalidDateField',
-    3002: 'RecordNotFound',
-    3003: 'FieldNotFound',
-    4000: 'BadStatsGroup',
-    4001: 'BadFilter',
-    5000: 'AppLimitExceeded',
-    5001: 'UserLimitExceeded',
-    5002: 'NewServerInstall',
-    5003: 'UnableToConnectToActiveDirectory',
-    5004: 'UnableToRetrieveStoredValue',
-    5005: 'UnableToConnectToMongoDb',
-    5006: 'UnableToConnectToSmtp',
-    5007: 'SwimlaneAlreadyInitialized',
-    5008: 'ModelValidationError',
-    5009: 'UpgradeInProcess',
-    5010: 'RequiredFieldMissing',
-    6000: 'ConnectionDataNotProvided',
-    7000: 'RegexNotDefined',
-    7001: 'AssetNotFound',
-    9000: 'BadThreatIntelConnector',
-    9001: 'NoThreatIntel',
-    9002: 'ThreatIntelTypeNotSupportedByThisProvider',
-    10000: 'DuplicateTaskName',
-    10001: 'TaskNotFound'
-}
-
-
 class SwimlaneError(Exception):
     """Base exception for Swimlane errors"""
 
 
 class SwimlaneHTTP400Error(SwimlaneError, HTTPError):
     """Exception raised when receiving a 400 response with additional context"""
+
+    codes = {
+        -1: 'Unknown',
+        1000: 'PasswordExpired',
+        1001: 'DuplicateUserName',
+        1002: 'InvalidUserNameOrPassword',
+        1003: 'ConfirmPasswordDoesNotMatch',
+        1004: 'PasswordDoesNotMeetComplexityRequirements',
+        1005: 'PasswordResetRequired',
+        1006: 'NewPasswordCannotMatchCurrent',
+        1007: 'InvalidUser',
+        1051: 'DuplicateGroupName',
+        1061: 'DuplicateRoleName',
+        2000: 'DuplicateFieldName',
+        2001: 'FieldNameEmpty',
+        2002: 'InvalidApplicationExportFile',
+        2003: 'ApplicationNotFound',
+        2004: 'InvalidCalculation',
+        3000: 'DuplicateFieldValue',
+        3001: 'InvalidDateField',
+        3002: 'RecordNotFound',
+        3003: 'FieldNotFound',
+        4000: 'BadStatsGroup',
+        4001: 'BadFilter',
+        5000: 'AppLimitExceeded',
+        5001: 'UserLimitExceeded',
+        5002: 'NewServerInstall',
+        5003: 'UnableToConnectToActiveDirectory',
+        5004: 'UnableToRetrieveStoredValue',
+        5005: 'UnableToConnectToMongoDb',
+        5006: 'UnableToConnectToSmtp',
+        5007: 'SwimlaneAlreadyInitialized',
+        5008: 'ModelValidationError',
+        5009: 'UpgradeInProcess',
+        5010: 'RequiredFieldMissing',
+        6000: 'ConnectionDataNotProvided',
+        7000: 'RegexNotDefined',
+        7001: 'AssetNotFound',
+        9000: 'BadThreatIntelConnector',
+        9001: 'NoThreatIntel',
+        9002: 'ThreatIntelTypeNotSupportedByThisProvider',
+        10000: 'DuplicateTaskName',
+        10001: 'TaskNotFound'
+    }
 
     def __init__(self, http_error):
         self.http_error = http_error
@@ -66,7 +64,7 @@ class SwimlaneHTTP400Error(SwimlaneError, HTTPError):
 
         self.code = int(error_content['ErrorCode'])
         self.argument = error_content['Argument']
-        self.name = codes.get(self.code, codes[-1])
+        self.name = self.codes.get(self.code, self.codes[-1])
 
         if self.argument is None:
             message = self.name

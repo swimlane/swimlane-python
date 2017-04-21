@@ -25,6 +25,7 @@ class Field(object):
 
         self.field_definition = self.record._app.get_field_definition_by_name(self.name)
         self.id = self.field_definition['id']
+        self.input_type = self.field_definition.get('inputType')
 
         selection_type = self.field_definition.get('selectionType', 'single')
         if selection_type == 'multi':

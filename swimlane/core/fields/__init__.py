@@ -1,6 +1,6 @@
 """Abstractions for Swimlane app field types to simplify getting/setting values on records"""
 import numbers
-from datetime import datetime
+from datetime import datetime, timedelta, date, time
 
 import pendulum
 import six
@@ -78,20 +78,50 @@ class DatetimeField(Field):
 
     _field_type = 'Core.Models.Fields.Date.DateField, Core'
 
-    supported_types = [datetime]
+    _type_date = 'date'
+    _type_time = 'time'
+    _type_interval = 'timespan'
+
+    # All others default to datetime
+    _input_type_map = {
+        _type_interval: [timedelta],
+        _type_date: [datetime, date],
+        _type_time: [datetime, time]
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(DatetimeField, self).__init__(*args, **kwargs)
+
+        self.supported_types = self._input_type_map.get(self.input_type, [datetime])
 
     def _set(self, value):
         self._validate_value(value)
 
-        # Force to Pendulum instance for consistency
+        # Force to appropriate Pendulum instance for consistency
         if value is not None:
-            value = pendulum.instance(value)
+            # Coercions to Pendulum classes for consistency
+            if self.input_type == self._type_interval:
+                # Force to Pendulum interval
+                if not isinstance(value, pendulum.Interval):
+                    value = pendulum.interval(value.total_seconds())
+            else:
+                # Force to Pendulum instance for consistency
+                value = pendulum.instance(value)
+
+                # Handle subtypes with matching Pendulum types
+                if self.input_type == self._type_time:
+                    value = value.time()
+                if self.input_type == self._type_date:
+                    value = value.date()
 
         return super(DatetimeField, self)._set(value)
 
     def set_swimlane(self, value):
         if value is not None:
-            value = pendulum.parse(value)
+            if self.input_type == self._type_interval:
+                value = pendulum.interval(milliseconds=int(value))
+            else:
+                value = pendulum.parse(value)
 
         return super(DatetimeField, self).set_swimlane(value)
 

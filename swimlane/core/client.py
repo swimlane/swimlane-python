@@ -8,7 +8,6 @@ from six.moves.urllib.parse import urljoin
 
 from swimlane.core.resources.app import AppAdapter
 from swimlane.core.resources.usergroup import UserAdapter, GroupAdapter
-# from swimlane.core.resources.tasks import TaskAdapter
 from swimlane.errors import SwimlaneHTTP400Error
 
 
@@ -22,9 +21,6 @@ class Swimlane(object):
         self.host.scheme = self.host.scheme or 'https'
         self.host.path = None
 
-        self.__username = username
-        self.__password = password
-
         self._session = requests.Session()
         self._session.verify = verify_ssl
         self._session.headers = {
@@ -32,8 +28,8 @@ class Swimlane(object):
         }
         self._session.auth = SwimlaneAuth(
             self,
-            self.__username,
-            self.__password
+            username,
+            password
         )
 
         self.apps = AppAdapter(self)
@@ -46,11 +42,11 @@ class Swimlane(object):
     def __repr__(self):
         return '<{cls}: {username} @ {host}>'.format(
             cls=self.__class__.__name__,
-            username=self.__username,
+            username=self._session.auth.username,
             host=self.host
         )
 
-    def request(self, method, endpoint, **kwargs):
+    def request(self, method, api_endpoint, **kwargs):
         """Shortcut helper for sending requests to API endpoints
         
         Handles generating full API URL, session reuse and auth, and response status code checks
@@ -58,10 +54,10 @@ class Swimlane(object):
         Raises HTTPError on 4xx/5xx HTTP responses, or Swimlane400Error on 400 responses with well-formatted additional
         context information about the exception
         """
-        while endpoint.startswith('/'):
-            endpoint = endpoint[1:]
+        while api_endpoint.startswith('/'):
+            api_endpoint = api_endpoint[1:]
 
-        response = self._session.request(method, urljoin(str(self.host) + self._api_root, endpoint), **kwargs)
+        response = self._session.request(method, urljoin(str(self.host) + self._api_root, api_endpoint), **kwargs)
 
         try:
             response.raise_for_status()
