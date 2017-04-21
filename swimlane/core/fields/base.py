@@ -26,6 +26,14 @@ class Field(object):
         self.field_definition = self.record._app.get_field_definition_by_name(self.name)
         self.id = self.field_definition['id']
 
+        selection_type = self.field_definition.get('selectionType', 'single')
+        if selection_type == 'multi':
+            self.is_multiselect = True
+        elif selection_type == 'single':
+            self.is_multiselect = False
+        else:
+            raise ValueError('Unknown selection type "{}"'.format(selection_type))
+
     def __repr__(self):
         return '<{class_name}: {py!r}>'.format(class_name=self.__class__.__name__, py=self.get_python())
 
@@ -84,11 +92,11 @@ class ReadOnly(object):
         raise AttributeError('Cannot manually set field "{}"'.format(self.name))
 
 
-class RecordCursor(APIResourceAdapter):
-    """Base class for objects encapsulating a record's complex fields potentially requiring additional request(s)"""
+class FieldCursor(APIResourceAdapter):
+    """Base class for cursors encapsulating a field's complex logic potentially requiring additional request(s)"""
 
     def __init__(self, field):
-        super(RecordCursor, self).__init__(field.record._swimlane)
+        super(FieldCursor, self).__init__(field.record._swimlane)
 
         self.__record_ref = weakref.ref(field.record)
         self.__field_ref = weakref.ref(field)
@@ -126,7 +134,7 @@ class RecordCursor(APIResourceAdapter):
 
 
 class CursorField(Field):
-    """Returns a proxy-like RecordCursor instance to allow encapsulation of value and extension of functionality"""
+    """Returns a proxy-like FieldCursor instance to support additional functionality"""
 
     cursor_class = None
 

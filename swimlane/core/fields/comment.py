@@ -1,10 +1,10 @@
 import pendulum
 
 from swimlane.core.resources import APIResource, UserGroup
-from .base import RecordCursor, ReadOnly, CursorField
+from .base import FieldCursor, ReadOnly, CursorField
 
 
-class CommentCursor(RecordCursor):
+class CommentCursor(FieldCursor):
     """Returned by CommentField to allow iteration and creation of Comment instances"""
 
     def __init__(self, field):

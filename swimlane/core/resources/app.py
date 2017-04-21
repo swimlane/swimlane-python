@@ -5,19 +5,28 @@ from swimlane.core.resources.report import ReportAdapter
 
 
 class AppAdapter(APIResourceAdapter):
-    """Abstracts app-level API consumption"""
+    """Allows retrieval of Swimlane Apps"""
 
-    def get(self, tracking_id=None, name=None, acronym=None):
-        if len(list(filter(None, (name, tracking_id, acronym)))) != 1:
-            raise ValueError('Must provide only one of name, tracking_id, or acronym')
+    def get(self, **kwargs):
+        """Get single app by id, name, or acronym"""
+        app_id = kwargs.pop('id', None)
+        name = kwargs.pop('name', None)
+        acronym = kwargs.pop('acronym', None)
 
-        if tracking_id:
+        if kwargs:
+            raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
+
+        if len(list(filter(None, (name, app_id, acronym)))) != 1:
+            raise TypeError('Must provide only one argument from name, id, or acronym')
+
+        if app_id:
             return App(
                 self._swimlane,
-                self._swimlane.request('get', 'app/{}'.format(tracking_id)).json()
+                self._swimlane.request('get', 'app/{}'.format(app_id)).json()
             )
         else:
             # Workaround for lack of support for get by name or acronym
+            # Holdover from previous driver support
             for app in self.list():
                 if any([
                     name and name == app.name,
@@ -26,6 +35,7 @@ class AppAdapter(APIResourceAdapter):
                     return app
 
     def list(self):
+        """Return list of all apps"""
         response = self._swimlane.request('get', 'app')
         return [App(self._swimlane, item) for item in response.json()]
 
@@ -54,6 +64,7 @@ class App(APIResource):
         return '{self.name} ({self.acronym})'.format(self=self)
 
     def get_field_definition_by_name(self, field_name):
+        """Get JSON field definition for field matching provided name"""
         try:
             return self._fields_by_name[field_name]
         except KeyError as e:
@@ -61,6 +72,7 @@ class App(APIResource):
             raise
 
     def get_field_definition_by_id(self, field_id):
+        """Get JSON field definition for field matching provided id"""
         try:
             return self._fields_by_id[field_id]
         except KeyError as e:

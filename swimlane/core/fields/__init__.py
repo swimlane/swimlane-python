@@ -9,6 +9,7 @@ from swimlane.core.fields.base import Field, ReadOnly
 from swimlane.core.fields.attachment import AttachmentsField
 from swimlane.core.fields.comment import CommentsField
 from swimlane.core.fields.history import HistoryField
+from swimlane.core.fields.reference import ReferenceField
 from swimlane.core.resources.usergroup import UserGroup
 from swimlane.utils import get_recursive_subclasses
 
@@ -127,11 +128,6 @@ class UserGroupField(Field):
             value = value.get_usergroup_selection()
 
         return value
-
-
-class ReferenceField(ReadOnly, Field):
-
-    _field_type = 'Core.Models.Fields.Reference.ReferenceField, Core'
 
 
 # Lookup corresponding field given a Swimlane "$type" key

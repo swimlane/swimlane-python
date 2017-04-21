@@ -16,6 +16,12 @@ class UserGroup(APIResource):
     def __str__(self):
         return self.name
 
+    def __eq__(self, other):
+        return isinstance(other, UserGroup) and all([
+            self.id == other.id,
+            self.name == other.name
+        ])
+
     def get_usergroup_selection(self):
         """Converts UserGroup to raw UserGroupSelection for populating record"""
         return {
@@ -38,10 +44,19 @@ class GroupAdapter(APIResourceAdapter):
         response = self._swimlane.request('get', 'groups')
         return [Group(self._swimlane, raw_group_data) for raw_group_data in response.json().get('groups', [])]
 
-    def get(self, group_id=None, name=None):
-        """Retrieve single group record"""
+    def get(self, **kwargs):
+        """Retrieve single group record by id or name"""
+        group_id = kwargs.pop('id', None)
+        name = kwargs.pop('name', None)
+
+        if kwargs:
+            raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
+
         if group_id is None and name is None:
-            raise ValueError('Must provide either group_id or name')
+            raise TypeError('Must provide either id or name argument')
+
+        if group_id and name:
+            raise TypeError('Cannot provide both id and name arguments')
 
         if group_id:
             response = self._swimlane.request('get', 'groups/{}'.format(group_id))
@@ -76,10 +91,19 @@ class UserAdapter(APIResourceAdapter):
         response = self._swimlane.request('get', "user")
         return [User(self._swimlane, raw_user_data) for raw_user_data in response.json().get('users', [])]
 
-    def get(self, user_id=None, username=None):
-        """Retrieve single user record"""
+    def get(self, **kwargs):
+        """Retrieve single user record by id or username"""
+        user_id = kwargs.pop('id', None)
+        username = kwargs.pop('username', None)
+
+        if kwargs:
+            raise TypeError('Unexpected **kwargs: %r' % kwargs)
+
         if user_id is None and username is None:
-            raise ValueError('Must provide either user_id or name')
+            raise TypeError('Must provide either id or username argument')
+
+        if user_id and username:
+            raise TypeError('Cannot provide both id and username arguments')
 
         if user_id:
             response = self._swimlane.request('get', 'user/{}'.format(user_id))

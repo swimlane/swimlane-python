@@ -3,10 +3,10 @@ from io import BytesIO
 import pendulum
 
 from swimlane.core.resources import APIResource
-from .base import RecordCursor, ReadOnly, CursorField
+from .base import FieldCursor, ReadOnly, CursorField
 
 
-class AttachmentCursor(RecordCursor):
+class AttachmentCursor(FieldCursor):
     """Allows creation and iteration of attachments"""
 
     def __init__(self, field):

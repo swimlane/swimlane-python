@@ -22,12 +22,19 @@ class Swimlane(object):
         self.host.scheme = self.host.scheme or 'https'
         self.host.path = None
 
+        self.__username = username
+        self.__password = password
+
         self._session = requests.Session()
         self._session.verify = verify_ssl
         self._session.headers = {
             'Content-Type': 'application/json'
         }
-        self._session.auth = SwimlaneAuth(self, username, password)
+        self._session.auth = SwimlaneAuth(
+            self,
+            self.__username,
+            self.__password
+        )
 
         self.apps = AppAdapter(self)
         self.users = UserAdapter(self)
@@ -35,6 +42,13 @@ class Swimlane(object):
 
         self.__settings = None
         self.__user = None
+
+    def __repr__(self):
+        return '<{cls}: {username} @ {host}>'.format(
+            cls=self.__class__.__name__,
+            username=self.__username,
+            host=self.host
+        )
 
     def request(self, method, endpoint, **kwargs):
         """Shortcut helper for sending requests to API endpoints

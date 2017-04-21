@@ -20,8 +20,17 @@ class RecordAdapter(APIResourceAdapter):
     def _app(self):
         return self.__ref_app()
 
-    def get(self, record_id):
-        response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.tracking_id, record_id))
+    def get(self, **kwargs):
+        """Get a single record by full id"""
+        record_id = kwargs.pop('id', None)
+
+        if kwargs:
+            raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
+
+        if record_id is None:
+            raise TypeError('Must provide id argument')
+
+        response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.id, record_id))
 
         return Record(self._app, response.json())
 
@@ -102,7 +111,7 @@ class Record(APIResource):
         # $type MUST come first, use OrderedDict with alphabetically sorted keys
         return OrderedDict(sorted({
             '$type': self._type,
-            'values': ...,
+            'values': [],
             'comments': [
                 {},
                 {}

@@ -1,11 +1,11 @@
 import pendulum
 
 from swimlane.core.resources import APIResource
-from .base import RecordCursor, ReadOnly, CursorField
+from .base import FieldCursor, ReadOnly, CursorField
 from swimlane.core.resources.usergroup import UserGroup
 
 
-class RevisionCursor(RecordCursor):
+class RevisionCursor(FieldCursor):
     """An iterable object that automatically lazy retrieves and caches history data for a record from API"""
 
     def __init__(self, field):
