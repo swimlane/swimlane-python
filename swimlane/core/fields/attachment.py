@@ -52,5 +52,5 @@ class Attachment(APIResource):
 
 class AttachmentsField(ReadOnly, CursorField):
 
-    _field_type = 'Core.Models.Fields.AttachmentField, Core'
+    field_type = 'Core.Models.Fields.AttachmentField, Core'
     cursor_class = AttachmentCursor

@@ -33,7 +33,7 @@ class ReferenceCursor(FieldCursor):
 
 class ReferenceField(ReadOnly, CursorField):
 
-    _field_type = 'Core.Models.Fields.Reference.ReferenceField, Core'
+    field_type = 'Core.Models.Fields.Reference.ReferenceField, Core'
     cursor_class = ReferenceCursor
 
     def __init__(self, *args, **kwargs):

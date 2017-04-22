@@ -62,5 +62,5 @@ class Revision(APIResource):
 
 class HistoryField(ReadOnly, CursorField):
 
-    _field_type = 'Core.Models.Fields.History.HistoryField, Core'
+    field_type = 'Core.Models.Fields.History.HistoryField, Core'
     cursor_class = RevisionCursor

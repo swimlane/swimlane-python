@@ -2,12 +2,9 @@ from __future__ import absolute_import
 from pkg_resources import get_distribution, DistributionNotFound
 
 from .core.client import Swimlane
-from .errors import SwimlaneHTTP400Error, SwimlaneError
 
 __all__ = [
     'Swimlane',
-    'SwimlaneHTTP400Error',
-    'SwimlaneError'
 ]
 
 

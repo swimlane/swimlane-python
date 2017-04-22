@@ -31,7 +31,7 @@ class Comment(APIResource):
 
 class CommentsField(ReadOnly, CursorField):
 
-    _field_type = 'Core.Models.Fields.CommentsField, Core'
+    field_type = 'Core.Models.Fields.CommentsField, Core'
     cursor_class = CommentCursor
 
 
