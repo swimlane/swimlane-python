@@ -5,6 +5,7 @@ import six
 
 from swimlane.core.fields import resolve_field_class
 from swimlane.core.resources.base import APIResource, APIResourceAdapter
+from swimlane.errors import UnknownField
 from swimlane.utils import random_string
 
 
@@ -47,7 +48,10 @@ class RecordAdapter(APIResourceAdapter):
 
     def create(self, **fields):
         """Create a new record in associated app and return the corresponding Record instance"""
-        raise NotImplementedError
+        for field_name, field_value in six.iteritems(fields):
+            field_definition = self._app.get_field_definition_by_name(field_name)
+            resolve_field_class(field_name)
+
         response = self._swimlane.request(
             'post',
             'app/{}/record'.format(self._app.id),
@@ -83,7 +87,7 @@ class Record(APIResource):
         field = self._fields.get(field_name)
 
         if field is None:
-            raise KeyError('Unknown field "{}"'.format(field_name))
+            raise UnknownField(self._app, field_name, self._fields.keys())
 
         field.set_python(value)
 
@@ -91,7 +95,7 @@ class Record(APIResource):
         field = self._fields.get(field_name)
 
         if field is None:
-            raise KeyError('Unknown field "{}"'.format(field_name))
+            raise UnknownField(self._app, field_name, self._fields.keys())
 
         return field.get_python()
 
@@ -99,7 +103,7 @@ class Record(APIResource):
         field = self._fields.get(field_name)
 
         if field is None:
-            raise KeyError('Unknown field "{}"'.format(field_name))
+            raise UnknownField(self._app, field_name, self._fields.keys())
 
         field.unset()
 
@@ -116,12 +120,8 @@ class Record(APIResource):
             field_class = resolve_field_class(field_definition)
 
             field_instance = field_class(field_definition['name'], self)
-            try:
-                value = self._raw['values'].get(field_instance.id)
-            except KeyError:
-                pass
-            else:
-                field_instance.set_swimlane(value)
+            value = self._raw['values'].get(field_instance.id)
+            field_instance.set_swimlane(value)
 
             self._fields[field_instance.name] = field_instance
 

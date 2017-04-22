@@ -1,10 +1,28 @@
 """Custom exceptions and errors"""
 
+from difflib import get_close_matches
+
 from requests import HTTPError
 
 
 class SwimlaneError(Exception):
     """Base exception for Swimlane errors"""
+
+
+class UnknownField(SwimlaneError, KeyError):
+    """Raised anytime access is attempted to a field that does not exist on an App or Record"""
+
+    def __init__(self, app, field_name, field_pool):
+        self.app = app
+        self.field_name = field_name
+        self.similar_field_names = get_close_matches(self.field_name, field_pool, 3)
+
+        message = "App '{}' has no field '{}'".format(self.app, self.field_name)
+
+        if self.similar_field_names:
+            message += '. Similar fields: ' + ', '.join([repr(f) for f in self.similar_field_names])
+
+        super(UnknownField, self).__init__(message)
 
 
 class SwimlaneHTTP400Error(SwimlaneError, HTTPError):

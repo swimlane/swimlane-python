@@ -1,3 +1,4 @@
+from swimlane.errors import UnknownField
 from .base import APIResourceAdapter, APIResource
 
 from swimlane.core.resources.record import RecordAdapter
@@ -67,14 +68,12 @@ class App(APIResource):
         """Get JSON field definition for field matching provided name"""
         try:
             return self._fields_by_name[field_name]
-        except KeyError as e:
-            e.message = 'Unable to find field with name "{}"'.format(field_name)
-            raise
+        except KeyError:
+            raise UnknownField(self, field_name, self._fields_by_name.keys())
 
     def get_field_definition_by_id(self, field_id):
         """Get JSON field definition for field matching provided id"""
         try:
             return self._fields_by_id[field_id]
-        except KeyError as e:
-            e.message = 'Unable to find field with ID "{}"'.format(field_id)
-            raise
+        except KeyError:
+            raise UnknownField(self, field_id, self._fields_by_id.keys())
