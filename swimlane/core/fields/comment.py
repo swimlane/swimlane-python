@@ -7,13 +7,6 @@ from .base import FieldCursor, ReadOnly, CursorField
 class CommentCursor(FieldCursor):
     """Returned by CommentField to allow iteration and creation of Comment instances"""
 
-    def __init__(self, field):
-        super(CommentCursor, self).__init__(field)
-
-        raw_comments = field.record._raw['comments'].get(field.id, [])
-
-        self._elements = [Comment(self._swimlane, raw) for raw in raw_comments]
-
 
 class Comment(APIResource):
     """Abstraction of a single comment from a comment field"""
@@ -34,4 +27,7 @@ class CommentsField(ReadOnly, CursorField):
     field_type = 'Core.Models.Fields.CommentsField, Core'
     cursor_class = CommentCursor
 
+    def get_initial_elements(self):
+        raw_comments = self.record._raw['comments'].get(self.id, [])
 
+        return [Comment(self.record._swimlane, raw) for raw in raw_comments]

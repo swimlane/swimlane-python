@@ -17,10 +17,10 @@ class UserGroup(APIResource):
         return self.name
 
     def __eq__(self, other):
-        return isinstance(other, UserGroup) and all([
-            self.id == other.id,
-            self.name == other.name
-        ])
+        return isinstance(other, UserGroup) and hash(self) == hash(other)
+
+    def __hash__(self):
+        return hash((self.id, self.name))
 
     def get_usergroup_selection(self):
         """Converts UserGroup to raw UserGroupSelection for populating record"""

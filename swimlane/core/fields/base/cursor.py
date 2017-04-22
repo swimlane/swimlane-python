@@ -7,13 +7,13 @@ from swimlane.core.resources import APIResourceAdapter
 class FieldCursor(APIResourceAdapter):
     """Base class for cursors encapsulating a field's complex logic potentially requiring additional request(s)"""
 
-    def __init__(self, field):
+    def __init__(self, field, initial_elements=None):
         super(FieldCursor, self).__init__(field.record._swimlane)
 
         self.__record_ref = weakref.ref(field.record)
         self.__field_ref = weakref.ref(field)
 
-        self._elements = []
+        self._elements = initial_elements or []
 
     def __repr__(self):
         return '<{self.__class__.__name__}: {self._record} ({length})>'.format(self=self, length=len(self))
@@ -22,14 +22,13 @@ class FieldCursor(APIResourceAdapter):
         return isinstance(other, self.__class__) and other._record.id == self._record.id
 
     def __len__(self):
-        return len(self.elements)
+        return len(self.evaluate())
 
     def __iter__(self):
-        for el in self.elements:
+        for el in self.evaluate():
             yield el
 
-    @property
-    def elements(self):
+    def evaluate(self):
         """Hook to allow lazy evaluation or retrieval of cursor's elements
         
         Defaults to simply returning list of self._elements
@@ -55,13 +54,17 @@ class CursorField(Field):
 
         self._cursor = None
 
+    def get_initial_elements(self):
+        """Return initial elements to be passed with cursor instantiation"""
+        return []
+
     def get_python(self):
         """Create, cache, and return the appropriate cursor instance"""
         if self._cursor is None:
             if self.cursor_class is None:
                 raise NotImplementedError('Must set "cursor_class" on {}'.format(self.__class__.__name__))
 
-            self._cursor = self.cursor_class(self)
+            self._cursor = self.cursor_class(self, self.get_initial_elements())
 
         return self._cursor
 

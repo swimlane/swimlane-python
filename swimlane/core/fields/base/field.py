@@ -1,6 +1,7 @@
 import weakref
 
 
+# TODO: Respect readonly field definition setting
 class Field(object):
     """Base class for abstracting Swimlane complex types"""
 
@@ -12,12 +13,11 @@ class Field(object):
     # List of supported types, leave blank to disable type validation
     supported_types = []
 
-    def __init__(self, name, record, default_value=_unset, allow_null=True):
+    def __init__(self, name, record, allow_null=True):
         self.name = name
         self.__record_ref = weakref.ref(record)
-        self.default = default_value
         self.allow_null = allow_null
-        self._value = self.default
+        self._value = self._unset
 
         self.field_definition = self.record._app.get_field_definition_by_name(self.name)
         self.id = self.field_definition['id']

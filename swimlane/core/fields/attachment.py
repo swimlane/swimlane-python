@@ -9,13 +9,6 @@ from .base import FieldCursor, ReadOnly, CursorField
 class AttachmentCursor(FieldCursor):
     """Allows creation and iteration of attachments"""
 
-    def __init__(self, field):
-        super(AttachmentCursor, self).__init__(field)
-
-        raw_value = field.get_swimlane() or []
-
-        self._elements = [Attachment(self._swimlane, raw) for raw in raw_value]
-
 
 class Attachment(APIResource):
     """Loose abstraction of Swimlane attachments from attachments fields"""
@@ -54,3 +47,8 @@ class AttachmentsField(ReadOnly, CursorField):
 
     field_type = 'Core.Models.Fields.AttachmentField, Core'
     cursor_class = AttachmentCursor
+
+    def get_initial_elements(self):
+        raw_value = self.get_swimlane() or []
+
+        return [Attachment(self.record._swimlane, raw) for raw in raw_value]

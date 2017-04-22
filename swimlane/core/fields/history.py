@@ -8,18 +8,17 @@ from swimlane.core.resources.usergroup import UserGroup
 class RevisionCursor(FieldCursor):
     """An iterable object that automatically lazy retrieves and caches history data for a record from API"""
 
-    def __init__(self, field):
-        super(RevisionCursor, self).__init__(field)
+    def __init__(self, *args, **kwargs):
+        super(RevisionCursor, self).__init__(*args, **kwargs)
         self.__retrieved = False
 
-    @property
-    def elements(self):
+    def evaluate(self):
         """Lazily retrieves, caches, and returns the list of record _revisions"""
         if not self.__retrieved:
             self._elements = self._retrieve_revisions()
             self.__retrieved = True
 
-        return super(RevisionCursor, self).elements
+        return super(RevisionCursor, self).evaluate()
 
     def _retrieve_revisions(self):
         """Retrieve and populate Revision instances from history API endpoint"""

@@ -23,6 +23,7 @@ class DatetimeField(Field):
     def __init__(self, *args, **kwargs):
         super(DatetimeField, self).__init__(*args, **kwargs)
 
+        # Determine supported_types after inspecting input subtype
         self.supported_types = self._input_type_map.get(self.input_type, [datetime])
 
     def _set(self, value):
@@ -39,14 +40,14 @@ class DatetimeField(Field):
 
         return super(DatetimeField, self)._set(value)
 
-    def set_swimlane(self, value):
+    def cast_to_python(self, value):
         if value is not None:
             if self.input_type == self._type_interval:
                 value = pendulum.interval(milliseconds=int(value))
             else:
                 value = pendulum.parse(value)
 
-        return super(DatetimeField, self).set_swimlane(value)
+        return value
 
     def get_python(self):
         """Coerce to best date type representation for the field subtype"""
