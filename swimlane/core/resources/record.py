@@ -116,6 +116,23 @@ class Record(Resource):
         return Record(Client.get("app/{0}/record/{1}".format(app_id,
                                                              record_id)))
 
+    @classmethod
+    def add_reference(cls, application_id, record_id, field_id,
+                      target_record_ids):
+        """
+        Add a record reference to a reference field in an existing record
+        Args:
+            application_id: The referencing application ID
+            record_id: The ID of the record to add a reference to
+            field_id: The reference field on the application
+            target_record_ids: The record ID(s) to add to the reference field
+
+        """
+        Client.post({
+            "fieldId": field_id,
+            "targetRecordIds": target_record_ids
+        }, "app/{0}/record/{1}/reference".format(application_id, record_id))
+
     def restrict(self, *user_groups, **kwargs):
         """
         Restrict the record to specific users and/or groups.
