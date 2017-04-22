@@ -74,7 +74,11 @@ class Field(object):
 
     def set_python(self, value):
         """Set field internal value from the python representation of field value"""
-        return self._set(value)
+        return_value = self._set(value)
+
+        self.record._raw['values'][self.id] = self.get_swimlane()
+
+        return return_value
 
     def set_swimlane(self, value):
         """Set field internal value from the swimlane representation of field value"""

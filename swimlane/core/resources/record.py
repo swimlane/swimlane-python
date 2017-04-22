@@ -1,5 +1,5 @@
+import json
 import weakref
-from collections import OrderedDict
 
 import six
 
@@ -48,6 +48,11 @@ class RecordAdapter(APIResourceAdapter):
     def create(self, **fields):
         """Create a new record in associated app and return the corresponding Record instance"""
         raise NotImplementedError
+        response = self._swimlane.request(
+            'post',
+            'app/{}/record'.format(self._app.id),
+
+        )
 
 
 class Record(APIResource):
@@ -75,22 +80,28 @@ class Record(APIResource):
         return str(self.tracking_id)
 
     def __setitem__(self, field_name, value):
-        if field_name not in self._fields:
+        field = self._fields.get(field_name)
+
+        if field is None:
             raise KeyError('Unknown field "{}"'.format(field_name))
 
-        self._fields[field_name].set_python(value)
+        field.set_python(value)
 
     def __getitem__(self, field_name):
-        if field_name not in self._fields:
+        field = self._fields.get(field_name)
+
+        if field is None:
             raise KeyError('Unknown field "{}"'.format(field_name))
 
-        return self._fields[field_name].get_python()
+        return field.get_python()
 
     def __delitem__(self, field_name):
-        if field_name not in self._fields:
+        field = self._fields.get(field_name)
+
+        if field is None:
             raise KeyError('Unknown field "{}"'.format(field_name))
 
-        self._fields[field_name].unset()
+        field.unset()
 
     def __iter__(self):
         for field_name, field in six.iteritems(self._fields):
@@ -115,30 +126,17 @@ class Record(APIResource):
             self._fields[field_instance.name] = field_instance
 
     def serialize(self):
-        """Serialize record for use in Swimlane save call"""
-        # $type MUST come first, use OrderedDict with alphabetically sorted keys
-        return OrderedDict(sorted({
-            '$type': self._type,
-            'values': [],
-            'comments': [
-                {},
-                {}
-            ]
-        }.items()))
-
-    def _is_new(self):
-        """Returns True if record has not been created in Swimlane yet"""
-        return False
+        """Serialize record to JSON string for use in Swimlane save call"""
+        return json.dumps(
+            self._raw,
+            sort_keys=True,
+            separators=(',', ':')
+        )
 
     def save(self):
-        """Create or update record in Swimlane"""
-        if self._is_new():
-            method = 'post'
-        else:
-            method = 'put'
-
-        response = self._swimlane.request(
-            method,
+        """Update record in Swimlane"""
+        self._swimlane.request(
+            'put',
             'app/{}/record'.format(self._app.id),
-            json=self.serialize()
+            data=self.serialize()
         )

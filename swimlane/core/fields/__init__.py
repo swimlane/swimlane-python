@@ -99,20 +99,12 @@ class DatetimeField(Field):
 
         # Force to appropriate Pendulum instance for consistency
         if value is not None:
-            # Coercions to Pendulum classes for consistency
             if self.input_type == self._type_interval:
                 # Force to Pendulum interval
-                if not isinstance(value, pendulum.Interval):
-                    value = pendulum.interval(value.total_seconds())
+                value = pendulum.interval.instance(value)
             else:
-                # Force to Pendulum instance for consistency
+                # Force to Pendulum instance
                 value = pendulum.instance(value)
-
-                # Handle subtypes with matching Pendulum types
-                if self.input_type == self._type_time:
-                    value = value.time()
-                if self.input_type == self._type_date:
-                    value = value.date()
 
         return super(DatetimeField, self)._set(value)
 
@@ -129,7 +121,22 @@ class DatetimeField(Field):
         value = super(DatetimeField, self).get_swimlane()
 
         if value is not None:
-            value = value.to_rfc3339_string()
+            if self.input_type == self._type_interval:
+                value = int(value.total_seconds() * 1000)
+            else:
+                value = value.to_rfc3339_string()
+
+        return value
+
+    def get_python(self):
+        """Coerce to best date type representation for the field subtype"""
+        value = super(DatetimeField, self).get_python()
+
+        # Handle subtypes with matching Pendulum types
+        if self.input_type == self._type_time:
+            value = value.time()
+        if self.input_type == self._type_date:
+            value = value.date()
 
         return value
 
