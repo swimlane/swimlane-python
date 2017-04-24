@@ -9,6 +9,13 @@ class UserGroupField(MultiSelectField):
 
     supported_types = [UserGroup]
 
+    def set_swimlane(self, value):
+        """Workaround for reports returning an empty usergroup field as a single element list with no id/name"""
+        if value == [{"$type": "Core.Models.Utilities.UserGroupSelection, Core"}]:
+            value = []
+
+        return super(UserGroupField, self).set_swimlane(value)
+
     def cast_to_python(self, value):
         """Convert JSON definition to UserGroup object"""
         # v2.x does not provide a distinction between users and groups at the field selection level, can only return
