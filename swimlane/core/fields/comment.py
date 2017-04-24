@@ -4,10 +4,6 @@ from swimlane.core.resources import APIResource, UserGroup
 from .base import FieldCursor, ReadOnly, CursorField
 
 
-class CommentCursor(FieldCursor):
-    """Returned by CommentField to allow iteration and creation of Comment instances"""
-
-
 class Comment(APIResource):
     """Abstraction of a single comment from a comment field"""
 
@@ -20,6 +16,29 @@ class Comment(APIResource):
 
     def __str__(self):
         return self.message
+
+
+class CommentCursor(FieldCursor):
+    """Returned by CommentField to allow iteration and creation of Comment instances"""
+
+    def comment(self, message):
+        """Add new comment to record comment field"""
+        message = str(message)
+
+        sw_repr = {
+            '$type': 'Core.Models.Record.Comments, Core',
+            'createdByUser': self._record._swimlane.user.get_usergroup_selection(),
+            'createdDate': pendulum.now().to_rfc3339_string(),
+            'message': message
+        }
+
+        self._record._raw['comments'].setdefault(self._field.id, [])
+        self._record._raw['comments'][self._field.id].append(sw_repr)
+
+        comment = Comment(self._swimlane, sw_repr)
+        self._elements.append(comment)
+
+        return comment
 
 
 class CommentsField(ReadOnly, CursorField):
