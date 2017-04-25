@@ -1,4 +1,4 @@
-"""This module provides operators and functions for aggregating."""
+"""This module provides operators and functions for aggregating"""
 
 AVG = "average"
 COUNT = "count"

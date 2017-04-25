@@ -1,4 +1,4 @@
-"""This module provides operators and functions for grouping by a field.."""
+"""This module provides operators and functions for grouping by a field"""
 
 GB = "groupBy"
 HOUR = "groupByHour"

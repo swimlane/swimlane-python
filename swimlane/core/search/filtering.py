@@ -1,4 +1,4 @@
-"""This module provides operators and functions for filtering."""
+"""This module provides operators and functions for filtering"""
 
 EQ = "equals"
 NOT_EQ = "doesNotEqual"
