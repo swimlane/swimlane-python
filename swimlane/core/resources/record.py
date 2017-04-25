@@ -19,6 +19,7 @@ class RecordAdapter(SwimlaneResolver):
 
     @property
     def _app(self):
+        """Resolve app weak reference"""
         return self.__ref_app()
 
     def get(self, **kwargs):
@@ -42,24 +43,43 @@ class RecordAdapter(SwimlaneResolver):
         for f in filters:
             report.filter(*f)
 
-        # TODO: Delete report after retrieving results
-
         return list(report)
 
     def create(self, **fields):
-        """Create a new record in associated app and return the corresponding Record instance"""
-        for field_name, field_value in six.iteritems(fields):
-            field_definition = self._app.get_field_definition_by_name(field_name)
+        """Create and return a new record in associated app and return the corresponding Record instance
+        
+        Arguments should be field names with their respective python values
+        """
+        # Use temporary Record instance to build fields and inject python values
+        new_record = Record(self._app, {
+            '$type': Record._type,
+            'isNew': True,
+            'applicationId': self._app.id,
+            'comments': {
+                '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib'
+            },
+            'values': {
+                '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
+            }
+        })
 
+        for field_name, field_value in six.iteritems(fields):
+            new_record[field_name] = field_value
+
+        # Send converted data to server
         response = self._swimlane.request(
             'post',
             'app/{}/record'.format(self._app.id),
-
+            data=new_record.serialize()
         )
+
+        # Return new Record instance from returned data
+        return Record(self._app, response.json())
 
 
 @total_ordering
 class Record(APIResource):
+    """A Swimlane record"""
 
     _type = 'Core.Models.Record.Record, Core'
 
@@ -68,14 +88,20 @@ class Record(APIResource):
 
         self._app = app
 
-        self.id = self._raw['id']
+        self.is_new = self._raw.get('isNew', False)
 
-        # Combine app acronym + trackingId instead of using trackingFull raw
-        # for guaranteed value (not available through report results)
-        self.tracking_id = '-'.join([
-            self._app.acronym,
-            str(int(self._raw['trackingId']))
-        ])
+        # Protect against creation from generic raw data not yet containing server-generated values
+        if self.is_new:
+            self.id = self.tracking_id = None
+        else:
+            self.id = self._raw['id']
+
+            # Combine app acronym + trackingId instead of using trackingFull raw
+            # for guaranteed value (not available through report results)
+            self.tracking_id = '-'.join([
+                self._app.acronym,
+                str(int(self._raw['trackingId']))
+            ])
 
         self._fields = {}
         self.__premap_fields()
@@ -147,6 +173,7 @@ class Record(APIResource):
 
     def save(self):
         """Update record in Swimlane"""
+        # Use "data=" vs "json=" to control serialization (primarily for ordered keys with $type key first)
         self._swimlane.request(
             'put',
             'app/{}/record'.format(self._app.id),
