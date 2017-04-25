@@ -1,13 +1,11 @@
+import mimetypes
 from io import BytesIO
 
 import pendulum
+from requests_toolbelt import MultipartEncoder
 
 from swimlane.core.resources import APIResource
 from .base import FieldCursor, ReadOnly, CursorField
-
-
-class AttachmentCursor(FieldCursor):
-    """Allows creation and iteration of attachments"""
 
 
 class Attachment(APIResource):
@@ -41,6 +39,45 @@ class Attachment(APIResource):
         stream.seek(0)
 
         return stream
+
+
+class AttachmentCursor(FieldCursor):
+    """Allows creation and iteration of attachments"""
+
+    def add(self, filename, stream, content_type=None):
+        """Upload a new attachment, and add it to current fields raw data to be persisted on save
+        
+        Can optionally manually set the content_type, will be guessed by provided filename extension and default to 
+        application/octet-stream if it cannot be guessed
+        """
+        # Guess file Content-Type or default
+        content_type = content_type or mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+
+        # Multipart body boundaries must be set in request Content-Type
+        # Normally done automatically, but default application/json header is interfering
+        multipart = MultipartEncoder(fields={
+            'file': (filename, stream, content_type)
+        })
+
+        response = self._record._swimlane.request(
+            'post',
+            'attachment',
+            data=multipart,
+            headers={
+                'Content-Type': multipart.content_type
+            }
+        )
+
+        # Returns raw attachment data as list with single element
+        raw_attachment_data = response.json()[0]
+
+        attachment = Attachment(self._record._swimlane, raw_attachment_data)
+        self._elements.append(attachment)
+
+        self._record._raw['values'].setdefault(self._field.id, [])
+        self._record._raw['values'][self._field.id].append(attachment._raw)
+
+        return attachment
 
 
 class AttachmentsField(ReadOnly, CursorField):

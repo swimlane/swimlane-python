@@ -11,7 +11,7 @@ class ReferenceCursor(FieldCursor):
         # Should be empty to start, added to as new records are lazily retrieved
         self._retrieved_record_ids = set([r.id for r in self._elements])
 
-    def evaluate(self):
+    def _evaluate(self):
         """Retrieve target App, and retrieve any not already retrieved records"""
         # Get target app if not already cached
         if self._target_app is None:
@@ -27,7 +27,7 @@ class ReferenceCursor(FieldCursor):
             self._retrieved_record_ids.add(record.id)
 
         # Yield the now populated elements as normal
-        return super(ReferenceCursor, self).evaluate()
+        return super(ReferenceCursor, self)._evaluate()
 
 
 class ReferenceField(ReadOnly, CursorField):
@@ -41,5 +41,5 @@ class ReferenceField(ReadOnly, CursorField):
         self._target_app_id = self.field_definition['targetId']
 
     def get_initial_elements(self):
-        # TODO: Override to provide initial set of elements; Requires fix to cursor evaluate
+        # TODO: Override to provide initial set of elements; Requires fix to cursor _evaluate
         return super(ReferenceField, self).get_initial_elements()

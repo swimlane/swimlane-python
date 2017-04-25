@@ -1,7 +1,7 @@
 import weakref
 
 
-# TODO: Respect readonly field definition setting
+# TODO: Respect readonly field definition setting(s) (calculated, createdBy, etc.)
 class Field(object):
     """Base class for abstracting Swimlane complex types"""
 
@@ -14,6 +14,7 @@ class Field(object):
     supported_types = []
 
     def __init__(self, name, record, allow_null=True):
+        """Value not included during instantiation to prevent ambiguity between python and swimlane representations"""
         self.name = name
         self.__record_ref = weakref.ref(record)
         self.allow_null = allow_null
@@ -85,7 +86,3 @@ class Field(object):
     def set_swimlane(self, value):
         """Set field internal value from the swimlane representation of field value"""
         return self._set(self.cast_to_python(value))
-
-    def unset(self):
-        """Marks field as having no particular value"""
-        self._value = self.default

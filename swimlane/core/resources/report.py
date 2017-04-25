@@ -98,8 +98,12 @@ class Report(APIResource):
         super(Report, self).__init__(app._swimlane, raw)
 
         self.app = app
+        self.name = self._raw['name']
 
         self.__records = []
+
+    def __str__(self):
+        return self.name
 
     def __iter__(self):
         if self.__records:

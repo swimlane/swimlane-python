@@ -12,13 +12,13 @@ class RevisionCursor(FieldCursor):
         super(RevisionCursor, self).__init__(*args, **kwargs)
         self.__retrieved = False
 
-    def evaluate(self):
+    def _evaluate(self):
         """Lazily retrieves, caches, and returns the list of record _revisions"""
         if not self.__retrieved:
             self._elements = self._retrieve_revisions()
             self.__retrieved = True
 
-        return super(RevisionCursor, self).evaluate()
+        return super(RevisionCursor, self)._evaluate()
 
     def _retrieve_revisions(self):
         """Retrieve and populate Revision instances from history API endpoint"""

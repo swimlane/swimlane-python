@@ -14,7 +14,7 @@ class MultiSelectCursor(FieldCursor):
 
     def _sync_field(self):
         """Set source field value to current cursor value"""
-        self._field.set_python(self.evaluate())
+        self._field.set_python(self._evaluate())
 
     def add(self, element):
         """Proxy to internal set.add and sync field"""

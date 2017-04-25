@@ -32,11 +32,11 @@ class CommentCursor(FieldCursor):
             'message': message
         }
 
-        self._record._raw['comments'].setdefault(self._field.id, [])
-        self._record._raw['comments'][self._field.id].append(sw_repr)
-
         comment = Comment(self._swimlane, sw_repr)
         self._elements.append(comment)
+
+        self._record._raw['comments'].setdefault(self._field.id, [])
+        self._record._raw['comments'][self._field.id].append(comment._raw)
 
         return comment
 

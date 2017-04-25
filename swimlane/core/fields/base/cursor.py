@@ -22,13 +22,16 @@ class FieldCursor(APIResourceAdapter):
         return isinstance(other, self.__class__) and other._record.id == self._record.id
 
     def __len__(self):
-        return len(self.evaluate())
+        return len(self._evaluate())
 
     def __iter__(self):
-        for el in self.evaluate():
+        for el in self._evaluate():
             yield el
 
-    def evaluate(self):
+    def __getitem__(self, item):
+        return self._evaluate()[item]
+
+    def _evaluate(self):
         """Hook to allow lazy evaluation or retrieval of cursor's elements
         
         Defaults to simply returning list of self._elements

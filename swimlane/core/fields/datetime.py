@@ -7,6 +7,7 @@ import pendulum
 from .base import Field
 
 
+# FIXME: Not working with records from report
 class DatetimeField(Field):
 
     field_type = 'Core.Models.Fields.Date.DateField, Core'
