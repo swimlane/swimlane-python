@@ -7,7 +7,6 @@ import pendulum
 from .base import Field
 
 
-# FIXME: Not working with records from report
 class DatetimeField(Field):
 
     field_type = 'Core.Models.Fields.Date.DateField, Core'
@@ -56,11 +55,12 @@ class DatetimeField(Field):
         """Coerce to best date type representation for the field subtype"""
         value = super(DatetimeField, self).get_python()
 
-        # Handle subtypes with matching Pendulum types
-        if self.input_type == self._type_time:
-            value = value.time()
-        if self.input_type == self._type_date:
-            value = value.date()
+        if value is not None:
+            # Handle subtypes with matching Pendulum types
+            if self.input_type == self._type_time:
+                value = value.time()
+            if self.input_type == self._type_date:
+                value = value.date()
 
         return value
 
