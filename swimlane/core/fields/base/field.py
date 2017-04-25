@@ -1,8 +1,10 @@
 import weakref
 
+from swimlane.core.resources import SwimlaneResolver
+
 
 # TODO: Respect readonly field definition setting(s) (calculated, createdBy, etc.)
-class Field(object):
+class Field(SwimlaneResolver):
     """Base class for abstracting Swimlane complex types"""
 
     field_type = None
@@ -13,8 +15,11 @@ class Field(object):
     # List of supported types, leave blank to disable type validation
     supported_types = []
 
+    # TODO: Set initial value from server at instantiation to differentiate set_python from initial value set
     def __init__(self, name, record, allow_null=True):
         """Value not included during instantiation to prevent ambiguity between python and swimlane representations"""
+        super(Field, self).__init__(record._swimlane)
+
         self.name = name
         self.__record_ref = weakref.ref(record)
         self.allow_null = allow_null
@@ -29,6 +34,7 @@ class Field(object):
 
     @property
     def record(self):
+        """Resolve weak reference to parent record"""
         return self.__record_ref()
 
     def _get(self):

@@ -1,11 +1,14 @@
 import weakref
 
 from .field import Field
-from swimlane.core.resources import APIResourceAdapter
+from swimlane.core.resources import SwimlaneResolver
 
 
-class FieldCursor(APIResourceAdapter):
-    """Base class for cursors encapsulating a field's complex logic potentially requiring additional request(s)"""
+class FieldCursor(SwimlaneResolver):
+    """Base class for encapsulating a field instance's complex logic
+    
+    Useful in abstracting away extra request(s), lazy evaluation, pagination, intensive calculations, etc.
+    """
 
     def __init__(self, field, initial_elements=None):
         super(FieldCursor, self).__init__(field.record._swimlane)
@@ -30,6 +33,10 @@ class FieldCursor(APIResourceAdapter):
 
     def __getitem__(self, item):
         return self._evaluate()[item]
+
+    def _sync_field(self):
+        """Set source field value to current cursor value"""
+        self._field.set_python(self._evaluate())
 
     def _evaluate(self):
         """Hook to allow lazy evaluation or retrieval of cursor's elements

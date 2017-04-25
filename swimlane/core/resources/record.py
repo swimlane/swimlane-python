@@ -1,15 +1,15 @@
 import json
 import weakref
+from functools import total_ordering
 
 import six
 
-from swimlane.core.fields import resolve_field_class
-from swimlane.core.resources.base import APIResource, APIResourceAdapter
+from swimlane.core.resources.base import APIResource, SwimlaneResolver
 from swimlane.errors import UnknownField
 from swimlane.utils import random_string
 
 
-class RecordAdapter(APIResourceAdapter):
+class RecordAdapter(SwimlaneResolver):
     """Allows retrieval and creation of Swimlane records"""
 
     def __init__(self, app):
@@ -50,7 +50,6 @@ class RecordAdapter(APIResourceAdapter):
         """Create a new record in associated app and return the corresponding Record instance"""
         for field_name, field_value in six.iteritems(fields):
             field_definition = self._app.get_field_definition_by_name(field_name)
-            resolve_field_class(field_name)
 
         response = self._swimlane.request(
             'post',
@@ -59,6 +58,7 @@ class RecordAdapter(APIResourceAdapter):
         )
 
 
+@total_ordering
 class Record(APIResource):
 
     _type = 'Core.Models.Record.Record, Core'
@@ -111,11 +111,23 @@ class Record(APIResource):
         for field_name, field in six.iteritems(self._fields):
             yield field_name, field.get_python()
 
+    def __hash__(self):
+        return hash((self.id, self._app))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and hash(self) == hash(other)
+
+    def __lt__(self, other):
+        return isinstance(other, self.__class__) and (self.id, self._app.id) < (other.id, other._app.id)
+
     def __premap_fields(self):
         """Build field instances using field definitions in app manifest
         
         Map raw record field data into appropriate field instances with their correct respective types
         """
+        # Circular imports
+        from swimlane.core.fields import resolve_field_class
+
         for field_definition in self._app._raw['fields']:
             field_class = resolve_field_class(field_definition)
 

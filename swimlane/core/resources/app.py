@@ -1,11 +1,11 @@
 from swimlane.errors import UnknownField
-from .base import APIResourceAdapter, APIResource
+from .base import SwimlaneResolver, APIResource
 
 from swimlane.core.resources.record import RecordAdapter
 from swimlane.core.resources.report import ReportAdapter
 
 
-class AppAdapter(APIResourceAdapter):
+class AppAdapter(SwimlaneResolver):
     """Allows retrieval of Swimlane Apps"""
 
     def get(self, **kwargs):
@@ -26,7 +26,7 @@ class AppAdapter(APIResourceAdapter):
                 self._swimlane.request('get', 'app/{}'.format(app_id)).json()
             )
         else:
-            # Workaround for lack of support for get by name or acronym
+            # FIXME: Workaround for lack of support for get by name or acronym
             # Holdover from previous driver support
             for app in self.list():
                 if any([

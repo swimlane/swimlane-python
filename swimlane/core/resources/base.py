@@ -1,7 +1,7 @@
 import weakref
 
 
-class APIResourceAdapter(object):
+class SwimlaneResolver(object):
     """Provides automatic weakref resolution for Swimlane client to avoid circular references and memory leaks"""
 
     def __init__(self, swimlane):
@@ -13,7 +13,7 @@ class APIResourceAdapter(object):
         return self.__ref_swimlane()
 
 
-class APIResource(APIResourceAdapter):
+class APIResource(SwimlaneResolver):
     """Base class for all API resources with an associated $type and/or raw data"""
 
     _type = None

@@ -1,4 +1,4 @@
-from swimlane.core.resources.base import APIResource, APIResourceAdapter
+from swimlane.core.resources.base import APIResource, SwimlaneResolver
 
 from swimlane.core.resources.usergroup import User, Group, UserGroup
 from swimlane.core.resources.app import App

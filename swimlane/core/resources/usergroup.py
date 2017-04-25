@@ -1,4 +1,4 @@
-from swimlane.core.resources.base import APIResource, APIResourceAdapter
+from swimlane.core.resources.base import APIResource, SwimlaneResolver
 
 
 class UserGroup(APIResource):
@@ -38,7 +38,7 @@ class UserGroup(APIResource):
         return UserGroup(swimlane, raw)
 
 
-class GroupAdapter(APIResourceAdapter):
+class GroupAdapter(SwimlaneResolver):
 
     def list(self):
         response = self._swimlane.request('get', 'groups')
@@ -84,7 +84,7 @@ class Group(UserGroup):
         self.description = self._raw.get('description')
 
 
-class UserAdapter(APIResourceAdapter):
+class UserAdapter(SwimlaneResolver):
 
     def list(self):
         """Retrieve all users"""

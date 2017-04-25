@@ -1,3 +1,5 @@
+from sortedcontainers import SortedSet
+
 from .cursor import CursorField, FieldCursor
 
 
@@ -10,11 +12,7 @@ class MultiSelectCursor(FieldCursor):
     def __init__(self, *args, **kwargs):
         super(MultiSelectCursor, self).__init__(*args, **kwargs)
 
-        self._elements = set(self._elements)
-
-    def _sync_field(self):
-        """Set source field value to current cursor value"""
-        self._field.set_python(self._evaluate())
+        self._elements = SortedSet(self._elements)
 
     def add(self, element):
         """Proxy to internal set.add and sync field"""

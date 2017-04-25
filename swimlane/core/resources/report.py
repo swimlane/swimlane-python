@@ -2,11 +2,11 @@ import itertools
 
 import pendulum
 
-from swimlane.core.resources.base import APIResourceAdapter, APIResource
+from swimlane.core.resources.base import SwimlaneResolver, APIResource
 from swimlane.core.search.filtering import EQ, NOT_EQ, CONTAINS, EXCLUDES
 
 
-class ReportAdapter(APIResourceAdapter):
+class ReportAdapter(SwimlaneResolver):
 
     def __init__(self, app):
         super(ReportAdapter, self).__init__(app._swimlane)
