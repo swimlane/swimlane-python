@@ -2,6 +2,7 @@ import re
 import weakref
 
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from pyuri import URI
 from requests import HTTPError
 from six.moves.urllib.parse import urljoin
@@ -9,6 +10,10 @@ from six.moves.urllib.parse import urljoin
 from swimlane.core.resources.app import AppAdapter
 from swimlane.core.resources.usergroup import UserAdapter, GroupAdapter
 from swimlane.errors import SwimlaneHTTP400Error
+
+
+# Disable insecure request warnings
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class Swimlane(object):
@@ -20,6 +25,9 @@ class Swimlane(object):
         self.host = URI(host)
         self.host.scheme = self.host.scheme or 'https'
         self.host.path = None
+
+        self.__settings = None
+        self.__user = None
 
         self._session = requests.Session()
         self._session.verify = verify_ssl
@@ -35,9 +43,6 @@ class Swimlane(object):
         self.apps = AppAdapter(self)
         self.users = UserAdapter(self)
         self.groups = GroupAdapter(self)
-
-        self.__settings = None
-        self.__user = None
 
     def __repr__(self):
         return '<{cls}: {username} @ {host}>'.format(
@@ -132,11 +137,18 @@ class SwimlaneAuth(object):
 
     def _authenticate(self):
         """Send login request and return login token"""
-        resp = self._swimlane.request('post', 'user/login', json={
-            'userName': self.username,
-            'password': self.password,
-            'domain': ''
-        })
+        # Explicitly provide verify argument, appears to not consistently be acknowledged across versions during
+        # initial setup for auth
+        resp = self._swimlane.request(
+            'post',
+            'user/login',
+            json={
+                'userName': self.username,
+                'password': self.password,
+                'domain': ''
+            },
+            verify=self._swimlane._session.verify
+        )
         json_content = resp.json()
 
         # Check for token in response content
