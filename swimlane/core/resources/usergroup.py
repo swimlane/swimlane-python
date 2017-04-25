@@ -50,7 +50,7 @@ class GroupAdapter(SwimlaneResolver):
         name = kwargs.pop('name', None)
 
         if kwargs:
-            raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
+            raise TypeError('Unexpected arguments: {}'.format(kwargs))
 
         if group_id is None and name is None:
             raise TypeError('Must provide either id or name argument')
@@ -97,7 +97,7 @@ class UserAdapter(SwimlaneResolver):
         username = kwargs.pop('username', None)
 
         if kwargs:
-            raise TypeError('Unexpected **kwargs: %r' % kwargs)
+            raise TypeError('Unexpected arguments: {}'.format(kwargs))
 
         if user_id is None and username is None:
             raise TypeError('Must provide either id or username argument')

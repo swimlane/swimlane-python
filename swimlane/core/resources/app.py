@@ -15,15 +15,20 @@ class AppAdapter(SwimlaneResolver):
         acronym = kwargs.pop('acronym', None)
 
         if kwargs:
-            raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
+            raise TypeError('Unexpected argument(s): {}'.format(kwargs))
 
-        if len(list(filter(None, (name, app_id, acronym)))) != 1:
+        if len(list(filter(lambda x: x is not None, (name, app_id, acronym)))) != 1:
             raise TypeError('Must provide only one argument from name, id, or acronym')
 
         if app_id:
+            # Server returns 204 instead of 404 for a non-existent app id
+            response = self._swimlane.request('get', 'app/{}'.format(app_id))
+            if response.status_code == 204:
+                raise ValueError('No app with id = "{}"'.format(app_id))
+
             return App(
                 self._swimlane,
-                self._swimlane.request('get', 'app/{}'.format(app_id)).json()
+                response.json()
             )
         else:
             # FIXME: Workaround for lack of support for get by name or acronym
@@ -34,6 +39,9 @@ class AppAdapter(SwimlaneResolver):
                     acronym and acronym == app.acronym
                 ]):
                     return app
+            else:
+                # No matching app found
+                raise ValueError('No app matching provided arguments: {}'.format(kwargs))
 
     def list(self):
         """Return list of all apps"""

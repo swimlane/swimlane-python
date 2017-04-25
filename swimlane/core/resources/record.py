@@ -27,7 +27,7 @@ class RecordAdapter(SwimlaneResolver):
         record_id = kwargs.pop('id', None)
 
         if kwargs:
-            raise TypeError('Unexpected **kwargs: {}'.format(kwargs))
+            raise TypeError('Unexpected arguments: {}'.format(kwargs))
 
         if record_id is None:
             raise TypeError('Must provide id argument')

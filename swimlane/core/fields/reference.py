@@ -1,4 +1,5 @@
 import six
+from sortedcontainers import SortedDict
 
 from swimlane.core.fields.base.multiselect import MultiSelectCursor, MultiSelectField
 from swimlane.core.resources import Record
@@ -6,29 +7,39 @@ from swimlane.core.resources import Record
 
 # TODO: Move Record instance cache to field to remove additional requests after direct field set, resetting cursor
 class ReferenceCursor(MultiSelectCursor):
-    """Handles retrieval of target app and records"""
+    """Handles lazy retrieval of target records"""
 
     def __init__(self, *args, **kwargs):
         super(ReferenceCursor, self).__init__(*args, **kwargs)
 
-        # Should be empty to start, added to as new records are lazily retrieved
-        self._retrieved_record_ids = set([r.id for r in self._elements])
+        self._record_cache = SortedDict()
 
     def _evaluate(self):
-        """Retrieve target App, and retrieve any not already retrieved records"""
-        # Get target app if not already cached
-
+        """Retrieve any not already retrieved records"""
         # Scan current list of targeted IDs and retrieve any that are missing
-        for target_record_id in self._field._get():
-            if target_record_id in self._retrieved_record_ids:
+        for target_record_id in self._elements:
+            if target_record_id in self._record_cache:
                 continue
 
             record = self._field.target_app.records.get(id=target_record_id)
-            self._elements.add(record)
-            self._retrieved_record_ids.add(record.id)
+            self._record_cache[target_record_id] = record
 
         # Yield the now populated elements as normal
-        return super(ReferenceCursor, self)._evaluate()
+        return list(self._record_cache.values())
+
+    def add(self, element):
+        """Support adding Records or IDs"""
+        if isinstance(element, Record):
+            element = element.id
+
+        return super(ReferenceCursor, self).add(element)
+
+    def remove(self, element):
+        """Support removing Records or IDs"""
+        if isinstance(element, Record):
+            element = element.id
+
+        return super(ReferenceCursor, self).remove(element)
 
 
 class ReferenceField(MultiSelectField):
@@ -74,7 +85,3 @@ class ReferenceField(MultiSelectField):
                 value = value.id
 
         return value
-
-    def get_initial_elements(self):
-        # FIXME: Should return list of just ids
-        return []
