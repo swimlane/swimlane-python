@@ -1,16 +1,16 @@
+"""Core Swimlane driver/client class"""
+
 import re
-import weakref
 
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from pyuri import URI
-from requests import HTTPError
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from six.moves.urllib.parse import urljoin
 
+from swimlane.core.resources import SwimlaneResolver
 from swimlane.core.resources.app import AppAdapter
-from swimlane.core.resources.usergroup import UserAdapter, GroupAdapter
+from swimlane.core.resources.usergroup import GroupAdapter, UserAdapter
 from swimlane.errors import SwimlaneHTTP400Error
-
 
 # Disable insecure request warnings
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -52,10 +52,10 @@ class Swimlane(object):
         )
 
     def request(self, method, api_endpoint, **kwargs):
-        """Shortcut helper for sending requests to API endpoints
-        
-        Handles generating full API URL, session reuse and auth, and response status code checks
-        
+        """Shortcut helper for sending requests to API
+
+        Handles generating full API URL, session reuse and auth, and response status code
+
         Raises HTTPError on 4xx/5xx HTTP responses, or Swimlane400Error on 400 responses with well-formatted additional
         context information about the exception
         """
@@ -66,11 +66,11 @@ class Swimlane(object):
 
         try:
             response.raise_for_status()
-        except HTTPError as e:
-            if e.response.status_code == 400:
-                raise SwimlaneHTTP400Error(e)
+        except requests.HTTPError as error:
+            if error.response.status_code == 400:
+                raise SwimlaneHTTP400Error(error)
             else:
-                raise e
+                raise error
 
         return response
 
@@ -120,14 +120,14 @@ class Swimlane(object):
         return (versions > version_sections) - (versions < version_sections)
 
 
-class SwimlaneAuth(object):
+class SwimlaneAuth(SwimlaneResolver):
 
     def __init__(self, swimlane, username, password):
+        super(SwimlaneAuth, self).__init__(swimlane)
         self.username = username
         self.password = password
 
-        self._swimlane = weakref.proxy(swimlane)
-        self._login_headers = self._authenticate()
+        self._login_headers = self.authenticate()
 
     def __call__(self, request):
 
@@ -135,7 +135,7 @@ class SwimlaneAuth(object):
 
         return request
 
-    def _authenticate(self):
+    def authenticate(self):
         """Send login request and return login token"""
         # Explicitly provide verify argument, appears to not consistently be acknowledged across versions during
         # initial setup for auth

@@ -1,5 +1,5 @@
-from .base import MultiSelectField
 from swimlane.core.resources.usergroup import UserGroup
+from .base import MultiSelectField
 
 
 class UserGroupField(MultiSelectField):

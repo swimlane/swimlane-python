@@ -1,3 +1,5 @@
+"""Utility functions"""
+
 import importlib
 import pkgutil
 import random
@@ -22,7 +24,7 @@ def import_submodules(package):
 
     results = {}
 
-    for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
+    for _, name, is_pkg in pkgutil.walk_packages(package.__path__):
         full_name = package.__name__ + '.' + name
         results[full_name] = importlib.import_module(full_name)
 

@@ -1,8 +1,7 @@
-from swimlane.errors import UnknownField
-from .base import SwimlaneResolver, APIResource
-
 from swimlane.core.resources.record import RecordAdapter
 from swimlane.core.resources.report import ReportAdapter
+from swimlane.errors import UnknownField
+from .base import APIResource, SwimlaneResolver
 
 
 class AppAdapter(SwimlaneResolver):
@@ -39,9 +38,9 @@ class AppAdapter(SwimlaneResolver):
                     acronym and acronym == app.acronym
                 ]):
                     return app
-            else:
-                # No matching app found
-                raise ValueError('No app matching provided arguments: {}'.format(kwargs))
+
+            # No matching app found
+            raise ValueError('No app matching provided arguments: {}'.format(kwargs))
 
     def list(self):
         """Return list of all apps"""

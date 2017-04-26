@@ -1,6 +1,7 @@
 """Custom exceptions and errors"""
 
 from difflib import get_close_matches
+from json import JSONDecodeError
 
 from requests import HTTPError
 
@@ -77,7 +78,7 @@ class SwimlaneHTTP400Error(SwimlaneError, HTTPError):
 
         try:
             error_content = self.http_error.response.json()
-        except Exception:
+        except JSONDecodeError:
             error_content = {'Argument': None, 'ErrorCode': '-1'}
 
         self.code = int(error_content['ErrorCode'])

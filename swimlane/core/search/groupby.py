@@ -23,4 +23,3 @@ def create_groupby(field_id, groupby_type):
         "fieldId": field_id,
         "groupByType": groupby_type
     }
-

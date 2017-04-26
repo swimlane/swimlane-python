@@ -5,7 +5,7 @@ import pendulum
 from requests_toolbelt import MultipartEncoder
 
 from swimlane.core.resources import APIResource
-from .base import FieldCursor, ReadOnly, CursorField
+from .base import CursorField, FieldCursor, ReadOnly
 
 
 class Attachment(APIResource):

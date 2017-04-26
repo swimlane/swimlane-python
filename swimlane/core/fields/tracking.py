@@ -1,4 +1,4 @@
-from .base import ReadOnly, Field
+from .base import Field, ReadOnly
 
 
 class TrackingField(ReadOnly, Field):

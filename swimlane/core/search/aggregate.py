@@ -21,4 +21,3 @@ def create_aggregate(field_id, aggregate_type):
         "fieldId": field_id,
         "aggregateType": aggregate_type
     }
-

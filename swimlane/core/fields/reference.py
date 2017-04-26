@@ -70,10 +70,10 @@ class ReferenceField(MultiSelectField):
         if value is not None:
             elements = []
 
-            for el in value:
-                if isinstance(el, Record):
-                    el = el.id
-                elements.append(el)
+            for element in value:
+                if isinstance(element, Record):
+                    element = element.id
+                elements.append(element)
 
             value = elements
 

@@ -1,8 +1,8 @@
 import pendulum
 
 from swimlane.core.resources import APIResource
-from .base import FieldCursor, ReadOnly, CursorField
 from swimlane.core.resources.usergroup import UserGroup
+from .base import CursorField, FieldCursor, ReadOnly
 
 
 class RevisionCursor(FieldCursor):

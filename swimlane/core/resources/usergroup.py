@@ -69,8 +69,8 @@ class GroupAdapter(SwimlaneResolver):
             for group_data in matched_groups:
                 if group_data.get('name') == name:
                     return Group(self._swimlane, group_data)
-            else:
-                raise ValueError('Unable to find group with name "{}"'.format(name))
+
+            raise ValueError('Unable to find group with name "{}"'.format(name))
 
 
 class Group(UserGroup):
@@ -116,8 +116,8 @@ class UserAdapter(SwimlaneResolver):
             for user_data in matched_users:
                 if user_data.get('userName') == username:
                     return User(self._swimlane, user_data)
-            else:
-                raise ValueError('Unable to find user with username "{}"'.format(username))
+
+            raise ValueError('Unable to find user with username "{}"'.format(username))
 
 
 class User(UserGroup):

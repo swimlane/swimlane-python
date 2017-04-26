@@ -36,12 +36,12 @@ class RecordAdapter(SwimlaneResolver):
 
         return Record(self._app, response.json())
 
-    def search(self, *filters):
+    def search(self, *filter_tuples):
         """Shortcut to generate a new temporary search report using provided filters and return the results"""
         report = self._app.reports.create('search-' + random_string(8))
 
-        for f in filters:
-            report.filter(*f)
+        for filter_tuple in filter_tuples:
+            report.filter(*filter_tuple)
 
         return list(report)
 
@@ -51,6 +51,7 @@ class RecordAdapter(SwimlaneResolver):
         Arguments should be field names with their respective python values
         """
         # Use temporary Record instance to build fields and inject python values
+        #pylint: disable=line-too-long
         new_record = Record(self._app, {
             '$type': Record._type,
             'isNew': True,

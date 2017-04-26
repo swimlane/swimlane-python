@@ -1,5 +1,8 @@
+"""Swimlane API driver"""
+
 from __future__ import absolute_import
-from pkg_resources import get_distribution, DistributionNotFound
+
+from pkg_resources import DistributionNotFound, get_distribution
 
 from .core.client import Swimlane
 

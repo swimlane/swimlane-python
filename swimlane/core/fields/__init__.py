@@ -16,8 +16,8 @@ def resolve_field_class(field_definition):
     """Return field class most fitting of provided Swimlane field definition"""
     try:
         return _FIELD_TYPE_MAP[field_definition['$type']]
-    except KeyError as e:
-        e.message = 'No field available to handle Swimlane $type "{}"'.format(field_definition)
+    except KeyError as error:
+        error.message = 'No field available to handle Swimlane $type "{}"'.format(field_definition)
         raise
 
 

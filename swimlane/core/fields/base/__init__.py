@@ -1,10 +1,10 @@
 """Base classes used to build field abstractions"""
-from .field import Field
 from .cursor import CursorField, FieldCursor
+from .field import Field
 from .multiselect import MultiSelectField
 
 
-class ReadOnly(object):
+class ReadOnly(Field):
     """Mixin disabling setting value via python"""
 
     def set_python(self, value):

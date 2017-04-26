@@ -50,8 +50,7 @@ class MultiSelectField(CursorField):
         if self.is_multiselect:
             return super(MultiSelectField, self).get_python()
 
-        else:
-            return self._get()
+        return self._get()
 
     def _set(self, value):
         """Expect single instance of supported_types or iterable of instances of supported_types when multi-select"""
@@ -60,9 +59,9 @@ class MultiSelectField(CursorField):
                 raise TypeError('Multiselect field "{}" must be set to iterable objects'.format(self.name))
 
             elements = []
-            for el in value:
-                self.validate_value(el)
-                elements.append(el)
+            for element in value:
+                self.validate_value(element)
+                elements.append(element)
 
             value = elements
         else:
@@ -81,8 +80,7 @@ class MultiSelectField(CursorField):
 
             return self._set(children)
 
-        else:
-            return super(MultiSelectField, self).set_swimlane(value)
+        return super(MultiSelectField, self).set_swimlane(value)
 
     def get_swimlane(self):
         if self.is_multiselect:
@@ -94,7 +92,4 @@ class MultiSelectField(CursorField):
 
             return children
 
-        else:
-            return super(MultiSelectField, self).get_swimlane()
-
-
+        return super(MultiSelectField, self).get_swimlane()

@@ -2,8 +2,8 @@ import itertools
 
 import pendulum
 
-from swimlane.core.resources.base import SwimlaneResolver, APIResource
-from swimlane.core.search.filtering import EQ, NOT_EQ, CONTAINS, EXCLUDES
+from swimlane.core.resources.base import APIResource, SwimlaneResolver
+from swimlane.core.search.filtering import CONTAINS, EQ, EXCLUDES, NOT_EQ
 
 
 class ReportAdapter(SwimlaneResolver):
@@ -47,6 +47,7 @@ class ReportAdapter(SwimlaneResolver):
         Return:
             A prefilled Report.
         """
+        #pylint: disable=protected-access
         created = pendulum.now().to_rfc3339_string()
         user_model = self._swimlane.user.get_usergroup_selection()
 

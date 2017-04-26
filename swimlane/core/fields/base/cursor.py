@@ -1,7 +1,7 @@
 import weakref
 
-from .field import Field
 from swimlane.core.resources import SwimlaneResolver
+from .field import Field
 
 
 class FieldCursor(SwimlaneResolver):
@@ -28,8 +28,8 @@ class FieldCursor(SwimlaneResolver):
         return len(self._evaluate())
 
     def __iter__(self):
-        for el in self._evaluate():
-            yield el
+        for element in self._evaluate():
+            yield element
 
     def __getitem__(self, item):
         return self._evaluate()[item]
@@ -74,6 +74,7 @@ class CursorField(Field):
             if self.cursor_class is None:
                 raise NotImplementedError('Must set "cursor_class" on {}'.format(self.__class__.__name__))
 
+            # pylint: disable=not-callable
             self._cursor = self.cursor_class(self, self.get_initial_elements())
 
         return self._cursor

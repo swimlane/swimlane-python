@@ -1,7 +1,7 @@
 import pendulum
 
 from swimlane.core.resources import APIResource, UserGroup
-from .base import FieldCursor, ReadOnly, CursorField
+from .base import CursorField, FieldCursor, ReadOnly
 
 
 class Comment(APIResource):
