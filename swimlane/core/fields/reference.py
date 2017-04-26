@@ -24,8 +24,8 @@ class ReferenceCursor(MultiSelectCursor):
             record = self._field.target_app.records.get(id=target_record_id)
             self._record_cache[target_record_id] = record
 
-        # Yield the now populated elements as normal
-        return list(self._record_cache.values())
+        # Return only the cached records currently listed in elements
+        return [self._record_cache[record_id] for record_id in self._elements]
 
     def add(self, element):
         """Support adding Records or IDs"""

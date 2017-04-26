@@ -1,6 +1,9 @@
+from functools import total_ordering
+
 from swimlane.core.resources.base import APIResource, SwimlaneResolver
 
 
+@total_ordering
 class UserGroup(APIResource):
     """Base class for Users and Groups
     
@@ -16,11 +19,14 @@ class UserGroup(APIResource):
     def __str__(self):
         return self.name
 
+    def __hash__(self):
+        return hash((self.id, self.name))
+
     def __eq__(self, other):
         return isinstance(other, UserGroup) and hash(self) == hash(other)
 
-    def __hash__(self):
-        return hash((self.id, self.name))
+    def __lt__(self, other):
+        return isinstance(other, UserGroup) and self.name < other.name
 
     def get_usergroup_selection(self):
         """Converts UserGroup to raw UserGroupSelection for populating record"""

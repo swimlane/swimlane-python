@@ -1,9 +1,11 @@
 """Custom exceptions and errors"""
 
 from difflib import get_close_matches
-from json import JSONDecodeError
 
 from requests import HTTPError
+from requests.compat import json
+
+JSONDecodeError = json.JSONDecodeError
 
 
 class SwimlaneError(Exception):
