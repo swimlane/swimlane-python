@@ -169,47 +169,51 @@ def test_auth(mock_swimlane):
             'users': []}
 
         mock_response.cookies.items.return_value = [('.AspNetCore.Identity.Application',
-  'CfDJ8Eq07zdLE8ZGtPyzBNIkJhIgJB4-EUThghuYsSpPGU6fiO0uXHSfU2LDOmrpxmfa8KAVjMI1JSL1YyXzCXavaTMT7ZBwUO9J6rJG3m2p3B8hHFMd4RGRQypqP-znY6VEJmrvVr6_ZSF8sx-E54FI2N5WQo7gfiqGVIX70WrqyTvbaU1spoGsTRsXs1BJaUeobhSrI8MWjouqXSDuhcTJjjGczq_LGlBkdzYpV1wzPJSiwWXs-ZN2pIJzfMOedAJRs0OzIvVbB8aUn0zKfUu5K3QHhKImdudDqsEadGtTLccygC6t9b6XqIueMGuOYnn7mmOUv6MJBwdzTCfh2Eg4ElYOB8pqZsedWSbXz1GYuTlTpLWihJTwADMKtucIX1myfM4M9DVng_P9yp6K2BHm9_2jEcGJhnJQ2zJBML8TpRpdwhzz3iKBhBohFPqudEJ535zaR4onSO7dFGwbfx-fyZ5E31BNGl70A--y3VcNHeDqzs13ylpR--4DykUTGRnoYjsDFuD4ZHopvNGA8aC0LszaYeVW0M0aUzKw8VbiJdB3xQr9u6wkwscdzG3DqmJGgA')]
+                                                     'CfDJ8Eq07zdLE8ZGtPyzBNIkJhIgJB4-EUThghuYsSpPGU6fiO0uXHSfU2LDOmrpxmfa8KAVjMI1JSL1YyXzCXavaTMT7ZBwUO9J6rJG3m2p3B8hHFMd4RGRQypqP-znY6VEJmrvVr6_ZSF8sx-E54FI2N5WQo7gfiqGVIX70WrqyTvbaU1spoGsTRsXs1BJaUeobhSrI8MWjouqXSDuhcTJjjGczq_LGlBkdzYpV1wzPJSiwWXs-ZN2pIJzfMOedAJRs0OzIvVbB8aUn0zKfUu5K3QHhKImdudDqsEadGtTLccygC6t9b6XqIueMGuOYnn7mmOUv6MJBwdzTCfh2Eg4ElYOB8pqZsedWSbXz1GYuTlTpLWihJTwADMKtucIX1myfM4M9DVng_P9yp6K2BHm9_2jEcGJhnJQ2zJBML8TpRpdwhzz3iKBhBohFPqudEJ535zaR4onSO7dFGwbfx-fyZ5E31BNGl70A--y3VcNHeDqzs13ylpR--4DykUTGRnoYjsDFuD4ZHopvNGA8aC0LszaYeVW0M0aUzKw8VbiJdB3xQr9u6wkwscdzG3DqmJGgA')]
 
         auth = SwimlaneAuth(mock_swimlane, 'admin', 'password')
 
-        assert auth._login_headers == {'Cookie': '.AspNetCore.Identity.Application=CfDJ8Eq07zdLE8ZGtPyzBNIkJhIgJB4-EUThghuYsSpPGU6fiO0uXHSfU2LDOmrpxmfa8KAVjMI1JSL1YyXzCXavaTMT7ZBwUO9J6rJG3m2p3B8hHFMd4RGRQypqP-znY6VEJmrvVr6_ZSF8sx-E54FI2N5WQo7gfiqGVIX70WrqyTvbaU1spoGsTRsXs1BJaUeobhSrI8MWjouqXSDuhcTJjjGczq_LGlBkdzYpV1wzPJSiwWXs-ZN2pIJzfMOedAJRs0OzIvVbB8aUn0zKfUu5K3QHhKImdudDqsEadGtTLccygC6t9b6XqIueMGuOYnn7mmOUv6MJBwdzTCfh2Eg4ElYOB8pqZsedWSbXz1GYuTlTpLWihJTwADMKtucIX1myfM4M9DVng_P9yp6K2BHm9_2jEcGJhnJQ2zJBML8TpRpdwhzz3iKBhBohFPqudEJ535zaR4onSO7dFGwbfx-fyZ5E31BNGl70A--y3VcNHeDqzs13ylpR--4DykUTGRnoYjsDFuD4ZHopvNGA8aC0LszaYeVW0M0aUzKw8VbiJdB3xQr9u6wkwscdzG3DqmJGgA'}
+        assert auth._login_headers == {
+            'Cookie': '.AspNetCore.Identity.Application=CfDJ8Eq07zdLE8ZGtPyzBNIkJhIgJB4-EUThghuYsSpPGU6fiO0uXHSfU2LDOmrpxmfa8KAVjMI1JSL1YyXzCXavaTMT7ZBwUO9J6rJG3m2p3B8hHFMd4RGRQypqP-znY6VEJmrvVr6_ZSF8sx-E54FI2N5WQo7gfiqGVIX70WrqyTvbaU1spoGsTRsXs1BJaUeobhSrI8MWjouqXSDuhcTJjjGczq_LGlBkdzYpV1wzPJSiwWXs-ZN2pIJzfMOedAJRs0OzIvVbB8aUn0zKfUu5K3QHhKImdudDqsEadGtTLccygC6t9b6XqIueMGuOYnn7mmOUv6MJBwdzTCfh2Eg4ElYOB8pqZsedWSbXz1GYuTlTpLWihJTwADMKtucIX1myfM4M9DVng_P9yp6K2BHm9_2jEcGJhnJQ2zJBML8TpRpdwhzz3iKBhBohFPqudEJ535zaR4onSO7dFGwbfx-fyZ5E31BNGl70A--y3VcNHeDqzs13ylpR--4DykUTGRnoYjsDFuD4ZHopvNGA8aC0LszaYeVW0M0aUzKw8VbiJdB3xQr9u6wkwscdzG3DqmJGgA'}
 
         mock_inflight_request = mock.MagicMock()
         auth(mock_inflight_request)
         mock_inflight_request.headers.update.assert_called_once_with(auth._login_headers)
 
-
         # Swimlane v2.14+
-        JWT_TOKEN = 'Some Token Value'
+        JWT_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhTHFfcWlCWVJyVThoIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsIm5iZiI6MTQ5MzMzMTQyNCwiZXhwIjoxNDkzMzM1MDI0LCJpYXQiOjE0OTMzMzE0MjQsImlzcyI6IlN3aW1sYW5lIiwiYXVkIjoiU3dpbWxhbmUifQ.w27D6JgYj6UuoTUivUmwNv8USqeieTTPwmmhJviiDRQ'
 
         mock_response.json.return_value = {
             '$type': 'API.Models.Identity.AuthorizeModel, API',
-            'token': JWT_TOKEN,
             'active': False,
             'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
-            'createdDate': '2017-03-31T09:10:52.717Z',
+            'createdDate': '2017-04-12T21:32:30.345Z',
             'disabled': False,
             'displayName': 'admin',
+            'email': '',
+            'favorites': {
+                '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib]], mscorlib'},
             'groups': [{'$type': 'Core.Models.Base.Entity, Core',
                         'disabled': False,
-                        'id': '58de1d1c07637a0264c0ca71',
+                        'id': 'aLq_qiBYSzR1R',
                         'name': 'Everyone'}],
-            'id': '58de1d1c07637a0264c0ca6a',
+            'id': 'aLq_qiBYRrU8h',
             'isAdmin': True,
             'isMe': True,
-            'lastLogin': '2017-04-27T14:11:38.54Z',
-            'lastPasswordChangedDate': '2017-03-31T09:10:52.536Z',
-            'modifiedByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
-            'modifiedDate': '2017-03-31T09:10:52.76Z',
+            'lastLogin': '2017-04-27T16:17:04.5160226-06:00',
+            'lastPasswordChangedDate': '2017-04-12T21:32:30.083Z',
+            'modifiedByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core',
+                               'id': 'aLq_qiBYRrU8h',
+                               'name': 'admin'},
+            'modifiedDate': '2017-04-27T22:17:04.5170289Z',
             'name': 'admin',
-            'passwordComplexityScore': 3,
             'passwordResetRequired': False,
             'permission': {'$type': 'Core.Models.Security.PermissionMatrix, Core'},
             'roles': [{'$type': 'Core.Models.Base.Entity, Core',
                        'disabled': False,
-                       'id': '58de1d1c07637a0264c0ca64',
+                       'id': 'aLq_qiBYR2CvJ',
                        'name': 'Administrator'}],
+            'token': JWT_TOKEN,
             'userName': 'admin',
             'users': []}
 

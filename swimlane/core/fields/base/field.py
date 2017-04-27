@@ -1,6 +1,6 @@
 import weakref
 
-from swimlane.core.resources import SwimlaneResolver
+from swimlane.core.resolver import SwimlaneResolver
 
 
 # TODO: Respect readonly field definition setting(s) (calculated, createdBy, etc.)

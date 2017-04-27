@@ -5,9 +5,8 @@ from pyuri import URI
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from six.moves.urllib.parse import urljoin
 
-from swimlane.core.resources import SwimlaneResolver
-from swimlane.core.resources.app import AppAdapter
-from swimlane.core.resources.usergroup import GroupAdapter, UserAdapter
+from swimlane.core.resolver import SwimlaneResolver
+from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter
 from swimlane.errors import SwimlaneHTTP400Error
 
 # Disable insecure request warnings

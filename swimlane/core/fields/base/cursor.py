@@ -1,6 +1,6 @@
 import weakref
 
-from swimlane.core.resources import SwimlaneResolver
+from swimlane.core.resolver import SwimlaneResolver
 from .field import Field
 
 

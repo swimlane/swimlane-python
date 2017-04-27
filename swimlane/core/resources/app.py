@@ -1,51 +1,5 @@
-from swimlane.core.resources.record import RecordAdapter
-from swimlane.core.resources.report import ReportAdapter
 from swimlane.errors import UnknownField
-from .base import APIResource, SwimlaneResolver
-
-
-class AppAdapter(SwimlaneResolver):
-    """Allows retrieval of Swimlane Apps"""
-
-    def get(self, **kwargs):
-        """Get single app by id, name, or acronym"""
-        app_id = kwargs.pop('id', None)
-        name = kwargs.pop('name', None)
-        acronym = kwargs.pop('acronym', None)
-
-        if kwargs:
-            raise TypeError('Unexpected argument(s): {}'.format(kwargs))
-
-        if len(list(filter(lambda x: x is not None, (name, app_id, acronym)))) != 1:
-            raise TypeError('Must provide only one argument from name, id, or acronym')
-
-        if app_id:
-            # Server returns 204 instead of 404 for a non-existent app id
-            response = self._swimlane.request('get', 'app/{}'.format(app_id))
-            if response.status_code == 204:
-                raise ValueError('No app with id = "{}"'.format(app_id))
-
-            return App(
-                self._swimlane,
-                response.json()
-            )
-        else:
-            # FIXME: Workaround for lack of support for get by name or acronym
-            # Holdover from previous driver support
-            for app in self.list():
-                if any([
-                    name and name == app.name,
-                    acronym and acronym == app.acronym
-                ]):
-                    return app
-
-            # No matching app found
-            raise ValueError('No app matching provided arguments: {}'.format(kwargs))
-
-    def list(self):
-        """Return list of all apps"""
-        response = self._swimlane.request('get', 'app')
-        return [App(self._swimlane, item) for item in response.json()]
+from .base import APIResource
 
 
 class App(APIResource):
@@ -65,6 +19,8 @@ class App(APIResource):
         self._fields_by_name = {f['name']: f for f in self._raw['fields']}
         self._fields_by_id = {f['id']: f for f in self._raw['fields']}
 
+        # Avoid circular import
+        from swimlane.core.adapters import RecordAdapter, ReportAdapter
         self.records = RecordAdapter(self)
         self.reports = ReportAdapter(self)
 
