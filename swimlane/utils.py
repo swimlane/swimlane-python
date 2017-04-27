@@ -5,6 +5,8 @@ import pkgutil
 import random
 import string
 
+import re
+
 
 def random_string(length, source=string.ascii_letters + string.digits):
     """Return random string of characters from source of specified length"""
@@ -32,3 +34,31 @@ def import_submodules(package):
             results.update(import_submodules(full_name))
 
     return results
+
+
+def compare_versions(swimlane, *version_sections):
+    """Return direction of Swimlane version relative to provided version sections
+    
+    If Swimlane version is equal to provided version, return 0
+    If Swimlane version is greater than provided version, return 1
+    If Swimlane version is less than provided version, return -1
+    
+    e.g. with Swimlane version = 2.13.2-173414
+        _compare_version(2) = 0
+        _compare_version(1) = 1
+        _compare_version(3) = -1
+        
+        _compare_version(2, 13) = 0
+        _compare_version(2, 12) = 1
+        _compare_version(2, 14) = -1
+        
+        _compare_version(2, 13, 3) = -1
+        
+        _compare_version(2, 13, 2, 173415) = -1
+    """
+    sections_provided = len(version_sections)
+
+    versions = tuple([int(match) for match in re.findall(r'\d+', swimlane.version)[0:sections_provided]])
+
+    return (versions > version_sections) - (versions < version_sections)
+

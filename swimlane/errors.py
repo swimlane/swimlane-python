@@ -90,7 +90,7 @@ class SwimlaneHTTP400Error(SwimlaneError, HTTPError):
         if self.argument is None:
             message = self.name
         else:
-            message = '{name}({argument})'.format(name=self.name, argument=self.argument)
+            message = '{name} ({argument})'.format(name=self.name, argument=self.argument)
 
         super(SwimlaneHTTP400Error, self).__init__(
             '{message}: Bad Request for url: {url}'.format(message=message, url=self.http_error.response.url)

@@ -3,7 +3,7 @@ import itertools
 import pendulum
 
 from swimlane.core.resources.base import APIResource, SwimlaneResolver
-from swimlane.core.search.filtering import CONTAINS, EQ, EXCLUDES, NOT_EQ
+from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ
 
 
 class ReportAdapter(SwimlaneResolver):

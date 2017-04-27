@@ -1,7 +1,5 @@
 """Core Swimlane driver/client class"""
 
-import re
-
 import requests
 from pyuri import URI
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -92,32 +90,6 @@ class Swimlane(object):
         if not self.__user:
             self.__user = self.users.get(username=self._session.auth.username)
         return self.__user
-
-    def _compare_version(self, *version_sections):
-        """Return direction of Swimlane version relative to provided version sections
-        
-        If Swimlane version is equal to provided version, return 0
-        If Swimlane version is greater than provided version, return 1
-        If Swimlane version is less than provided version, return -1
-        
-        e.g. with Swimlane version = 2.13.2-173414
-            _compare_version(2) = 0
-            _compare_version(1) = 1
-            _compare_version(3) = -1
-            
-            _compare_version(2, 13) = 0
-            _compare_version(2, 12) = 1
-            _compare_version(2, 14) = -1
-            
-            _compare_version(2, 13, 3) = -1
-            
-            _compare_version(2, 13, 2, 173415) = -1
-        """
-        sections_provided = len(version_sections)
-
-        versions = tuple(re.findall(r'\d+', self.version)[0:sections_provided])
-
-        return (versions > version_sections) - (versions < version_sections)
 
 
 class SwimlaneAuth(SwimlaneResolver):
