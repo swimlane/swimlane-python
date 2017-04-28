@@ -16,13 +16,12 @@ class Field(SwimlaneResolver):
     supported_types = []
 
     # TODO: Set initial value from server at instantiation to differentiate set_python from initial value set
-    def __init__(self, name, record, allow_null=True):
+    def __init__(self, name, record):
         """Value not included during instantiation to prevent ambiguity between python and swimlane representations"""
         super(Field, self).__init__(record._swimlane)
 
         self.name = name
         self.__record_ref = weakref.ref(record)
-        self.allow_null = allow_null
         self._value = self._unset
 
         self.field_definition = self.record._app.get_field_definition_by_name(self.name)
@@ -58,10 +57,7 @@ class Field(SwimlaneResolver):
 
     def validate_value(self, value):
         """Validate value is an acceptable type during _set operation"""
-        if value is None:
-            if not self.allow_null:
-                raise ValueError('Field "{}" does not allow null and cannot be set to None')
-        else:
+        if value is not None:
             if self.supported_types and not isinstance(value, tuple(self.supported_types)):
                 raise TypeError('Field "{}" expects one of "{}", got "{}" instead'.format(
                     self.name,

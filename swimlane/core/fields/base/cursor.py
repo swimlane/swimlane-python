@@ -71,9 +71,6 @@ class CursorField(Field):
     def get_python(self):
         """Create, cache, and return the appropriate cursor instance"""
         if self._cursor is None:
-            if self.cursor_class is None:
-                raise NotImplementedError('Must set "cursor_class" on {}'.format(self.__class__.__name__))
-
             # pylint: disable=not-callable
             self._cursor = self.cursor_class(self, self.get_initial_elements())
 

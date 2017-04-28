@@ -1,2 +1,4 @@
 mock
+pylint
 pytest
+tox

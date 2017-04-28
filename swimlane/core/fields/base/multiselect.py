@@ -14,14 +14,20 @@ class MultiSelectCursor(FieldCursor):
 
         self._elements = SortedSet(self._elements)
 
-    def add(self, element):
-        """Proxy to internal set.add and sync field"""
+    def select(self, element):
+        """Add an element to the set of selected elements
+        
+        Proxy to internal set.add and sync field
+        """
         self._field.validate_value(element)
         self._elements.add(element)
         self._sync_field()
 
-    def remove(self, element):
-        """Proxy to internal set.remove and sync field"""
+    def deselect(self, element):
+        """Remove an element from the set of selected elements
+        
+        Proxy to internal set.remove and sync field
+        """
         self._elements.remove(element)
         self._sync_field()
 
@@ -37,10 +43,8 @@ class MultiSelectField(CursorField):
         selection_type = self.field_definition.get('selectionType', 'single')
         if selection_type == 'multi':
             self.is_multiselect = True
-        elif selection_type == 'single':
-            self.is_multiselect = False
         else:
-            raise ValueError('Unknown selection type "{}"'.format(selection_type))
+            self.is_multiselect = False
 
     def get_initial_elements(self):
         return self._get()
@@ -55,8 +59,6 @@ class MultiSelectField(CursorField):
     def _set(self, value):
         """Expect single instance of supported_types or iterable of instances of supported_types when multi-select"""
         if self.is_multiselect:
-            if not hasattr(value, '__iter__'):
-                raise TypeError('Multiselect field "{}" must be set to iterable objects'.format(self.name))
 
             elements = []
             for element in value:

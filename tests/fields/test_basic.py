@@ -3,6 +3,8 @@ import numbers
 
 import pytest
 
+from swimlane.core.fields import resolve_field_class
+
 
 def test_text_field(mock_record):
     """Test automatic type coercion during set"""
@@ -32,3 +34,13 @@ def test_tracking_id_field(mock_record):
 
     with pytest.raises(AttributeError):
         mock_record['Tracking Id'] = 'Other Tracking value'
+
+
+def test_default_repr(mock_record):
+    assert repr(mock_record._fields['Numeric']) == '<NumberField: 1>'
+
+
+def test_resolve_field_class():
+    """Test looking up field by field $type"""
+    with pytest.raises(KeyError):
+        resolve_field_class({'$type': 'Not a valid type'})

@@ -5,6 +5,9 @@ from swimlane.core.fields.base.multiselect import MultiSelectCursor, MultiSelect
 from swimlane.core.resources import Record
 
 
+# FIXME: Repr broken
+
+
 # TODO: Move Record instance cache to field to remove additional requests after direct field set, resetting cursor
 class ReferenceCursor(MultiSelectCursor):
     """Handles lazy retrieval of target records"""
@@ -27,19 +30,19 @@ class ReferenceCursor(MultiSelectCursor):
         # Return only the cached records currently listed in elements
         return [self._record_cache[record_id] for record_id in self._elements]
 
-    def add(self, element):
+    def select(self, element):
         """Support adding Records or IDs"""
         if isinstance(element, Record):
             element = element.id
 
-        return super(ReferenceCursor, self).add(element)
+        return super(ReferenceCursor, self).select(element)
 
-    def remove(self, element):
+    def deselect(self, element):
         """Support removing Records or IDs"""
         if isinstance(element, Record):
             element = element.id
 
-        return super(ReferenceCursor, self).remove(element)
+        return super(ReferenceCursor, self).deselect(element)
 
 
 class ReferenceField(MultiSelectField):
@@ -78,10 +81,3 @@ class ReferenceField(MultiSelectField):
             value = elements
 
         return super(ReferenceField, self).set_python(value)
-
-    def cast_to_swimlane(self, value):
-        if value is not None:
-            if isinstance(value, Record):
-                value = value.id
-
-        return value
