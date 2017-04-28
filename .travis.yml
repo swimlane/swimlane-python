@@ -7,4 +7,9 @@ python:
   - "3.5"
   - "3.6"
   - "pypy"
-script: python setup.py test
+install:
+  - pip install -r requirements.txt
+  - pip install -r test-requirements.txt
+  - pip install codacy-coverage
+script: pytest --cov=swimlane --cov-report=xml .
+after_script: python-codacy-coverage -r coverage.xml
