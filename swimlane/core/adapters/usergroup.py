@@ -1,3 +1,5 @@
+from six.moves.urllib.parse import quote_plus
+
 from swimlane.core.resources import Group, User
 from swimlane.core.resolver import SwimlaneResolver
 
@@ -63,7 +65,8 @@ class UserAdapter(SwimlaneResolver):
             return User(self._swimlane, response.json())
 
         else:
-            response = self._swimlane.request('get', 'user/search?query={}'.format(username))
+            # TODO: Investigate users with special characters not being returned
+            response = self._swimlane.request('get', 'user/search?query={}'.format(quote_plus(username)))
             matched_users = response.json()
 
             for user_data in matched_users:

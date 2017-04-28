@@ -4,8 +4,8 @@ import importlib
 import pkgutil
 import random
 import string
-
 import re
+from pkg_resources import DistributionNotFound, get_distribution
 
 
 def random_string(length, source=string.ascii_letters + string.digits):
@@ -62,3 +62,10 @@ def compare_versions(swimlane, *version_sections):
 
     return (versions > version_sections) - (versions < version_sections)
 
+
+def get_package_version():
+    """Return swimlane lib package version, or 0.0.0-dev if not available"""
+    try:
+        return get_distribution(__name__.split('.')[0]).version
+    except DistributionNotFound:
+        return '0.0.0-dev'

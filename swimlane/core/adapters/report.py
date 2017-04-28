@@ -25,13 +25,14 @@ class ReportAdapter(SwimlaneResolver):
         will be returned. By default, all reports in the system are returned.
         """
         raw_reports = self._swimlane.request('get', "reports?appId={}".format(self._app.id)).json()
-        return [Report(self._app, raw_report) for raw_report in raw_reports]
+        # Ignore StatsReports for now
+        return [Report(self._app, raw_report) for raw_report in raw_reports if raw_report['$type'] == Report._type]
 
     def get(self, report_id):
         """Retrieve report by ID"""
         return Report(
             self._app,
-            self._swimlane.request('get', "reports/{0}".format(report_id))
+            self._swimlane.request('get', "reports/{0}".format(report_id)).json()
         )
 
     def build(self, name):

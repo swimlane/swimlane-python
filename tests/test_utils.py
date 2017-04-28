@@ -4,8 +4,15 @@ import os
 
 import pytest
 import mock
+from pkg_resources import DistributionNotFound
 
-from swimlane.utils import random_string, get_recursive_subclasses, import_submodules, compare_versions
+from swimlane.utils import (
+    random_string,
+    get_recursive_subclasses,
+    import_submodules,
+    compare_versions,
+    get_package_version
+)
 
 
 def test_random_string():
@@ -66,3 +73,14 @@ def test_compare_versions(inputs, expected):
     mock_swimlane.version = '2.13.2-173414'
 
     assert compare_versions(mock_swimlane, *inputs) == expected
+
+
+def test_get_package_version():
+    version = get_package_version()
+    assert tuple(version.split('.')[:2]) > ('0', '0', '0')
+
+    mock_dist = mock.MagicMock()
+    mock_dist.version = '1.2.3'
+
+    with mock.patch('swimlane.utils.get_distribution', side_effect=DistributionNotFound):
+        assert get_package_version() == '0.0.0-dev'

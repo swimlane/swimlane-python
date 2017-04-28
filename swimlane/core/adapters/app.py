@@ -10,7 +10,6 @@ class AppAdapter(SwimlaneResolver):
         orig_kwargs = kwargs.copy()
         app_id = kwargs.pop('id', None)
         name = kwargs.pop('name', None)
-        acronym = kwargs.pop('acronym', None)
 
         if kwargs:
             raise TypeError('Unexpected argument(s): {}'.format(kwargs))
@@ -29,13 +28,10 @@ class AppAdapter(SwimlaneResolver):
                 response.json()
             )
         else:
-            # FIXME: Workaround for lack of support for get by name or acronym
+            # FIXME: Workaround for lack of support for get by name
             # Holdover from previous driver support
             for app in self.list():
-                if any([
-                    name and name == app.name,
-                    acronym and acronym == app.acronym
-                ]):
+                if name and name == app.name:
                     return app
 
             # No matching app found

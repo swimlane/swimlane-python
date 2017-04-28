@@ -5,9 +5,6 @@ from swimlane.core.fields.base.multiselect import MultiSelectCursor, MultiSelect
 from swimlane.core.resources import Record
 
 
-# FIXME: Repr broken
-
-
 # TODO: Move Record instance cache to field to remove additional requests after direct field set, resetting cursor
 class ReferenceCursor(MultiSelectCursor):
     """Handles lazy retrieval of target records"""
