@@ -81,7 +81,6 @@ def test_get_package_version():
 
     with mock.patch('swimlane.utils.get_distribution', return_value=mock_dist):
         version = get_package_version()
-        print(version)
         assert tuple(version.split('.')[:2]) > ('0', '0', '0')
 
     with mock.patch('swimlane.utils.get_distribution', side_effect=DistributionNotFound):
