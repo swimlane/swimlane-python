@@ -65,8 +65,8 @@ def compare_versions(swimlane, *version_sections):
 
 
 def get_package_version():
-    """Return swimlane lib package version, or 0.0.0-dev if not available"""
+    """Return swimlane lib package version, or 0.0.0.dev if not available"""
     try:
         return get_distribution(__name__.split('.')[0]).version
     except DistributionNotFound:
-        return '0.0.0-dev'
+        return '0.0.0.dev'

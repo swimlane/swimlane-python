@@ -76,11 +76,13 @@ def test_compare_versions(inputs, expected):
 
 
 def test_get_package_version():
-    version = get_package_version()
-    assert tuple(version.split('.')[:2]) > ('0', '0', '0')
-
     mock_dist = mock.MagicMock()
     mock_dist.version = '1.2.3'
 
+    with mock.patch('swimlane.utils.get_distribution', return_value=mock_dist):
+        version = get_package_version()
+        print(version)
+        assert tuple(version.split('.')[:2]) > ('0', '0', '0')
+
     with mock.patch('swimlane.utils.get_distribution', side_effect=DistributionNotFound):
-        assert get_package_version() == '0.0.0-dev'
+        assert get_package_version() == '0.0.0.dev'
