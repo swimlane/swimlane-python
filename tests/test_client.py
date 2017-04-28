@@ -4,9 +4,6 @@ import mock
 from swimlane.core.client import SwimlaneAuth
 from swimlane.errors import SwimlaneHTTP400Error
 from requests import HTTPError
-from requests.compat import json
-
-JSONDecodeError = json.JSONDecodeError
 
 
 def test_request_handling(mock_swimlane):
@@ -57,7 +54,7 @@ def test_request_handling(mock_swimlane):
             raise RuntimeError
 
         # Test failure to parse response content
-        mock_response.json.side_effect = JSONDecodeError('', '', 1)
+        mock_response.json.side_effect = ValueError
 
         try:
             mock_swimlane.request('get', 'somepage')

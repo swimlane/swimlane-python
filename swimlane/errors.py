@@ -3,9 +3,6 @@
 from difflib import get_close_matches
 
 from requests import HTTPError
-from requests.compat import json
-
-JSONDecodeError = json.JSONDecodeError
 
 
 class SwimlaneError(Exception):
@@ -80,7 +77,7 @@ class SwimlaneHTTP400Error(SwimlaneError, HTTPError):
 
         try:
             error_content = self.http_error.response.json()
-        except JSONDecodeError:
+        except ValueError:
             error_content = {'Argument': None, 'ErrorCode': '-1'}
 
         self.code = int(error_content['ErrorCode'])
