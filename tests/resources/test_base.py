@@ -9,10 +9,10 @@ def test_repr(mock_user):
 
 
 @pytest.mark.parametrize('raw', [
-    ({},),
-    ({'$type': 'Wrong Type'})
+    {},
+    {'$type': 'Wrong Type'}
 ])
 def test_type_checks(mock_swimlane, raw):
     """Use User class to test $type validation"""
     with pytest.raises(TypeError):
-        User(mock_swimlane, {})
+        User(mock_swimlane, raw)
