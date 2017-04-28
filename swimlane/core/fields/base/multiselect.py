@@ -41,10 +41,7 @@ class MultiSelectField(CursorField):
         super(MultiSelectField, self).__init__(*args, **kwargs)
 
         selection_type = self.field_definition.get('selectionType', 'single')
-        if selection_type == 'multi':
-            self.is_multiselect = True
-        else:
-            self.is_multiselect = False
+        self.is_multiselect = selection_type == 'multi'
 
     def get_initial_elements(self):
         return self._get()
