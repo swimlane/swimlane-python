@@ -1,5 +1,3 @@
-import json
-
 import mock
 
 from swimlane.core.resources import Record
@@ -9,12 +7,6 @@ from swimlane.errors import UnknownField
 def test_repr(mock_record):
 
     assert repr(mock_record) == '<Record: RA-7>'
-
-
-def test_serialization(mock_record):
-    """Validate serialized data can be easily restored"""
-
-    assert mock_record._raw == json.loads(mock_record.serialize())
 
 
 def test_save(mock_swimlane, mock_record):
@@ -28,7 +20,7 @@ def test_save(mock_swimlane, mock_record):
         mock_request.assert_called_once_with(
             'put',
             'app/{}/record'.format(mock_record._app.id),
-            data=mock_record.serialize()
+            json=mock_record._raw
         )
 
 

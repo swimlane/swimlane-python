@@ -1,7 +1,7 @@
 from six.moves.urllib.parse import quote_plus
 
-from swimlane.core.resources import Group, User
 from swimlane.core.resolver import SwimlaneResolver
+from swimlane.core.resources import Group, User
 
 
 class GroupAdapter(SwimlaneResolver):

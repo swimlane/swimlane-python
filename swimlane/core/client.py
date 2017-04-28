@@ -2,11 +2,13 @@
 
 import requests
 from pyuri import URI
+from requests.compat import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from requests.structures import CaseInsensitiveDict
 from six.moves.urllib.parse import urljoin
 
-from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter
+from swimlane.core.resolver import SwimlaneResolver
 from swimlane.errors import SwimlaneHTTP400Error
 
 # Disable insecure request warnings
@@ -28,9 +30,6 @@ class Swimlane(object):
 
         self._session = requests.Session()
         self._session.verify = verify_ssl
-        self._session.headers.update({
-            'Content-Type': 'application/json'
-        })
         self._session.auth = SwimlaneAuth(
             self,
             username,
@@ -58,6 +57,16 @@ class Swimlane(object):
         """
         while api_endpoint.startswith('/'):
             api_endpoint = api_endpoint[1:]
+
+        # Manually grab and dump json data to have full control over serialization
+        # Emulate default requests behavior
+        json_data = kwargs.pop('json', None)
+        if json_data is not None:
+            headers = CaseInsensitiveDict(kwargs.get('headers', {}))
+            headers.setdefault('Content-Type', 'application/json')
+            kwargs['headers'] = headers
+
+            kwargs['data'] = json.dumps(json_data, sort_keys=True, separators=(',', ':'))
 
         response = self._session.request(method, urljoin(str(self.host) + self._api_root, api_endpoint), **kwargs)
 

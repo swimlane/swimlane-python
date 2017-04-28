@@ -1,5 +1,4 @@
 requests>=2,<3
-requests-toolbelt>=0.7,<0.8
 six>=1.10,<1.11
 sortedcontainers>=1.5,<1.6
 pyuri>=0.3.0,<0.4.0

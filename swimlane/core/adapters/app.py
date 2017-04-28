@@ -1,5 +1,5 @@
-from swimlane.core.resources import App
 from swimlane.core.resolver import SwimlaneResolver
+from swimlane.core.resources import App
 
 
 class AppAdapter(SwimlaneResolver):

@@ -2,7 +2,6 @@ import mimetypes
 from io import BytesIO
 
 import pendulum
-from requests_toolbelt import MultipartEncoder
 
 from swimlane.core.resources import APIResource
 from .base import CursorField, FieldCursor, ReadOnly
@@ -53,19 +52,12 @@ class AttachmentCursor(FieldCursor):
         # Guess file Content-Type or default
         content_type = content_type or mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
-        # Multipart body boundaries must be set in request Content-Type
-        # Normally done automatically, but default application/json header is interfering
-        multipart = MultipartEncoder(fields={
-            'file': (filename, stream, content_type)
-        })
-
         response = self._record._swimlane.request(
             'post',
             'attachment',
-            data=multipart,
-            headers={
-                'Content-Type': multipart.content_type
-            }
+            files={
+                'file': (filename, stream, content_type)
+            },
         )
 
         # Returns raw attachment data as list with single element

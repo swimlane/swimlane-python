@@ -1,8 +1,8 @@
-import pytest
 import mock
+import pytest
 
 from swimlane import Swimlane
-from swimlane.core.resources import App, Record, UserGroup, User, Group, Report
+from swimlane.core.resources import App, Record, User, Group, Report
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 import numbers
 
-import pytest
 import mock
+import pytest
 import six
 
 

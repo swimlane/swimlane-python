@@ -1,9 +1,9 @@
 """Tests for custom Swimlane errors"""
 import mock
+from requests import HTTPError
 
 from swimlane.core.client import SwimlaneAuth
 from swimlane.errors import SwimlaneHTTP400Error
-from requests import HTTPError
 
 
 def test_request_handling(mock_swimlane):

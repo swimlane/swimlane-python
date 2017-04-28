@@ -3,8 +3,9 @@
 import importlib
 import pkgutil
 import random
-import string
 import re
+import string
+
 from pkg_resources import DistributionNotFound, get_distribution
 
 

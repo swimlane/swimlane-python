@@ -1,9 +1,9 @@
+import os
 import string
 import sys
-import os
 
-import pytest
 import mock
+import pytest
 from pkg_resources import DistributionNotFound
 
 from swimlane.utils import (

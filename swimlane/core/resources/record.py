@@ -1,4 +1,3 @@
-import json
 from functools import total_ordering
 
 import six
@@ -85,19 +84,10 @@ class Record(APIResource):
 
             self._fields[field_instance.name] = field_instance
 
-    def serialize(self):
-        """Serialize record to JSON string for use in Swimlane save call"""
-        return json.dumps(
-            self._raw,
-            sort_keys=True,
-            separators=(',', ':')
-        )
-
     def save(self):
         """Update record in Swimlane"""
-        # Use "data=" vs "json=" to control serialization (primarily for ordered keys with $type key first)
         self._swimlane.request(
             'put',
             'app/{}/record'.format(self._app.id),
-            data=self.serialize()
+            json=self._raw
         )

@@ -2,8 +2,8 @@ import weakref
 
 import six
 
-from swimlane.core.resources import Record
 from swimlane.core.resolver import SwimlaneResolver
+from swimlane.core.resources import Record
 from swimlane.utils import random_string
 
 
@@ -69,7 +69,7 @@ class RecordAdapter(SwimlaneResolver):
         response = self._swimlane.request(
             'post',
             'app/{}/record'.format(self._app.id),
-            data=new_record.serialize()
+            json=new_record._raw
         )
 
         # Return new Record instance from returned data
