@@ -131,7 +131,7 @@ class Record(Resource):
         Client.post({
             "fieldId": field_id,
             "targetRecordIds": target_record_ids
-        }, "app/{0}/record/{1}/reference".format(application_id, record_id))
+        }, "app/{0}/record/{1}/add-references".format(application_id, record_id))
 
     def restrict(self, *user_groups, **kwargs):
         """
