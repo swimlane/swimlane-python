@@ -1,67 +1,42 @@
-"""Provides an App class."""
-
-from ..auth import Client
-from .resource import Resource
+from swimlane.errors import UnknownField
+from .base import APIResource
 
 
-class App(Resource):
-    """A simple abstraction over a Swimlane app."""
+class App(APIResource):
+    """Represents a single App record"""
 
-    def __init__(self, fields):
-        """Init an App with fields.
+    _type = 'Core.Models.Application.Application, Core'
 
-        Args:
-            fields (dict): A dict of fields and values
-        """
-        super(App, self).__init__(fields)
+    def __init__(self, swimlane, raw):
+        super(App, self).__init__(swimlane, raw)
 
-    def field_id(self, name):
-        """Get the field ID of a field by name.
+        self.acronym = self._raw['acronym']
+        self.name = self._raw['name']
+        self.description = self._raw.get('description', '')
+        self.id = self._raw['id']
+        self.tracking_id = self._raw.get('trackingFieldId')
 
-        Args:
-            name (str): The name of the field.
+        self._fields_by_name = {f['name']: f for f in self._raw['fields']}
+        self._fields_by_id = {f['id']: f for f in self._raw['fields']}
 
-        Returns:
-            A field ID as a str.
-        """
-        return next((f["id"] for f in self.fields if f["name"] == name), None)
+        # Avoid circular import
+        from swimlane.core.adapters import RecordAdapter, ReportAdapter
+        self.records = RecordAdapter(self)
+        self.reports = ReportAdapter(self)
 
-    def save(self):
-        """Create/update the app."""
-        if hasattr(self, 'id') and self.id:
-            self._fields = Client.put(self, 'app/{}'.format(self.id))
-        else:
-            self._fields = Client.post(self, 'app')
+    def __str__(self):
+        return '{self.name} ({self.acronym})'.format(self=self)
 
-    @classmethod
-    def find_all(cls):
-        """List all apps.
+    def get_field_definition_by_name(self, field_name):
+        """Get JSON field definition for field matching provided name"""
+        try:
+            return self._fields_by_name[field_name]
+        except KeyError:
+            raise UnknownField(self, field_name, self._fields_by_name.keys())
 
-        Returns:
-            A generator that yields all apps in the system.
-        """
-        return (App(x) for x in Client.get("app/"))
-
-    @classmethod
-    def find(cls, app_id=None, name=None, acronym=None):
-        """Find an application.
-
-        Args:
-            app_id (str): The app ID
-            name (str): The app name
-            acronym (str): The app acronym
-
-        Returns:
-            A resource that matches the fields
-        """
-        if app_id:
-            return App(Client.get("app/{0}".format(app_id)))
-
-        else:
-            apps = cls.find_all()
-            for app in apps:
-                if any([
-                    name and name == getattr(app, 'name', None),
-                    acronym and acronym == getattr(app, 'acronym', None)
-                ]):
-                    return app
+    def get_field_definition_by_id(self, field_id):
+        """Get JSON field definition for field matching provided id"""
+        try:
+            return self._fields_by_id[field_id]
+        except KeyError:
+            raise UnknownField(self, field_id, self._fields_by_id.keys())

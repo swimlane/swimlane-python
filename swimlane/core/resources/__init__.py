@@ -1,9 +1,5 @@
-from .resource import Resource
-from .app import App
-from .record import Record
-from .report import Report
-from .stats_report import StatsReport
-from .stats_result import StatsResult
-from .user import User
-from .group import Group
-from .task import Task
+from swimlane.core.resources.app import App
+from swimlane.core.resources.base import APIResource
+from swimlane.core.resources.record import Record
+from swimlane.core.resources.report import Report
+from swimlane.core.resources.usergroup import Group, User, UserGroup

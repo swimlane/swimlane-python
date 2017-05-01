@@ -1,110 +1,77 @@
-"""This module provides a Report class."""
+import itertools
 
-from datetime import datetime
-from ..auth import Client
-from .. import SwimlaneDict
-from .resource import Resource
-from .user import User
+from swimlane.core.resources.base import APIResource
+from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ
 
 
-class Report(Resource):
-    """A report class used for searching."""
+class Report(APIResource):
+    """A report class used for searching"""
 
-    def __init__(self, fields):
-        """Init a Report with fields.
+    _type = "Core.Models.Search.Report, Core"
 
-        Args:
-            fields (dict): A dict of fields and values.
-        """
-        super(Report, self).__init__(fields)
+    _FILTER_OPERANDS = (
+        EQ,
+        NOT_EQ,
+        CONTAINS,
+        EXCLUDES
+    )
 
-    def insert(self):
-        """Insert the current Report."""
-        self._fields = Client.post(self, "reports")
+    _page_size = 50
 
-    def update(self):
-        """Update the current Report."""
-        self._fields = Client.put(self, "reports")
+    def __init__(self, app, raw):
+        super(Report, self).__init__(app._swimlane, raw)
 
-    @classmethod
-    def new_for(cls, app_id, user_id, name):
-        """Get a prefilled Report for the App designated by app_id.
+        self.app = app
+        self.name = self._raw['name']
 
-        Args:
-            app_id (str): The ID of the App to search in.
-            user_id (str): The ID of the user creating the report.
-            name (str): The name of the Report.
+        self.__records = []
 
-        Return:
-            A prefilled Report.
-        """
-        created = datetime.utcnow().isoformat() + "Z"
-        user = User.find(user_id)
-        user_model = {
-            "$type": "Core.Models.Utilities.UserGroupSelection, Core",
-            "id": user_id,
-            "name": user.name
-        }
+    def __str__(self):
+        return self.name
 
-        return Report(SwimlaneDict({
-            "$type": "Core.Models.Search.Report, Core",
-            "groupBys": [],
-            "aggregates": [],
-            "applicationIds": [app_id],
-            "columns": [],
-            "sorts": {
-                "$type": "System.Collections.Generic.Dictionary`2"
-                         "[[System.String, mscorlib],"
-                         "[Core.Models.Search.SortTypes, Core]], mscorlib",
-            },
-            "filters": [],
-            "pageSize": 18,
-            "offset": 0,
-            "defaultSearchReport": False,
-            "allowed": [],
-            "permissions": {
-                "$type": "Core.Models.Security.PermissionMatrix, Core"
-            },
-            "createdDate": created,
-            "modifiedDate": created,
-            "createdByUser": user_model,
-            "modifiedByUser": user_model,
-            "id": None,
-            "name": name,
-            "disabled": False,
-            "keywords": ""
-        }))
+    def __iter__(self):
+        """Lazily retrieve and paginate report results and build Record instances from returned data"""
+        if self.__records:
+            for record in self.__records:
+                yield record
+        else:
+            for page in itertools.count():
+                result_data = self._retrieve_report_page(page)
+                count = result_data['count']
+                records = [self._build_record(raw_data) for raw_data in result_data['results'].get(self.app.id, [])]
 
-    @classmethod
-    def find_all(cls, app_id=None):
-        """Find all reports.
+                for result in records:
+                    self.__records.append(result)
+                    yield result
 
-        If app_id is specified, only reports that are a member of that App
-        will be returned. By default, all reports in the system are returned.
-        This method will return either Reports or StatsReports depending on
-        what Swimlane returns.
+                if not records or len(records) < self._page_size or page * self._page_size >= count:
+                    break
 
-        Args:
-            app_id (str): An App ID.
+    def filter(self, field, operand, value):
+        """Adds a filter to report from field name, comparison operand, and value"""
+        if operand not in self._FILTER_OPERANDS:
+            raise ValueError('Operand must be one of {}'.format(', '.join(self._FILTER_OPERANDS)))
 
-        Returns:
-            A generator that yields Reports.
-        """
-        url = "reports"
-        if app_id:
-            url += "?appId={0}".format(app_id)
+        self._raw['filters'].append({
+            "fieldId": self.app.get_field_definition_by_name(field)['id'],
+            "filterType": operand,
+            "value": value,
+        })
 
-        return (Report(r) for r in Client.get(url))
+    def _retrieve_report_page(self, page=0):
+        """Retrieve paginated report results for an individual page"""
+        return self._swimlane.request('post', 'search', json=self._get_paginated_body(page)).json()
 
-    @classmethod
-    def find(cls, report_id):
-        """Find a report by ID.
+    def _build_record(self, raw_record_data):
+        # Avoid circular imports
+        from swimlane.core.resources import Record
+        return Record(self.app, raw_record_data)
 
-        Args:
-            report_id (str): A Report ID.
+    def _get_paginated_body(self, page):
+        """Return raw body content formatted with correct pagination and offset values for provided page"""
+        body = self._raw.copy()
 
-        Returns:
-            A Report.
-        """
-        return Report(Client.get("reports/{0}".format(report_id)))
+        body['pageSize'] = self._page_size
+        body['offset'] = page
 
+        return body

@@ -1,109 +1,72 @@
-import binascii
-import copy
-import os
-import time
+"""Utility functions"""
 
-from .core.resources import App
+import importlib
+import pkgutil
+import random
+import re
+import string
 
-
-def random_objectid():
-    """Returns a randomly generated MongoDB ObjectId."""
-    timestamp = '{0:x}'.format(int(time.time()))
-    rest = binascii.b2a_hex(os.urandom(8)).decode('ascii')
-    return timestamp + rest
+from pkg_resources import DistributionNotFound, get_distribution
 
 
-def scrub(obj, *keys):
+def random_string(length, source=string.ascii_letters + string.digits):
+    """Return random string of characters from source of specified length"""
+    return ''.join(random.choice(source) for _ in range(length))
+
+
+def get_recursive_subclasses(cls):
+    """Return list of all subclasses for a class, including subclasses of direct subclasses"""
+    return cls.__subclasses__() + [g for s in cls.__subclasses__() for g in get_recursive_subclasses(s)]
+
+
+def import_submodules(package):
+    """Return list of imported module instances from beneath root_package"""
+
+    if isinstance(package, str):
+        package = importlib.import_module(package)
+
+    results = {}
+
+    for _, name, is_pkg in pkgutil.walk_packages(package.__path__):
+        full_name = package.__name__ + '.' + name
+        results[full_name] = importlib.import_module(full_name)
+
+        if is_pkg:
+            results.update(import_submodules(full_name))
+
+    return results
+
+
+def compare_versions(swimlane, *version_sections):
+    """Return direction of Swimlane version relative to provided version sections
+    
+    If Swimlane version is equal to provided version, return 0
+    If Swimlane version is greater than provided version, return 1
+    If Swimlane version is less than provided version, return -1
+    
+    e.g. with Swimlane version = 2.13.2-173414
+        _compare_version(2) = 0
+        _compare_version(1) = 1
+        _compare_version(3) = -1
+        
+        _compare_version(2, 13) = 0
+        _compare_version(2, 12) = 1
+        _compare_version(2, 14) = -1
+        
+        _compare_version(2, 13, 3) = -1
+        
+        _compare_version(2, 13, 2, 173415) = -1
     """
-    Recursively remove one or more keys from a dict or list object.
+    sections_provided = len(version_sections)
 
-    :param obj: A dict or list to scrub.
-    :type obj: dict or list
-    :param keys: One or more keys to remove.
-    :param keys: str
-    """
-    if isinstance(obj, dict):
-        for k in obj.keys():
-            if k in keys:
-                del obj[k]
-            else:
-                scrub(obj[k], *keys)
-    elif isinstance(obj, list):
-        for i in reversed(range(len(obj))):
-            if obj[i] in keys:
-                del obj[i]
-            else:
-                scrub(obj[i], *keys)
-    else:
-        pass
+    versions = tuple([int(match) for match in re.findall(r'\d+', swimlane.version)[0:sections_provided]])
+
+    return (versions > version_sections) - (versions < version_sections)
 
 
-def get_by_key_value(obj, key, value, default=None):
-    """
-    Returns an object in a list with a matching key and value.
-
-    :param obj: The list to search for object.
-    :type obj: list
-    :param key: The key to look for.
-    :type key: str
-    :param value: The value to look for.
-    :type value: str
-    :param default: Value to return if not found.
-    :type default: any
-    :returns: The object if it exists, otherwise the default value.
-    :rtype: dict
-    """
-    return next((o for o in obj if key in o and o[key] == value), default)
-
-
-def copy_field_values(src_app, src_field_name, dest_app, dest_field_name):
-    """
-    Copy a field's values from one field to another, only copying values
-    that don't exist in the destination field. A best effort to preserve value
-    order is made between the source and destination.
-
-    :param src_app: The source app to copy from.
-    :type src_app: :class:`App`
-    :param src_field_name: the name of the field to copy from.
-    :type src_field_name: str
-    :param dest_app: The app to copy to.
-    :type dest_app: :class:`App`
-    :param dest_field_name: The name of the field to copy to.
-    :type dest_field_name: str
-    :returns: A tuple of added and moved values.
-    :rtype: tuple
-    """
-    if not isinstance(src_app, App):
-        raise TypeError('The src_app must be an instance of App')
-    if not isinstance(dest_app, App):
-        raise TypeError('The dest_app must be an instance of App')
-    src_field = get_by_key_value(src_app.fields, 'name', src_field_name)
-    if not src_field:
-        raise ValueError('Field %s does not exist in source app' %
-                         src_field_name)
-    dest_field = get_by_key_value(dest_app.fields, 'name', dest_field_name)
-    if not dest_field:
-        raise ValueError('Field %s does not exist in destination app' %
-                         dest_field_name)
-    if src_field['fieldType'] != 'valuesList' or \
-            dest_field['fieldType'] != 'valuesList':
-        raise TypeError('Source and destination fields must be valuesList')
-    added_values = []
-    moved_values= []
-    for src_index, src_value in enumerate(src_field['values']):
-        dest_value = get_by_key_value(dest_field['values'], 'name',
-                                      src_value['name'])
-        if not dest_value:
-            dest_value = src_value.copy()
-            dest_value['id'] = random_objectid()
-            dest_field['values'].insert(src_index, dest_value)
-            added_values.append(dest_value)
-        else:
-            dest_index = dest_field['values'].index(dest_value)
-            if src_index != dest_index:
-                dest_value = dest_field['values'].pop(dest_index)
-                dest_field['values'].insert(src_index, dest_value)
-                moved_values.append(dest_value)
-    if added_values or moved_values:
-        dest_app.save()
-    return added_values, moved_values
+def get_package_version():
+    """Return swimlane lib package version, or 0.0.0.dev if not available"""
+    try:
+        return get_distribution(__name__.split('.')[0]).version
+    except DistributionNotFound:
+        return '0.0.0.dev'
