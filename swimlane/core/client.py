@@ -9,6 +9,7 @@ from six.moves.urllib.parse import urljoin
 
 from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter
 from swimlane.core.resolver import SwimlaneResolver
+from swimlane.core.resources import User
 from swimlane.errors import SwimlaneHTTP400Error
 
 # Disable insecure request warnings
@@ -33,7 +34,8 @@ class Swimlane(object):
         self._session.auth = SwimlaneAuth(
             self,
             username,
-            password
+            password,
+            verify_ssl
         )
 
         self.apps = AppAdapter(self)
@@ -41,9 +43,9 @@ class Swimlane(object):
         self.groups = GroupAdapter(self)
 
     def __repr__(self):
-        return '<{cls}: {username} @ {host}>'.format(
+        return '<{cls}: {user} @ {host}>'.format(
             cls=self.__class__.__name__,
-            username=self._session.auth.username,
+            user=self.user,
             host=self.host
         )
 
@@ -95,19 +97,15 @@ class Swimlane(object):
     @property
     def user(self):
         """Returns User record for authenticated user"""
-        if not self.__user:
-            self.__user = self.users.get(username=self._session.auth.username)
-        return self.__user
+        return self._session.auth.user
 
 
 class SwimlaneAuth(SwimlaneResolver):
 
-    def __init__(self, swimlane, username, password):
+    def __init__(self, swimlane, username, password, verify_ssl=True):
         super(SwimlaneAuth, self).__init__(swimlane)
-        self.username = username
-        self.password = password
 
-        self._login_headers = self.authenticate()
+        self.user, self._login_headers = self.authenticate(username, password, verify_ssl)
 
     def __call__(self, request):
 
@@ -115,24 +113,24 @@ class SwimlaneAuth(SwimlaneResolver):
 
         return request
 
-    def authenticate(self):
-        """Send login request and return login token"""
-        # Explicitly provide verify argument, appears to not consistently be acknowledged across versions during
+    def authenticate(self, username, password, verify_ssl=True):
+        """Send login request and return User instance and login headers"""
+        # Explicitly provide verify_ssl argument, appears to not consistently be acknowledged across versions during
         # initial setup for auth
         resp = self._swimlane.request(
             'post',
             'user/login',
             json={
-                'userName': self.username,
-                'password': self.password,
+                'userName': username,
+                'password': password,
                 'domain': ''
             },
-            verify=self._swimlane._session.verify
+            verify=verify_ssl
         )
         json_content = resp.json()
 
         # Check for token in response content
-        token = json_content.get('token')
+        token = json_content.pop('token', None)
 
         if token is None:
             # Legacy cookie authentication (2.13-)
@@ -145,4 +143,41 @@ class SwimlaneAuth(SwimlaneResolver):
                 'Authorization': 'Bearer {}'.format(token)
             }
 
-        return headers
+        # User
+
+        user = User(self._swimlane, _user_raw_from_login_content(json_content))
+
+        return user, headers
+
+
+def _user_raw_from_login_content(login_content):
+    """Returns a User instance with appropriate raw data parsed from login response content"""
+    matching_keys = [
+        'displayName',
+        'lastLogin',
+        'active',
+        'name',
+        'isMe',
+        'lastPasswordChangedDate',
+        'passwordResetRequired',
+        'groups',
+        'roles',
+        'email',
+        'isAdmin',
+        'createdDate',
+        'modifiedDate',
+        'createdByUser',
+        'modifiedByUser',
+        'userName',
+        'id',
+        'disabled'
+    ]
+
+    raw_data = {
+        '$type': User._type,
+    }
+
+    for key in matching_keys:
+        raw_data[key] = login_content[key]
+
+    return raw_data

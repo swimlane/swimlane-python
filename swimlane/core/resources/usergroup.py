@@ -58,3 +58,4 @@ class User(UserGroup):
 
         self.username = self._raw.get('userName')
         self.display_name = self._raw.get('displayName')
+        self.email = self._raw.get('email')
