@@ -1,7 +1,7 @@
 import mock
 import pytest
 
-from swimlane import Swimlane
+from swimlane.core.client import SwimlaneAuth, Swimlane
 from swimlane.core.resources import App, Record, User, Group, Report
 
 
@@ -9,8 +9,9 @@ from swimlane.core.resources import App, Record, User, Group, Report
 def mock_swimlane():
     """Return a mock Swimlane client"""
     with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
-        swimlane = Swimlane('http://host', 'admin', 'password')
-        swimlane._session.auth.authenticate = lambda: {}
+        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+            swimlane = Swimlane('http://host', 'admin', 'password')
+            swimlane._session.auth.user = mock_user(swimlane)
 
     return swimlane
 

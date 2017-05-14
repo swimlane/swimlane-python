@@ -178,6 +178,7 @@ def _user_raw_from_login_content(login_content):
     }
 
     for key in matching_keys:
-        raw_data[key] = login_content[key]
+        if key in login_content:
+            raw_data[key] = login_content[key]
 
     return raw_data

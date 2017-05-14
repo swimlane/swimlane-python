@@ -66,48 +66,6 @@ def test_request_handling(mock_swimlane):
             raise RuntimeError
 
 
-def test_lazy_user(mock_swimlane):
-    """Test accessing logged in user object is evaluated lazily and cached after first retrieval"""
-    with mock.patch.object(mock_swimlane._session, 'request') as mock_request:
-        mock_response = mock.MagicMock()
-        mock_response.json.return_value = [{
-            '$type': 'Core.Models.Identity.ApplicationUser, Core',
-            'active': False,
-            'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
-            'createdDate': '2017-03-31T09:10:52.717Z',
-            'disabled': False,
-            'displayName': 'admin',
-            'groups': [],
-            'id': '58de1d1c07637a0264c0ca6a',
-            'isAdmin': True,
-            'isMe': False,
-            'lastLogin': '2017-04-27T14:11:38.54Z',
-            'lastPasswordChangedDate': '2017-03-31T09:10:52.536Z',
-            'modifiedByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
-            'modifiedDate': '2017-03-31T09:10:52.76Z',
-            'name': 'admin',
-            'passwordComplexityScore': 3,
-            'passwordHash': 'AQAAAAEAACcQAAAAEESp9LR0jN3qPF2fw5qWdyceYxbeBbawMW5AFt31dA5n3xX16MFJWsU/j82heenFww==',
-            'passwordResetRequired': False,
-            'roles': [],
-            'userName': 'admin'}]
-
-        mock_request.return_value = mock_response
-
-        assert mock_request.call_count == 0
-
-        user = mock_swimlane.user
-
-        assert user.username == 'admin'
-        assert mock_request.call_count == 1
-
-        # Check twice to make sure user is cached after initial lazy request
-        user = mock_swimlane.user
-
-        assert user.username == 'admin'
-        assert mock_request.call_count == 1
-
-
 def test_lazy_settings(mock_swimlane):
     """Test accessing settings is evaluated lazily and cached after first retrieval"""
 
