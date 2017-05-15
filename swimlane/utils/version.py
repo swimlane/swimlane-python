@@ -6,7 +6,7 @@ from pkg_resources import get_distribution, DistributionNotFound
 from swimlane.errors import InvalidServerVersion
 
 
-def compare_versions(a, b, zerofill=False):
+def compare_versions(version_a, version_b, zerofill=False):
     """Return direction of version relative to provided version sections
     
     If a is equal to b, return 0
@@ -29,8 +29,8 @@ def compare_versions(a, b, zerofill=False):
         compare_version('2.13.2', '2.13.2', True) = 0
     
     """
-    a_sections = list((int(match) for match in re.findall(r'\d+', a)))
-    b_sections = list((int(match) for match in re.findall(r'\d+', b)))
+    a_sections = list((int(match) for match in re.findall(r'\d+', version_a)))
+    b_sections = list((int(match) for match in re.findall(r'\d+', version_b)))
 
     if zerofill:
         max_sections = max([len(a_sections), len(b_sections)])
@@ -64,7 +64,7 @@ def requires_swimlane_version(min_version=None, max_version=None):
     def decorator(func):
 
         @functools.wraps(func)
-        def wrapper(self, *args,  **kwargs):
+        def wrapper(self, *args, **kwargs):
             swimlane = self._swimlane
 
             if min_version and compare_versions(min_version, swimlane.version) > 0:

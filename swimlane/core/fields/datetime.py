@@ -38,35 +38,17 @@ class DatetimeField(Field):
                 value = pendulum.interval.instance(value)
             elif self.input_type == self._type_date:
                 # Pendulum date
-                value = self._date_to_datetime(value)
+                if isinstance(value, date):
+                    value = pendulum.combine(value, pendulum.time(0))
             elif self.input_type == self._type_time:
                 # Pendulum time
-                value = self._time_to_datetime(value)
+                if isinstance(value, time):
+                    value = pendulum.combine(pendulum.date.today(), value)
             else:
                 # Pendulum instance
                 value = pendulum.instance(value)
 
         return super(DatetimeField, self)._set(value)
-
-    def _date_to_datetime(self, value):
-        """Convert date to datetime or raise TypeError if not possible
-        
-        Time component is set to 00:00:00
-        """
-        if isinstance(value, date):
-            value = pendulum.combine(value, pendulum.time(0))
-
-        return value
-
-    def _time_to_datetime(self, value):
-        """Convert time to datetime or raise TypeError if not possible
-        
-        Date component is set to today
-        """
-        if isinstance(value, time):
-            value = pendulum.combine(pendulum.date.today(), value)
-
-        return value
 
     def cast_to_python(self, value):
         if value is not None:
