@@ -1,6 +1,10 @@
 ![swimlane](https://raw.githubusercontent.com/swimlane/swimlane-python/master/docs/logo.png)
 
-![version](https://img.shields.io/pypi/v/swimlane.svg) ![py-versions](https://img.shields.io/pypi/pyversions/swimlane.svg) ![py-impl](https://img.shields.io/pypi/implementation/swimlane.svg) ![travis](https://travis-ci.org/swimlane/swimlane-python.svg?branch=master) [![Code Climate](https://codeclimate.com/github/swimlane/swimlane-python/badges/gpa.svg)](https://codeclimate.com/github/swimlane/swimlane-python) [![Test Coverage](https://codeclimate.com/github/swimlane/swimlane-python/badges/coverage.svg)](https://codeclimate.com/github/swimlane/swimlane-python/coverage)
+![version](https://img.shields.io/pypi/v/swimlane.svg)
+![py-versions](https://img.shields.io/pypi/pyversions/swimlane.svg)
+![travis](https://travis-ci.org/swimlane/swimlane-python.svg?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/215d8281290749bba687a08db1d59d8b)](https://www.codacy.com/app/Swimlane/swimlane-python?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=swimlane/swimlane-python&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/215d8281290749bba687a08db1d59d8b)](https://www.codacy.com/app/Swimlane/swimlane-python?utm_source=github.com&utm_medium=referral&utm_content=swimlane/swimlane-python&utm_campaign=Badge_Coverage)
 ---
 Python driver for the [Swimlane](http://www.swimlane.com) API
 
