@@ -7,6 +7,9 @@ import pendulum
 from .base import Field
 
 
+UTC = pendulum.timezone('UTC')
+
+
 class DatetimeField(Field):
 
     field_type = 'Core.Models.Fields.Date.DateField, Core'
@@ -45,8 +48,9 @@ class DatetimeField(Field):
                     # Pendulum time
                     if isinstance(value, time):
                         value = pendulum.combine(pendulum.date.today(), value)
-                # Pendulum instance
-                value = pendulum.instance(value)
+
+                # Convert to Pendulum instance in UTC
+                value = UTC.convert(pendulum.instance(value))
 
         return super(DatetimeField, self)._set(value)
 

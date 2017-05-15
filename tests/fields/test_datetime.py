@@ -4,20 +4,22 @@ import pytz
 
 import pytest
 
-datetime_now = datetime.datetime.now(pytz.utc)
+UTC = pendulum.timezone('UTC')
+
+datetime_now = datetime.datetime.now(pytz.timezone('MST'))
 pendulum_now = pendulum.instance(datetime_now)
 
 pendulum_interval = pendulum.interval(minutes=5)
 
 
 @pytest.mark.parametrize('field_name,dt,expected_raw', [
-    ('Incident Closed', pendulum_now, pendulum_now.to_rfc3339_string()),
+    ('Incident Closed', pendulum_now, UTC.convert(pendulum_now).to_rfc3339_string()),
     (
         'Date Field',
         pendulum_now,
         pendulum.Pendulum(pendulum_now.year, pendulum_now.month, pendulum_now.day).to_rfc3339_string()
     ),
-    ('Time Field', pendulum_now, pendulum_now.to_rfc3339_string()),
+    ('Time Field', pendulum_now, UTC.convert(pendulum_now).to_rfc3339_string()),
     ('Incident Duration', pendulum_interval, pendulum_interval.in_seconds() * 1000)
 ])
 def test_raw_serialization(mock_record, field_name, dt, expected_raw):
@@ -56,12 +58,12 @@ def test_date_set_invalid(mock_record, invalid_date_obj):
     datetime_now,
     datetime_now.time(),
     pendulum_now,
-    pendulum_now.time()
+    UTC.convert(pendulum_now).time()
 ])
 def test_time_set(mock_record, valid_time_obj):
     """Test that the time subtype can be set to a Time or Datetime"""
     mock_record['Time Field'] = valid_time_obj
-    assert mock_record['Time Field'] == pendulum_now.time()
+    assert mock_record['Time Field'] == UTC.convert(pendulum_now).time()
 
 
 @pytest.mark.parametrize('invalid_time_obj', [
