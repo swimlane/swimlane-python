@@ -36,15 +36,15 @@ class DatetimeField(Field):
             if self.input_type == self._type_interval:
                 # Pendulum interval
                 value = pendulum.interval.instance(value)
-            elif self.input_type == self._type_date:
-                # Pendulum date
-                if isinstance(value, date):
-                    value = pendulum.combine(value, pendulum.time(0))
-            elif self.input_type == self._type_time:
-                # Pendulum time
-                if isinstance(value, time):
-                    value = pendulum.combine(pendulum.date.today(), value)
             else:
+                if self.input_type == self._type_date:
+                    # Pendulum date
+                    if isinstance(value, date):
+                        value = pendulum.combine(value, pendulum.time(0))
+                elif self.input_type == self._type_time:
+                    # Pendulum time
+                    if isinstance(value, time):
+                        value = pendulum.combine(pendulum.date.today(), value)
                 # Pendulum instance
                 value = pendulum.instance(value)
 
@@ -72,3 +72,11 @@ class DatetimeField(Field):
 
         return value
 
+    def get_swimlane(self):
+        """Return datetimes as rfc3339 strings and timespans as millisecond epochs"""
+        value = super(DatetimeField, self).get_swimlane()
+
+        if self.input_type == self._type_interval:
+            return value.in_seconds() * 1000
+        else:
+            return value.to_rfc3339_string()

@@ -7,6 +7,25 @@ import pytest
 datetime_now = datetime.datetime.now(pytz.utc)
 pendulum_now = pendulum.instance(datetime_now)
 
+pendulum_interval = pendulum.interval(minutes=5)
+
+
+@pytest.mark.parametrize('field_name,dt,expected_raw', [
+    ('Incident Closed', pendulum_now, pendulum_now.to_rfc3339_string()),
+    (
+        'Date Field',
+        pendulum_now,
+        pendulum.Pendulum(pendulum_now.year, pendulum_now.month, pendulum_now.day).to_rfc3339_string()
+    ),
+    ('Time Field', pendulum_now, pendulum_now.to_rfc3339_string()),
+    ('Incident Duration', pendulum_interval, pendulum_interval.in_seconds() * 1000)
+])
+def test_raw_serialization(mock_record, field_name, dt, expected_raw):
+    """Test that datetime field values are appropriately serialized to raw"""
+    mock_record[field_name] = dt
+    field_id = mock_record._app.get_field_definition_by_name(field_name)['id']
+    assert mock_record._raw['values'][field_id] == expected_raw
+
 
 @pytest.mark.parametrize('valid_date_obj', [
     datetime_now,
