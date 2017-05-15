@@ -25,6 +25,24 @@ class UnknownField(SwimlaneError, KeyError):
         super(UnknownField, self).__init__(message)
 
 
+class InvalidServerVersion(SwimlaneError, ValueError):
+    """Raised when method requiring a specific server version range is called when connected to server outside range"""
+
+    def __init__(self, swimlane, min_version, max_version):
+        self.swimlane = swimlane
+        self.min_version = min_version
+        self.max_version = max_version
+
+        if self.min_version and self.max_version:
+            message = 'between {} - {}'.format(self.min_version, self.max_version)
+        elif self.min_version:
+            message = '>= {}'.format(self.min_version)
+        else:
+            message = '<= {}'.format(self.max_version)
+
+        super(InvalidServerVersion, self).__init__('Server version {} must be '.format(swimlane.version) + message)
+
+
 class SwimlaneHTTP400Error(SwimlaneError, HTTPError):
     """Exception raised when receiving a 400 response with additional context"""
 

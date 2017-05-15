@@ -10,7 +10,10 @@ from swimlane.utils import (
     random_string,
     get_recursive_subclasses,
     import_submodules,
+)
+from swimlane.utils.version import (
     compare_versions,
+    requires_swimlane_version,
     get_package_version
 )
 
@@ -56,32 +59,48 @@ def test_import_submodules():
 
 
 @pytest.mark.parametrize('inputs,expected', [
-    ((2,), 0),
-    ((1,), 1),
-    ((3,), -1),
-    ((2, 13), 0),
-    ((2, 12), 1),
-    ((2, 14), -1),
-    ((2, 13, 3), -1),
-    ((2, 13, 2), 0),
-    ((2, 13, 2, 173414), 0),
-    ((2, 13, 2, 173415), -1)
+    ('2', 0),
+    ('1', 1),
+    ('3', -1),
+    ('2.13', 0),
+    ('2.12', 1),
+    ('2.14', -1),
+    ('2.13.3', -1),
+    ('2.13.2', 0),
+    ('2.13.2-173414', 0),
+    ('2.13.2-173415', -1)
 ])
-def test_compare_versions(inputs, expected):
-    """Test compare versions"""
-    mock_swimlane = mock.MagicMock()
-    mock_swimlane.version = '2.13.2-173414'
+def test_compare_versions_no_zerofill(inputs, expected):
+    """Test compare versions when only comparing sections of version included in both provided versions"""
+    assert compare_versions(inputs, '2.13.2-173414') == expected
 
-    assert compare_versions(mock_swimlane, *inputs) == expected
+
+@pytest.mark.parametrize('inputs,expected', [
+    ('2', 1),
+    ('1', 1),
+    ('3', -1),
+    ('2.13', 1),
+    ('2.12', 1),
+    ('2.14', -1),
+    ('2.13.3', -1),
+    ('2.13.2', 1),
+    ('2.13.2-173414', 0),
+    ('2.13.2-173415', -1)
+])
+def test_compare_versions_with_zerofill(inputs, expected):
+    """Test compare versions when comparing sections of version with default 0 for missing sections"""
+    target = '2.13.2-173414'
+    assert compare_versions(inputs, target, True) == expected
+    assert compare_versions(target, inputs, True) == -expected
 
 
 def test_get_package_version():
     mock_dist = mock.MagicMock()
     mock_dist.version = '1.2.3'
 
-    with mock.patch('swimlane.utils.get_distribution', return_value=mock_dist):
+    with mock.patch('swimlane.utils.version.get_distribution', return_value=mock_dist):
         version = get_package_version()
         assert tuple(version.split('.')[:2]) > ('0', '0', '0')
 
-    with mock.patch('swimlane.utils.get_distribution', side_effect=DistributionNotFound):
+    with mock.patch('swimlane.utils.version.get_distribution', side_effect=DistributionNotFound):
         assert get_package_version() == '0.0.0.dev'
