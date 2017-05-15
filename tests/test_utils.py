@@ -6,6 +6,8 @@ import mock
 import pytest
 from pkg_resources import DistributionNotFound
 
+from swimlane.core.resolver import SwimlaneResolver
+from swimlane.errors import InvalidServerVersion
 from swimlane.utils import (
     random_string,
     get_recursive_subclasses,
@@ -104,3 +106,85 @@ def test_get_package_version():
 
     with mock.patch('swimlane.utils.version.get_distribution', side_effect=DistributionNotFound):
         assert get_package_version() == '0.0.0.dev'
+
+
+class TestRequiresSwimlaneVersion(object):
+    """Tests for the requires_swimlane_version decorator"""
+
+    def _get_resolver(self, min_version, max_version):
+        """Factory used in tests"""
+        class TestResolver(SwimlaneResolver):
+            @requires_swimlane_version(min_version, max_version)
+            def func(self, *args, **kwargs):
+                return args, kwargs
+
+        return TestResolver
+
+    @pytest.mark.parametrize('min_version,max_version', [
+        ('2.13', '2.12'),
+        ('2', '1.2.3'),
+        (None, None)
+    ])
+    def test_invalid_version_range(self, min_version, max_version):
+        """Test that requires_swimlane_version raises ValueError when receiving conflicting version range"""
+        with pytest.raises(ValueError):
+            self._get_resolver(min_version, max_version)
+
+    @pytest.mark.parametrize('min_version,max_version', [
+        ('2.13', '2.13'),
+        ('2.12', '2.13'),
+        (None, '2.13'),
+        ('2.13', None),
+        ('2', '3.2.1'),
+        ('2.3.4', '3')
+    ])
+    def test_valid_version_range(self, min_version, max_version):
+        """Test that requires_swimlane_version does not raise exceptions when given a valid version range"""
+        self._get_resolver(min_version, max_version)
+
+    @pytest.mark.parametrize('swimlane_version,min_version,max_version', [
+        ('2.13', '2.14', None),
+        ('2.13.2', '2.14', None),
+        ('2.13.2', '2.13.3', None),
+        ('2.13', None, '2.12'),
+        ('2.13.2', None, '2.13'),
+        ('2.13.2', None, '2.13.1'),
+        ('2.13.2', '2.13', '2.13.1'),
+        ('2.13.2', '2.13.3', '2.13.4'),
+    ])
+    def test_call_invalid_version(self, swimlane_version, min_version, max_version):
+        """Test that InvalidServerVersion is raised when calling a method with an out of range Swimlane version"""
+        mock_swimlane = mock.MagicMock()
+        mock_swimlane.version = swimlane_version
+
+        resolver_class = self._get_resolver(min_version, max_version)
+
+        resolver = resolver_class(mock_swimlane)
+
+        with pytest.raises(InvalidServerVersion):
+            resolver.func()
+
+    @pytest.mark.parametrize('swimlane_version,min_version,max_version', [
+        ('2.13', '2.12', None),
+        ('2.13', '2.13', None),
+        ('2.13.2', '2.12', None),
+        ('2.13', None, '2.13'),
+        ('2.13.2', None, '2.13.3'),
+        ('2.13.2', '2.13', '2.14'),
+        ('2.13.2', '2.13.0', '2.14'),
+        ('2.13.2', '2.13.0', '2.14.1'),
+        ('2.13', '2.13', '2.14.1'),
+    ])
+    def test_call_valid_version(self, swimlane_version, min_version, max_version):
+        """Test that InvalidServerVersion is raised when calling a method with an out of range Swimlane version"""
+        mock_swimlane = mock.MagicMock()
+        mock_swimlane.version = swimlane_version
+
+        resolver_class = self._get_resolver(min_version, max_version)
+
+        resolver = resolver_class(mock_swimlane)
+
+        args = (1, 2, 3)
+        kwargs = {'a': 'A', 'b': 'B'}
+
+        assert resolver.func(*args, **kwargs) == (args, kwargs)

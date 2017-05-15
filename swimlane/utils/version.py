@@ -67,10 +67,10 @@ def requires_swimlane_version(min_version=None, max_version=None):
         def wrapper(self, *args, **kwargs):
             swimlane = self._swimlane
 
-            if min_version and compare_versions(min_version, swimlane.version) > 0:
+            if min_version and compare_versions(min_version, swimlane.version, True) < 0:
                 raise InvalidServerVersion(swimlane, min_version, max_version)
 
-            if max_version and compare_versions(swimlane.version, max_version) > 0:
+            if max_version and compare_versions(swimlane.version, max_version, True) < 0:
                 raise InvalidServerVersion(swimlane, min_version, max_version)
 
             return func(self, *args, **kwargs)
