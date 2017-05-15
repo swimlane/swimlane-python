@@ -41,6 +41,11 @@ class ReferenceCursor(MultiSelectCursor):
 
         return super(ReferenceCursor, self).deselect(element)
 
+    @property
+    def target_app(self):
+        """Make field's target_app available on cursor"""
+        return self._field.target_app
+
 
 class ReferenceField(MultiSelectField):
 

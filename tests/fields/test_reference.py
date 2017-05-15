@@ -18,6 +18,7 @@ def test_reference_field(mock_record, mock_swimlane, mock_app):
 
         reference = mock_record[field_name]
         assert isinstance(reference, ReferenceCursor)
+        assert reference.target_app is field.target_app
 
     with mock.patch.object(mock_app.records, 'get', return_value=mock_record):
         # Lazy retrieval of target app definition and selected records
