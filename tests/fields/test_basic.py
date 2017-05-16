@@ -4,6 +4,7 @@ import numbers
 import pytest
 
 from swimlane.core.fields import resolve_field_class
+from swimlane.exceptions import ValidationError
 
 
 def test_text_field(mock_record):
@@ -19,7 +20,7 @@ def test_numeric_field(mock_record):
 
     assert isinstance(mock_record['Numeric'], numbers.Number)
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         mock_record['Numeric'] = 'Not a number'
 
     current_value = mock_record['Numeric']
@@ -32,7 +33,7 @@ def test_tracking_id_field(mock_record):
 
     assert mock_record['Tracking Id'] == 'RA-7'
 
-    with pytest.raises(AttributeError):
+    with pytest.raises(ValidationError):
         mock_record['Tracking Id'] = 'Other Tracking value'
 
 

@@ -33,8 +33,11 @@ def test_create(mock_swimlane, mock_app, mock_record):
          set
     )
 
-    fields = {field_name: field_value for field_name, field_value in mock_record if isinstance(field_value, primitives)}
-    fields.pop('Tracking Id')
+    fields = {}
+    for field_name, field in six.iteritems(mock_record._fields):
+        field_value = field.get_python()
+        if isinstance(field_value, primitives) and not field.readonly:
+            fields[field_name] = field_value
 
     with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
         assert mock_app.records.create(**fields) == mock_record

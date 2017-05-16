@@ -4,6 +4,8 @@ import pytz
 
 import pytest
 
+from swimlane.exceptions import ValidationError
+
 UTC = pendulum.timezone('UTC')
 
 datetime_now = datetime.datetime.now(pytz.timezone('MST'))
@@ -50,7 +52,7 @@ def test_date_set(mock_record, valid_date_obj):
 ])
 def test_date_set_invalid(mock_record, invalid_date_obj):
     """Test providing invalid data to date field"""
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         mock_record['Date Field'] = invalid_date_obj
 
 
@@ -75,5 +77,5 @@ def test_time_set(mock_record, valid_time_obj):
 ])
 def test_time_set_invalid(mock_record, invalid_time_obj):
     """Test providing invalid data to date field"""
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         mock_record['Time Field'] = invalid_time_obj

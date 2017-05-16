@@ -5,11 +5,11 @@ from difflib import get_close_matches
 from requests import HTTPError
 
 
-class SwimlaneError(Exception):
+class SwimlaneException(Exception):
     """Base exception for Swimlane errors"""
 
 
-class UnknownField(SwimlaneError, KeyError):
+class UnknownField(SwimlaneException, KeyError):
     """Raised anytime access is attempted to a field that does not exist on an App or Record"""
 
     def __init__(self, app, field_name, field_pool):
@@ -17,7 +17,7 @@ class UnknownField(SwimlaneError, KeyError):
         self.field_name = field_name
         self.similar_field_names = get_close_matches(self.field_name, field_pool, 3)
 
-        message = "App '{}' has no field '{}'".format(self.app, self.field_name)
+        message = "{!r} has no field '{}'".format(self.app, self.field_name)
 
         if self.similar_field_names:
             message += '. Similar fields: ' + ', '.join([repr(f) for f in self.similar_field_names])
@@ -25,7 +25,19 @@ class UnknownField(SwimlaneError, KeyError):
         super(UnknownField, self).__init__(message)
 
 
-class InvalidServerVersion(SwimlaneError, NotImplementedError):
+class ValidationError(SwimlaneException, ValueError):
+    """Raised when record's field data is invalid"""
+
+    def __init__(self, record, failure):
+        self.record = record
+        self.failure = failure
+
+        super(ValidationError, self).__init__(
+            'Validation failed for {!r}. Reason: {}'.format(self.record, self.failure)
+        )
+
+
+class InvalidServerVersion(SwimlaneException, NotImplementedError):
     """Raised when method requiring a specific server version range is called when connected to server outside range"""
 
     def __init__(self, swimlane, min_version, max_version):
@@ -40,10 +52,10 @@ class InvalidServerVersion(SwimlaneError, NotImplementedError):
         else:
             message = '<= {}'.format(self.max_version)
 
-        super(InvalidServerVersion, self).__init__('Server version {} must be '.format(swimlane.version) + message)
+        super(InvalidServerVersion, self).__init__('Server version {}, must be '.format(swimlane.version) + message)
 
 
-class SwimlaneHTTP400Error(SwimlaneError, HTTPError):
+class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
     """Exception raised when receiving a 400 response with additional context"""
 
     codes = {

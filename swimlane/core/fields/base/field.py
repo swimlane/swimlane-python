@@ -1,9 +1,9 @@
 import weakref
 
 from swimlane.core.resolver import SwimlaneResolver
+from swimlane.exceptions import ValidationError
 
 
-# TODO: Respect readonly field definition setting(s) (calculated, createdBy, etc.)
 class Field(SwimlaneResolver):
     """Base class for abstracting Swimlane complex types"""
 
@@ -15,7 +15,6 @@ class Field(SwimlaneResolver):
     # List of supported types, leave blank to disable type validation
     supported_types = []
 
-    # TODO: Set initial value from server at instantiation to differentiate set_python from initial value set
     def __init__(self, name, record):
         """Value not included during instantiation to prevent ambiguity between python and swimlane representations"""
         super(Field, self).__init__(record._swimlane)
@@ -27,6 +26,8 @@ class Field(SwimlaneResolver):
         self.field_definition = self.record._app.get_field_definition_by_name(self.name)
         self.id = self.field_definition['id']
         self.input_type = self.field_definition.get('inputType')
+        self.required = self.field_definition.get('required', False)
+        self.readonly = bool(self.field_definition.get('formula', self.field_definition.get('readOnly', False)))
 
     def __repr__(self):
         return '<{class_name}: {py!r}>'.format(class_name=self.__class__.__name__, py=self.get_python())
@@ -59,9 +60,9 @@ class Field(SwimlaneResolver):
         """Validate value is an acceptable type during _set operation"""
         if value is not None:
             if self.supported_types and not isinstance(value, tuple(self.supported_types)):
-                raise TypeError('Field "{}" expects one of "{}", got "{}" instead'.format(
+                raise ValidationError(self.record, "Field '{}' expects one of {}, got '{}' instead".format(
                     self.name,
-                    ', '.join([t.__name__ for t in self.supported_types]),
+                    ', '.join([repr(t.__name__) for t in self.supported_types]),
                     type(value).__name__)
                 )
 
@@ -72,8 +73,12 @@ class Field(SwimlaneResolver):
 
     def set_python(self, value):
         """Set field internal value from the python representation of field value"""
+        if self.readonly:
+            raise ValidationError(self.record, "Cannot set readonly field '{}'".format(self.name))
+
         return_value = self._set(value)
 
+        # Set raw value to expected swimlane format once internal set is successful
         self.record._raw['values'][self.id] = self.get_swimlane()
 
         return return_value

@@ -3,7 +3,7 @@ import functools
 
 from pkg_resources import get_distribution, DistributionNotFound
 
-from swimlane.errors import InvalidServerVersion
+from swimlane.exceptions import InvalidServerVersion
 
 
 def compare_versions(version_a, version_b, zerofill=False):

@@ -3,7 +3,7 @@ import weakref
 import six
 
 from swimlane.core.resolver import SwimlaneResolver
-from swimlane.core.resources import Record
+from swimlane.core.resources.record import Record, record_factory
 from swimlane.utils import random_string
 
 
@@ -49,28 +49,11 @@ class RecordAdapter(SwimlaneResolver):
         Arguments should be field names with their respective python values
         """
         # Use temporary Record instance to build fields and inject python values
-        #pylint: disable=line-too-long
-        new_record = Record(self._app, {
-            '$type': Record._type,
-            'isNew': True,
-            'applicationId': self._app.id,
-            'comments': {
-                '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib'
-            },
-            'values': {
-                '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
-            }
-        })
+        new_record = record_factory(self._app)
 
         for field_name, field_value in six.iteritems(fields):
             new_record[field_name] = field_value
 
-        # Send converted data to server
-        response = self._swimlane.request(
-            'post',
-            'app/{}/record'.format(self._app.id),
-            json=new_record._raw
-        )
+        new_record.save()
 
-        # Return new Record instance from returned data
-        return Record(self._app, response.json())
+        return new_record

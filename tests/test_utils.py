@@ -7,7 +7,7 @@ import pytest
 from pkg_resources import DistributionNotFound
 
 from swimlane.core.resolver import SwimlaneResolver
-from swimlane.errors import InvalidServerVersion
+from swimlane.exceptions import InvalidServerVersion
 from swimlane.utils import (
     random_string,
     get_recursive_subclasses,

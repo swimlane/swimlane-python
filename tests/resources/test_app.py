@@ -1,4 +1,4 @@
-from swimlane.errors import UnknownField
+from swimlane.exceptions import UnknownField
 
 
 def test_repr(mock_app):

@@ -1,9 +1,10 @@
 from functools import total_ordering
 
+import pendulum
 import six
 
 from swimlane.core.resources.base import APIResource
-from swimlane.errors import UnknownField
+from swimlane.exceptions import UnknownField, ValidationError
 
 
 @total_ordering
@@ -21,7 +22,7 @@ class Record(APIResource):
 
         # Protect against creation from generic raw data not yet containing server-generated values
         if self.is_new:
-            self.id = self.tracking_id = None
+            self.id = self.tracking_id = self.created = self.modified = None
         else:
             self.id = self._raw['id']
 
@@ -32,10 +33,16 @@ class Record(APIResource):
                 str(int(self._raw['trackingId']))
             ])
 
+            self.created = pendulum.parse(self._raw['createdDate'])
+            self.modified = pendulum.parse(self._raw['modifiedDate'])
+
         self._fields = {}
         self.__premap_fields()
 
     def __str__(self):
+        if self.is_new:
+            return '{} - New'.format(self._app.acronym)
+
         return str(self.tracking_id)
 
     def __setitem__(self, field_name, value):
@@ -84,10 +91,52 @@ class Record(APIResource):
 
             self._fields[field_instance.name] = field_instance
 
+    def validate(self):
+        """Explicitly validate field data. Called automatically during save call before sending data to server
+        
+        Returns None or raises ValidationError
+        """
+        for field in (_field for _field in six.itervalues(self._fields) if _field.required):
+            if field.get_swimlane() is None:
+                raise ValidationError(self, 'Required field "{}" is not set'.format(field.name))
+
     def save(self):
-        """Update record in Swimlane"""
-        self._swimlane.request(
-            'put',
+        """Persist record changes on Swimlane server
+        
+        Updates internal raw data with response content from server to guarantee calculated field values match values on
+        server
+        
+        Raises ValidationError if any fields fail validation
+        """
+
+        if self.is_new:
+            method = 'post'
+        else:
+            method = 'put'
+
+        self.validate()
+
+        response = self._swimlane.request(
+            method,
             'app/{}/record'.format(self._app.id),
             json=self._raw
         )
+
+        # Reinitialize record with new raw content returned from server to update any calculated fields
+        self.__init__(self._app, response.json())
+
+
+def record_factory(app):
+    """Return a temporary Record instance to be used for field validation and value parsing"""
+    # pylint: disable=line-too-long
+    return Record(app, {
+        '$type': Record._type,
+        'isNew': True,
+        'applicationId': app.id,
+        'comments': {
+            '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib'
+        },
+        'values': {
+            '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
+        }
+    })

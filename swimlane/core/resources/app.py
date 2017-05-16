@@ -1,4 +1,4 @@
-from swimlane.errors import UnknownField
+from swimlane.exceptions import UnknownField
 from .base import APIResource
 
 

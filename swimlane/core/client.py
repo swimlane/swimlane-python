@@ -10,7 +10,7 @@ from six.moves.urllib.parse import urljoin
 from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources import User
-from swimlane.errors import SwimlaneHTTP400Error
+from swimlane.exceptions import SwimlaneHTTP400Error
 
 # Disable insecure request warnings
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

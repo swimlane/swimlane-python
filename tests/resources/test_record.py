@@ -1,27 +1,53 @@
 import mock
+import pytest
 
-from swimlane.core.resources import Record
-from swimlane.errors import UnknownField
+from swimlane.core.resources.record import Record, record_factory
+from swimlane.exceptions import UnknownField, ValidationError
 
 
 def test_repr(mock_record):
-
     assert repr(mock_record) == '<Record: RA-7>'
+    assert repr(record_factory(mock_record._app)) == '<Record: RA - New>'
 
 
 def test_save(mock_swimlane, mock_record):
     """Test save endpoint called with correct args"""
 
     with mock.patch.object(mock_swimlane, 'request') as mock_request:
+        with mock.patch.object(mock_record, 'validate') as mock_validate:
 
-        mock_record['Numeric'] = 5
-        mock_record.save()
+            mock_request.return_value.json.return_value = mock_record._raw
 
-        mock_request.assert_called_once_with(
-            'put',
-            'app/{}/record'.format(mock_record._app.id),
-            json=mock_record._raw
-        )
+            mock_record['Numeric'] = 5
+            mock_record.save()
+
+            mock_validate.assert_called_once_with()
+            mock_request.assert_called_once_with(
+                'put',
+                'app/{}/record'.format(mock_record._app.id),
+                json=mock_record._raw
+            )
+
+            # Test validation failure
+            mock_validate.side_effect = ValidationError(mock_record, 'Test error')
+
+            with pytest.raises(ValidationError):
+                mock_record.save()
+
+            assert mock_validate.call_count == 2
+            assert mock_request.call_count == 1
+
+
+def test_validate_required_fields(mock_record):
+    """Test validate method checks for required fields"""
+    assert mock_record.validate() is None
+
+    field_name = 'Numeric'
+    mock_record[field_name] = None
+    mock_record._fields[field_name].required = True
+
+    with pytest.raises(ValidationError):
+        mock_record.validate()
 
 
 def test_ordering(mock_record):

@@ -1,5 +1,6 @@
 """Tests for multiselect fields"""
 from swimlane.core.resources import UserGroup
+from swimlane.exceptions import ValidationError
 
 
 def test_values_list_single_select_field(mock_record):
@@ -103,7 +104,7 @@ def test_usergroup_single_field(mock_record, mock_group, mock_user):
 
     try:
         mock_record['Incident Owner'] = 'Everyone'
-    except TypeError:
+    except ValidationError:
         pass
     else:
         raise RuntimeError

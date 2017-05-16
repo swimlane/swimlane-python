@@ -82,5 +82,5 @@ class DatetimeField(Field):
 
         if self.input_type == self._type_interval:
             return value.in_seconds() * 1000
-        else:
-            return value.to_rfc3339_string()
+
+        return value.to_rfc3339_string()
