@@ -25,7 +25,7 @@ class UnknownField(SwimlaneError, KeyError):
         super(UnknownField, self).__init__(message)
 
 
-class InvalidServerVersion(SwimlaneError, ValueError):
+class InvalidServerVersion(SwimlaneError, NotImplementedError):
     """Raised when method requiring a specific server version range is called when connected to server outside range"""
 
     def __init__(self, swimlane, min_version, max_version):
