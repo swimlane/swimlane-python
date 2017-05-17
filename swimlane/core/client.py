@@ -21,13 +21,15 @@ class Swimlane(object):
 
     _api_root = '/api/'
 
-    def __init__(self, host, username, password, verify_ssl=True):
+    def __init__(self, host, username, password, verify_ssl=True, default_timeout=60):
         self.host = URI(host)
         self.host.scheme = self.host.scheme or 'https'
         self.host.path = None
 
         self.__settings = None
         self.__user = None
+
+        self._default_timeout = default_timeout
 
         self._session = requests.Session()
         self._session.verify = verify_ssl
@@ -59,6 +61,9 @@ class Swimlane(object):
         """
         while api_endpoint.startswith('/'):
             api_endpoint = api_endpoint[1:]
+
+        # Ensure a timeout is set
+        kwargs.setdefault('timeout', self._default_timeout)
 
         # Manually grab and dump json data to have full control over serialization
         # Emulate default requests behavior
