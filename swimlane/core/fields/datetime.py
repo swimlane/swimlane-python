@@ -80,6 +80,9 @@ class DatetimeField(Field):
         """Return datetimes as rfc3339 strings and timespans as millisecond epochs"""
         value = super(DatetimeField, self).get_swimlane()
 
+        if value is None:
+            return value
+
         if self.input_type == self._type_interval:
             return value.in_seconds() * 1000
 

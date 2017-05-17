@@ -46,20 +46,13 @@ class Record(APIResource):
         return str(self.tracking_id)
 
     def __setitem__(self, field_name, value):
-        field = self._fields.get(field_name)
-
-        if field is None:
-            raise UnknownField(self._app, field_name, self._fields.keys())
-
-        field.set_python(value)
+        self.__get_field(field_name).set_python(value)
 
     def __getitem__(self, field_name):
-        field = self._fields.get(field_name)
+        return self.__get_field(field_name).get_python()
 
-        if field is None:
-            raise UnknownField(self._app, field_name, self._fields.keys())
-
-        return field.get_python()
+    def __delitem__(self, field_name):
+        self[field_name] = None
 
     def __iter__(self):
         for field_name, field in six.iteritems(self._fields):
@@ -73,6 +66,13 @@ class Record(APIResource):
 
     def __lt__(self, other):
         return isinstance(other, self.__class__) and (self.id, self._app.id) < (other.id, other._app.id)
+
+    def __get_field(self, field_name):
+        """Returns field instance or raises UnknownField"""
+        try:
+            return self._fields[field_name]
+        except KeyError:
+            raise UnknownField(self._app, field_name, self._fields.keys())
 
     def __premap_fields(self):
         """Build field instances using field definitions in app manifest

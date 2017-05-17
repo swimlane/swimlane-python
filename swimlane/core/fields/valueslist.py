@@ -34,6 +34,9 @@ class ValuesListField(MultiSelectField):
 
     def cast_to_swimlane(self, value):
         """Rehydrate value back as full JSON representation"""
+        if value is None:
+            return value
+
         return {
             '$type': 'Core.Models.Record.ValueSelection, Core',
             'id': self.selection_to_id_map[value],
