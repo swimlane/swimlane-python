@@ -54,7 +54,9 @@ def test_resolve_field_class():
 )
 def test_all_fields_empty_value(mock_record, field_class):
     """Test setting fields to empty value works for all field classes"""
-    field = next((_field for _field in mock_record._fields.values() if isinstance(_field, field_class)))
+    # Get any not readonly field instance of provided field_class
+    # Does not guarantee full scope of all field subtypes function as expected
+    field = next((_field for _field in mock_record._fields.values() if isinstance(_field, field_class) and not _field.readonly))
 
     del mock_record[field.name]
 
