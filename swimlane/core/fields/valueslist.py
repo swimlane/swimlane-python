@@ -1,5 +1,6 @@
 import six
 
+from swimlane.exceptions import ValidationError
 from .base import MultiSelectField
 
 
@@ -19,11 +20,14 @@ class ValuesListField(MultiSelectField):
 
         if value is not None:
             if value not in self.selection_to_id_map:
-                raise ValueError('Field "{}" invalid value "{}". Valid options: {}'.format(
-                    self.name,
-                    value,
-                    ', '.join(self.selection_to_id_map.keys())
-                ))
+                raise ValidationError(
+                    self.record,
+                    'Field "{}" invalid value "{}". Valid options: {}'.format(
+                        self.name,
+                        value,
+                        ', '.join(self.selection_to_id_map.keys())
+                    )
+                )
 
     def cast_to_python(self, value):
         """Store actual value as internal representation"""
