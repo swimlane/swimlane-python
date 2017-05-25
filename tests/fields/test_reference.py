@@ -1,7 +1,9 @@
 import mock
+import pytest
 
 from swimlane.core.fields.reference import ReferenceCursor
-from swimlane.core.resources import Record
+from swimlane.core.resources import Record, App
+from swimlane.exceptions import ValidationError, SwimlaneHTTP400Error
 
 
 class TestReferenceField(object):
@@ -53,3 +55,31 @@ class TestReferenceField(object):
             # No new requests should have been necessary, other than the original lookups
             assert mock_record_get.call_count == 3
 
+    def test_target_app_validation(self, mock_swimlane, mock_record, mock_app):
+        """Test that reference field validation checks that provided record is in the field's target app"""
+        # Set target app to some random other app
+        target_app = App(mock_swimlane, mock_app._raw)
+        target_app.id = 'abcdef'
+        target_app.name = 'Some other app'
+
+        with mock.patch.object(mock_swimlane.apps, 'get', return_value=target_app):
+            reference_cursor = mock_record[self.field_name]
+
+            with pytest.raises(ValidationError):
+                reference_cursor.add(mock_record)
+
+            with pytest.raises(ValidationError):
+                mock_record[self.field_name] = [mock_record]
+
+    def test_orphaned_record_cleanup(self, mock_swimlane, mock_record, mock_app):
+        """Test that orphaned records that no longer exist are ignored by ReferenceCursor"""
+        mock_response = mock.MagicMock()
+        mock_response.status_code = 400
+        mock_response.json.return_value = {
+            'ErrorCode': 3002,
+            'Argument': None
+        }
+
+        with mock.patch.object(mock_swimlane.apps, 'get', return_value=mock_app):
+            with mock.patch.object(mock_app.records, 'get', side_effect=SwimlaneHTTP400Error(mock_response)):
+                assert len(mock_record[self.field_name]) == 0
