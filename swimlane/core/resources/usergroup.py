@@ -27,7 +27,10 @@ class UserGroup(APIResource):
 
     def __lt__(self, other):
         if not isinstance(other, UserGroup):
-            return NotImplemented
+            raise TypeError("Comparisons not supported between instances of '{}' and '{}'".format(
+                other.__class__.__name__,
+                self.__class__.__name__
+            ))
 
         return self.name < other.name
 

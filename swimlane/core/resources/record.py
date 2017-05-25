@@ -66,7 +66,10 @@ class Record(APIResource):
 
     def __lt__(self, other):
         if not isinstance(other, self.__class__):
-            return NotImplemented
+            raise TypeError("Comparisons not supported between instances of '{}' and '{}'".format(
+                other.__class__.__name__,
+                self.__class__.__name__
+            ))
 
         tracking_number_self = int(self.tracking_id.split('-')[1])
         tracking_number_other = int(other.tracking_id.split('-')[1])
