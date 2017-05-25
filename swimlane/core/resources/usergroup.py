@@ -26,7 +26,10 @@ class UserGroup(APIResource):
         return isinstance(other, UserGroup) and hash(self) == hash(other)
 
     def __lt__(self, other):
-        return isinstance(other, UserGroup) and self.name < other.name
+        if not isinstance(other, UserGroup):
+            return NotImplemented
+
+        return self.name < other.name
 
     def get_usergroup_selection(self):
         """Converts UserGroup to raw UserGroupSelection for populating record"""

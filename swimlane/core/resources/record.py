@@ -62,14 +62,11 @@ class Record(APIResource):
         return hash((self.id, self._app))
 
     def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            raise NotImplementedError
-
-        return hash(self) == hash(other)
+        return isinstance(other, self.__class__) and hash(self) == hash(other)
 
     def __lt__(self, other):
         if not isinstance(other, self.__class__):
-            raise NotImplementedError
+            return NotImplemented
 
         tracking_number_self = int(self.tracking_id.split('-')[1])
         tracking_number_other = int(other.tracking_id.split('-')[1])

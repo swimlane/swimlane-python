@@ -27,6 +27,12 @@ class App(APIResource):
     def __str__(self):
         return '{self.name} ({self.acronym})'.format(self=self)
 
+    def __hash__(self):
+        return hash((self.id, self.name))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and hash(self) == hash(other)
+
     def get_field_definition_by_name(self, field_name):
         """Get JSON field definition for field matching provided name"""
         try:
