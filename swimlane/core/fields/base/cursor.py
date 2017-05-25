@@ -66,7 +66,7 @@ class CursorField(Field):
 
     def get_initial_elements(self):
         """Return initial elements to be passed with cursor instantiation"""
-        return []
+        return self._get()
 
     def get_python(self):
         """Create, cache, and return the appropriate cursor instance"""

@@ -43,9 +43,6 @@ class MultiSelectField(CursorField):
         selection_type = self.field_definition.get('selectionType', 'single')
         self.is_multiselect = selection_type == 'multi'
 
-    def get_initial_elements(self):
-        return self._get()
-
     def get_python(self):
         """Only return cursor instance if configured for multiselect"""
         if self.is_multiselect:
