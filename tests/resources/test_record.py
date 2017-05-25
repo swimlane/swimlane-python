@@ -50,7 +50,7 @@ def test_validate_required_fields(mock_record):
         mock_record.validate()
 
 
-def test_ordering(mock_record):
+def test_ordering(mock_record, mock_app):
     record_copy = Record(mock_record._app, mock_record._raw)
 
     # Equality by id and app id
@@ -63,6 +63,10 @@ def test_ordering(mock_record):
     # Ordering by tracking id and app name
     record_copy.tracking_id = 'RA-16'
     assert mock_record < record_copy
+
+    # Verify can't sort/order against non-record instances
+    with pytest.raises(TypeError):
+        mock_record < mock_app
 
 
 def test_unknown_field_access(mock_record):

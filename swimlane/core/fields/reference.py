@@ -9,6 +9,11 @@ from swimlane.exceptions import ValidationError, SwimlaneHTTP400Error
 class ReferenceCursor(FieldCursor):
     """Handles lazy retrieval of target records"""
 
+    def __init__(self, *args, **kwargs):
+        super(ReferenceCursor, self).__init__(*args, **kwargs)
+
+        self._elements = self._elements or SortedDict()
+
     @property
     def target_app(self):
         """Make field's target_app available on cursor"""
@@ -32,7 +37,7 @@ class ReferenceCursor(FieldCursor):
 
         self._elements = retrieved_records
 
-        return super(ReferenceCursor, self)._evaluate().values()
+        return self._elements.values()
 
     def add(self, record):
         """Add a reference to the provided record"""
@@ -67,27 +72,27 @@ class ReferenceField(CursorField):
 
         return self.__target_app
 
-    def validate_value(self, record):
+    def validate_value(self, value):
         """Validate provided record is a part of the appropriate target app for the field"""
-        if record not in (None, self._unset):
+        if value not in (None, self._unset):
 
-            super(ReferenceField, self).validate_value(record)
+            super(ReferenceField, self).validate_value(value)
 
-            if record._app != self.target_app:
+            if value._app != self.target_app:
                 raise ValidationError(
                     self.record,
                     "Reference field '{}' has target app '{}', cannot reference record '{}' from app '{}'".format(
                         self.name,
                         self.target_app,
-                        record,
-                        record._app
+                        value,
+                        value._app
                     )
                 )
 
     def _set(self, value):
         value = value or SortedDict()
 
-        for record_id, record in six.iteritems(value):
+        for record in six.itervalues(value):
             self.validate_value(record)
 
         self._cursor = None
@@ -119,4 +124,4 @@ class ReferenceField(CursorField):
 
     def get_swimlane(self):
         """Return list of record ids"""
-        return super(ReferenceField, self).get_swimlane().keys()
+        return list(super(ReferenceField, self).get_swimlane().keys())

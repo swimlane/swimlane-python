@@ -4,38 +4,52 @@ from swimlane.core.fields.reference import ReferenceCursor
 from swimlane.core.resources import Record
 
 
-def test_reference_field(mock_record, mock_swimlane, mock_app):
+class TestReferenceField(object):
 
     field_name = 'Reference'
 
-    field = mock_record._fields[field_name]
+    def test_target_app(self, mock_record, mock_swimlane, mock_app):
+        """Test availability of .target_app property on ReferenceCursor"""
 
-    record_id = '58e24e8607637a0b488849d4'
+        field = mock_record.get_field(self.field_name)
 
-    with mock.patch.object(mock_swimlane.apps, 'get', return_value=mock_app):
+        with mock.patch.object(mock_swimlane.apps, 'get', return_value=mock_app):
 
-        assert field.target_app == mock_app
+            assert field.target_app == mock_app
 
-        reference = mock_record[field_name]
-        assert isinstance(reference, ReferenceCursor)
-        assert reference.target_app is field.target_app
+            reference_cursor = mock_record[self.field_name]
+            assert isinstance(reference_cursor, ReferenceCursor)
+            assert reference_cursor.target_app is field.target_app
 
-    with mock.patch.object(mock_app.records, 'get', return_value=mock_record):
-        # Lazy retrieval of target app definition and selected records
+    def test_lazy_retrieval(self, mock_app, mock_record):
+        """Test lazy retrieval of referenced records"""
+        # Can't patch attribute
+        field = mock_record.get_field(self.field_name)
+        field._ReferenceField__target_app = mock_app
+        reference_cursor = mock_record[self.field_name]
 
-        assert len(reference) == 3
+        with mock.patch.object(reference_cursor.target_app.records, 'get') as mock_record_get:
+            mock_record_get.return_value = mock_record
+            assert mock_record_get.call_count == 0
 
-        for referenced_record in reference:
-            assert isinstance(referenced_record, Record)
+            # Lazy retrieval of target app definition and selected records
 
-        # Add/remove/set referenced record(s) by Record instance or ID
-        mock_record[field_name] = [record_id]
-        mock_record[field_name] = [mock_record]
+            assert len(reference_cursor) == 3
+            assert mock_record_get.call_count == 3
 
-        # Select/deselect
-        assert len(mock_record[field_name]) == 1
-        mock_record[field_name].deselect(mock_record)
-        assert len(mock_record[field_name]) == 0
-        mock_record[field_name].select(mock_record)
-        assert len(mock_record[field_name]) == 1
+            for referenced_record in reference_cursor:
+                assert isinstance(referenced_record, Record)
+
+            # Add/remove/set referenced record(s) by Record instance or ID
+            mock_record[self.field_name] = [mock_record]
+
+            # Select/deselect
+            assert len(mock_record[self.field_name]) == 1
+            mock_record[self.field_name].remove(mock_record)
+            assert len(mock_record[self.field_name]) == 0
+            mock_record[self.field_name].add(mock_record)
+            assert len(mock_record[self.field_name]) == 1
+
+            # No new requests should have been necessary, other than the original lookups
+            assert mock_record_get.call_count == 3
 

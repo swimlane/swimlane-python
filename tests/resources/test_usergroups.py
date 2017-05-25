@@ -1,3 +1,4 @@
+import pytest
 
 
 def test_get_usergroup_selection(mock_user, mock_group):
@@ -14,13 +15,17 @@ def test_get_usergroup_selection(mock_user, mock_group):
     }
 
 
-def test_metamethods(mock_user, mock_group):
+def test_metamethods(mock_user, mock_group, mock_record):
     """Test handful of simple metamethods for id and hashing, sorting, uniqueness, etc."""
     # Equality by id
     assert mock_user != mock_group
 
     # Ordering by name (Everyone < admin)
     assert mock_group < mock_user
+
+    # Ordering type support
+    with pytest.raises(TypeError):
+        mock_user < mock_record
 
     # Hash
     local_set = set()

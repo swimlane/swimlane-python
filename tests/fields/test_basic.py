@@ -4,7 +4,7 @@ import numbers
 import pytest
 
 from swimlane.core.fields import resolve_field_class, _FIELD_TYPE_MAP
-from swimlane.core.fields.base import ReadOnly
+from swimlane.core.fields.base import ReadOnly, FieldCursor
 from swimlane.exceptions import ValidationError
 
 
@@ -63,7 +63,7 @@ def test_all_fields_empty_value(mock_record, field_class):
     swimlane = field.get_swimlane()
     python = field.get_python()
 
-    if getattr(field, 'is_multiselect', False):
+    if getattr(field, 'is_multiselect', False) or isinstance(python, FieldCursor):
         # Multi select fields use cursors or ordered sets in most cases
         assert len(swimlane) == len(python) == 0
     else:
