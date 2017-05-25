@@ -58,7 +58,7 @@ class Field(SwimlaneResolver):
 
     def validate_value(self, value):
         """Validate value is an acceptable type during _set operation"""
-        if value is not None:
+        if value not in (None, self._unset):
             if self.supported_types and not isinstance(value, tuple(self.supported_types)):
                 raise ValidationError(self.record, "Field '{}' expects one of {}, got '{}' instead".format(
                     self.name,
