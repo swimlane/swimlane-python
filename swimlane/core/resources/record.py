@@ -46,10 +46,10 @@ class Record(APIResource):
         return str(self.tracking_id)
 
     def __setitem__(self, field_name, value):
-        self.__get_field(field_name).set_python(value)
+        self.get_field(field_name).set_python(value)
 
     def __getitem__(self, field_name):
-        return self.__get_field(field_name).get_python()
+        return self.get_field(field_name).get_python()
 
     def __delitem__(self, field_name):
         self[field_name] = None
@@ -62,17 +62,19 @@ class Record(APIResource):
         return hash((self.id, self._app))
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and hash(self) == hash(other)
+        if not isinstance(other, self.__class__):
+            raise NotImplementedError
+
+        return hash(self) == hash(other)
 
     def __lt__(self, other):
-        return isinstance(other, self.__class__) and (self.id, self._app.id) < (other.id, other._app.id)
+        if not isinstance(other, self.__class__):
+            raise NotImplementedError
 
-    def __get_field(self, field_name):
-        """Returns field instance or raises UnknownField"""
-        try:
-            return self._fields[field_name]
-        except KeyError:
-            raise UnknownField(self._app, field_name, self._fields.keys())
+        tracking_number_self = int(self.tracking_id.split('-')[1])
+        tracking_number_other = int(other.tracking_id.split('-')[1])
+
+        return (self._app.name, tracking_number_self) < (other._app.name, tracking_number_other)
 
     def __premap_fields(self):
         """Build field instances using field definitions in app manifest
@@ -90,6 +92,13 @@ class Record(APIResource):
             field_instance.set_swimlane(value)
 
             self._fields[field_instance.name] = field_instance
+
+    def get_field(self, field_name):
+        """Returns field instance or raises UnknownField"""
+        try:
+            return self._fields[field_name]
+        except KeyError:
+            raise UnknownField(self._app, field_name, self._fields.keys())
 
     def validate(self):
         """Explicitly validate field data. Called automatically during save call before sending data to server

@@ -60,7 +60,8 @@ def test_ordering(mock_record):
 
     assert record_copy != mock_record
 
-    # Ordering by id and app id
+    # Ordering by tracking id and app name
+    record_copy.tracking_id = 'RA-16'
     assert mock_record < record_copy
 
 
