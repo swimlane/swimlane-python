@@ -1,9 +1,13 @@
 import six
+import logging
 from sortedcontainers import SortedDict
 
 from swimlane.core.fields.base import CursorField, FieldCursor
 from swimlane.core.resources import Record
 from swimlane.exceptions import ValidationError, SwimlaneHTTP400Error
+
+
+logger = logging.getLogger(__name__)
 
 
 class ReferenceCursor(FieldCursor):
@@ -31,6 +35,7 @@ class ReferenceCursor(FieldCursor):
                     record = self.target_app.records.get(id=record_id)
                 except SwimlaneHTTP400Error:
                     # Record appears to be orphaned, don't include in set of elements
+                    logger.debug("Received 400 response retrieving record '{}', ignoring assumed orphaned record")
                     continue
 
             retrieved_records[record_id] = record
