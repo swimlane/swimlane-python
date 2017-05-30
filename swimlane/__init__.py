@@ -15,4 +15,4 @@ __version__ = get_package_version()
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
-logger.setLevel(logging.DEBUG)
+
