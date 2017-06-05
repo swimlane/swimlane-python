@@ -1,9 +1,10 @@
 """Core Swimlane client class"""
 
 import requests
+import urllib3
 from pyuri import URI
 from requests.compat import json
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from urllib3.exceptions import InsecureRequestWarning
 from requests.structures import CaseInsensitiveDict
 from six.moves.urllib.parse import urljoin
 
@@ -13,7 +14,7 @@ from swimlane.core.resources import User
 from swimlane.exceptions import SwimlaneHTTP400Error
 
 # Disable insecure request warnings
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class Swimlane(object):

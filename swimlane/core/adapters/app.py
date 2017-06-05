@@ -40,8 +40,8 @@ class AppAdapter(SwimlaneResolver):
                 response.json()
             )
         else:
-            # FIXME: Workaround for lack of support for get by name
-            # Holdover from previous driver support
+            # Workaround for lack of support for get by name
+            # Holdover from previous driver support, to be fixed as part of 3.x
             for app in self.list():
                 if name and name == app.name:
                     return app

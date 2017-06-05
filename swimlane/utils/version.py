@@ -1,5 +1,5 @@
-import re
 import functools
+import re
 
 from pkg_resources import get_distribution, DistributionNotFound
 

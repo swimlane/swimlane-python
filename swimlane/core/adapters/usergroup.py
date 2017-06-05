@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from six.moves.urllib.parse import quote_plus
 
 from swimlane.core.resolver import SwimlaneResolver
