@@ -1,4 +1,4 @@
-"""Core Swimlane driver/client class"""
+"""Core Swimlane client class"""
 
 import requests
 from pyuri import URI
@@ -17,7 +17,23 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class Swimlane(object):
-    """Swimlane API client"""
+    """Swimlane API client
+
+    Core class used throughout library for all API requests and server interactions
+
+    Args:
+        host (str): Full RFC-1738 URL pointing to Swimlane host. Defaults will be provided for all parts
+        username (str): Authentication username
+        password (str): Authentication password
+        verify_ssl (bool): Verify SSL (ignored on HTTP). Disable to use self-signed certificates
+        default_timeout (int): Default request connect and read timeout in seconds for all requests
+
+    Attributes:
+        host (URI): Full RFC-1738 URL pointing to Swimlane host
+        apps (AppAdapter): AppAdapter configured for current Swimlane instance
+        users (UserAdapter): UserAdapter configured for current Swimlane instance
+        groups (GroupAdapter): GroupAdapter configured for current Swimlane instance
+    """
 
     _api_root = '/api/'
 
@@ -52,12 +68,16 @@ class Swimlane(object):
         )
 
     def request(self, method, api_endpoint, **kwargs):
-        """Shortcut helper for sending requests to API
+        """Wrapper for underlying requests Session
 
-        Handles generating full API URL, session reuse and auth, and response status code
+        Handles generating full API URL, session reuse and auth, request defaults, and invalid response status codes
 
-        Raises HTTPError on 4xx/5xx HTTP responses, or Swimlane400Error on 400 responses with well-formatted additional
-        context information about the exception
+        All provided kwargs are passed to underlying requests call
+
+        Raises requests.HTTPError on 4xx/5xx HTTP responses, or Swimlane400Error on 400 responses with well-formatted
+        additional context information about the exception
+
+        Returns response on successful responses
         """
         while api_endpoint.startswith('/'):
             api_endpoint = api_endpoint[1:]
@@ -96,16 +116,17 @@ class Swimlane(object):
 
     @property
     def version(self):
-        """Returns server API version"""
+        """Server API version"""
         return self.settings['apiVersion']
 
     @property
     def user(self):
-        """Returns User record for authenticated user"""
+        """User record instance for authenticated user"""
         return self._session.auth.user
 
 
 class SwimlaneAuth(SwimlaneResolver):
+    """Handles authentication for all requests"""
 
     def __init__(self, swimlane, username, password, verify_ssl=True):
         super(SwimlaneAuth, self).__init__(swimlane)

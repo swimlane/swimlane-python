@@ -9,7 +9,15 @@ from swimlane.exceptions import UnknownField, ValidationError
 
 @total_ordering
 class Record(APIResource):
-    """A Swimlane record"""
+    """A single Swimlane Record instance
+
+    Attributes:
+        id (str): Full Record ID
+        tracking_id (str): Record tracking ID
+        created (pendulum.Pendulum): Pendulum datetime for Record created date
+        modified (pendulum.Pendulum): Pendulum datetime for Record last modified date
+        is_new (bool): True if Record does not yet exist on server. Other values may be temporarily None if True
+    """
 
     _type = 'Core.Models.Record.Record, Core'
 
@@ -94,16 +102,27 @@ class Record(APIResource):
             self._fields[field_instance.name] = field_instance
 
     def get_field(self, field_name):
-        """Returns field instance or raises UnknownField"""
+        """Get field instance used to get, set, and serialize internal field value
+
+        Returns:
+            Field: Requested field instance
+
+        Raises:
+             UnknownField: Raised if `field_name` not found in parent App
+        """
         try:
             return self._fields[field_name]
         except KeyError:
             raise UnknownField(self._app, field_name, self._fields.keys())
 
     def validate(self):
-        """Explicitly validate field data. Called automatically during save call before sending data to server
-        
-        Returns None or raises ValidationError
+        """Explicitly validate field data
+
+        Notes:
+            Called automatically during save call before sending data to server
+
+        Raises:
+             ValidationError: If any fields fail validation
         """
         for field in (_field for _field in six.itervalues(self._fields) if _field.required):
             if field.get_swimlane() is None:
@@ -115,7 +134,8 @@ class Record(APIResource):
         Updates internal raw data with response content from server to guarantee calculated field values match values on
         server
         
-        Raises ValidationError if any fields fail validation
+        Raises:
+            ValidationError: If any fields fail validation
         """
 
         if self.is_new:
@@ -136,7 +156,14 @@ class Record(APIResource):
 
 
 def record_factory(app):
-    """Return a temporary Record instance to be used for field validation and value parsing"""
+    """Return a temporary Record instance to be used for field validation and value parsing
+
+    Args:
+        app (App): Target App to create a transient Record instance for
+
+    Returns:
+        Record: Unsaved Record instance to be used for validation, creation, etc.
+    """
     # pylint: disable=line-too-long
     return Record(app, {
         '$type': Record._type,

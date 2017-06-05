@@ -3,10 +3,22 @@ from swimlane.core.resources import App
 
 
 class AppAdapter(SwimlaneResolver):
-    """Allows retrieval of Swimlane Apps"""
+    """Handles retrieval of Swimlane App resources"""
 
     def get(self, **kwargs):
-        """Get single app by id, name, or acronym"""
+        """Get single app by one of id or name
+
+        Keyword Args:
+            id (str): Full app id
+            name (str): App name
+
+        Returns:
+            App: Corresponding App resource instance
+
+        Raises:
+            TypeError: No or multiple keyword arguments provided
+            ValueError: No matching app found on server
+        """
         orig_kwargs = kwargs.copy()
         app_id = kwargs.pop('id', None)
         name = kwargs.pop('name', None)
@@ -38,6 +50,10 @@ class AppAdapter(SwimlaneResolver):
             raise ValueError('No app matching provided arguments: {}'.format(orig_kwargs))
 
     def list(self):
-        """Return list of all apps"""
+        """Retrieve list of all apps
+
+        Returns:
+            :obj:`list` of :obj:`App`: List of all retrieved apps
+        """
         response = self._swimlane.request('get', 'app')
         return [App(self._swimlane, item) for item in response.json()]

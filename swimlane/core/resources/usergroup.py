@@ -6,8 +6,16 @@ from swimlane.core.resources.base import APIResource
 @total_ordering
 class UserGroup(APIResource):
     """Base class for Users and Groups
-    
-    Returned in some places where determining whether object is a User or Group is not possible
+
+    Notes:
+        Returned in some places where determining whether object is a User or Group is not possible without additional
+        requests. Use appropriate adapter on `swimlane` client to retrieve more specific instance using `id` as needed
+
+        Can be compared to User or Group instances directly without ensuring the classes are the same
+
+    Attributes:
+        id (str): Full user/group ID
+        name (str): User/group name
     """
 
     def __init__(self, swimlane, raw):
@@ -35,7 +43,11 @@ class UserGroup(APIResource):
         return self.name < other.name
 
     def get_usergroup_selection(self):
-        """Converts UserGroup to raw UserGroupSelection for populating record"""
+        """Converts UserGroup to raw UserGroupSelection for populating record
+
+        Returns:
+            dict: Formatted UserGroup data as used by some fields
+        """
         return {
             '$type': 'Core.Models.Utilities.UserGroupSelection, Core',
             'id': self.id,
@@ -44,7 +56,11 @@ class UserGroup(APIResource):
 
 
 class Group(UserGroup):
-    """A class for working with Swimlane groups"""
+    """A class for working with Swimlane groups
+
+    Attributes:
+        description (str): Group description
+    """
 
     _type = 'Core.Models.Groups.Group, Core'
 
@@ -55,7 +71,13 @@ class Group(UserGroup):
 
 
 class User(UserGroup):
-    """Encapsulates a single Swimlane user record"""
+    """Encapsulates a single Swimlane user record
+
+    Attributes:
+        username (str): Unique username
+        display_name (str): User display name
+        email (str): User email
+    """
 
     _type = 'Core.Models.Identity.ApplicationUser, Core'
 

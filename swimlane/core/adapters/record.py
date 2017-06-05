@@ -8,7 +8,7 @@ from swimlane.utils import random_string
 
 
 class RecordAdapter(SwimlaneResolver):
-    """Allows retrieval and creation of Swimlane records"""
+    """Handles retrieval and creation of Swimlane Record resources"""
 
     def __init__(self, app):
         super(RecordAdapter, self).__init__(app._swimlane)
@@ -21,7 +21,18 @@ class RecordAdapter(SwimlaneResolver):
         return self.__ref_app()
 
     def get(self, **kwargs):
-        """Get a single record by full id"""
+        """Get a single record by id
+
+        Keyword Args:
+            id (str): Full record ID
+
+        Returns:
+            Record: Matching Record instance returned from API
+
+        Raises:
+            TypeError: No id argument provided
+            Swimlane400HTTPError: Unable to find requested record using provided ``id``
+        """
         record_id = kwargs.pop('id', None)
 
         if kwargs:
@@ -35,7 +46,28 @@ class RecordAdapter(SwimlaneResolver):
         return Record(self._app, response.json())
 
     def search(self, *filter_tuples):
-        """Shortcut to generate a new temporary search report using provided filters and return the results"""
+        """Shortcut to generate a new temporary search report using provided filters and return the resulting records
+
+        Notes:
+            Uses a temporary Report instance with a random name to facilitate search. Records are normally paginated,
+            but are returned as a single list here, potentially causing performance issues with large searches.
+
+            All provided filters are AND'ed together
+
+            Filter operators are available as constants in `swimlane.core.search`
+
+        Examples:
+
+            ::
+
+                records = app.records.search(
+                    ('field_name', 'equals', 'field_value'),
+                    ('other_field', search.NOT_EQ, 'value')
+                )
+
+        Returns:
+            :obj:`list` of :class:`Record`: List of Record instances returned from the search results
+        """
         report = self._app.reports.build('search-' + random_string(8))
 
         for filter_tuple in filter_tuples:
@@ -46,7 +78,23 @@ class RecordAdapter(SwimlaneResolver):
     def create(self, **fields):
         """Create and return a new record in associated app and return the corresponding Record instance
         
-        Arguments should be field names with their respective python values
+        Notes:
+            Keyword arguments should be field names with their respective python values
+
+        Examples:
+            Create a new record on an app with simple field names
+
+            >>> record = app.records.create(field_a='Some Value', someOtherField=100, ...)
+
+            Create a new record on an app with complex field names
+
+            >>> record = app.records.create(**{'Field 1': 'Field 1 Value', 'Other Field': 100, ...})
+
+        Returns:
+            Record: Newly created Record instance with data as returned from API response
+
+        Raises:
+            UnknownField: Raised if any fields are provided that are not available on target app
         """
         # Use temporary Record instance to build fields and inject python values
         new_record = record_factory(self._app)

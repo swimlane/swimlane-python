@@ -8,7 +8,7 @@ test:
 
 docs:
 	pip install -r docs/requirements.txt
-	cd docs/ && sphinx-build -T . _build/html
+	cd docs/ && sphinx-build -E -T . _build/html
 
 release:
 	python setup.py sdist bdist_wheel upload -r swimlane

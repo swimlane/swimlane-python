@@ -2,7 +2,8 @@ from datetime import datetime
 
 import mock
 
-from swimlane.core.fields.comment import CommentCursor, Comment
+from swimlane.core.fields.comment import CommentCursor
+from swimlane.core.resources.comment import Comment
 from swimlane.core.resources import UserGroup
 
 

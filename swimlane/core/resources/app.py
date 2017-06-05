@@ -3,7 +3,19 @@ from .base import APIResource
 
 
 class App(APIResource):
-    """Represents a single App record"""
+    """A single App record instance
+
+    Used lookup field definitions and retrieve/create child Record instances
+
+    Attributes:
+        name (str): App name
+        acronym (str): App acronym
+        description (str): App description
+        id (str): Full App ID
+        tracking_id (str): App tracking ID
+        records (RecordAdapter): RecordAdapter configured for current App
+        reports (ReportAdapter): ReportAdapter configured for current App
+    """
 
     _type = 'Core.Models.Application.Application, Core'
 
@@ -34,14 +46,34 @@ class App(APIResource):
         return isinstance(other, self.__class__) and hash(self) == hash(other)
 
     def get_field_definition_by_name(self, field_name):
-        """Get JSON field definition for field matching provided name"""
+        """Get JSON field definition for field matching provided name
+
+        Args:
+            field_name (str): Target field name to get definition for
+
+        Raises:
+            UnknownField: Raised when given a field name not found in App
+
+        Returns:
+            dict: Field metadata definition
+        """
         try:
             return self._fields_by_name[field_name]
         except KeyError:
             raise UnknownField(self, field_name, self._fields_by_name.keys())
 
     def get_field_definition_by_id(self, field_id):
-        """Get JSON field definition for field matching provided id"""
+        """Get JSON field definition for field matching provided id
+
+        Args:
+            field_id (str): Target field ID to get definitino for
+
+        Raises:
+            UnknownField: Raised when given a field ID not found in App
+
+        Returns:
+            dict: Field metadata definition
+        """
         try:
             return self._fields_by_id[field_id]
         except KeyError:

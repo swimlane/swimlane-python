@@ -8,26 +8,35 @@ from swimlane.exceptions import InvalidServerVersion
 
 def compare_versions(version_a, version_b, zerofill=False):
     """Return direction of version relative to provided version sections
-    
-    If a is equal to b, return 0
-    If a is greater than b, return 1
-    If a is less than b, return -1
-    
-        compare_version('2', '2') = 0
-        compare_version('2', '1') = 1
-        compare_version('2', '3') = -1
-    
-    If zerofill is False (default), sections not included in both versions are ignored during comparison
-    
-        compare_version('2.13.2', '2.13') = 0
-        compare_version('2.13.2-1234', '3') = -1
-    
-    If zerofill is True, any sections in one version not included in other version are set to 0
-    
-        compare_version('2.13.2', '2.13', True) = 1
-        compare_version('2.13.2-1234', '2.13.2', True) = 1
-        compare_version('2.13.2', '2.13.2', True) = 0
-    
+
+    Args:
+        version_a (str): First version to compare
+        version_b (str): Second version to compare
+        zerofill (bool): If True, treat any missing version sections as 0, otherwise ignore section. Defaults to False
+
+    Returns:
+        int: 0 if equal, -1 if a > b, 1 if a < b
+
+    Examples:
+
+        If a is equal to b, return 0
+        If a is greater than b, return -1
+        If a is less than b, return 1
+
+        >>> compare_versions('2', '2') == 0
+        >>> compare_versions('2', '1') == -1
+        >>> compare_versions('2', '3') == 1
+
+        If zerofill is False (default), sections not included in both versions are ignored during comparison
+
+        >>> compare_versions('2.13.2', '2.13') == 0
+        >>> compare_versions('2.13.2-1234', '3') == 1
+
+        If zerofill is True, any sections in one version not included in other version are set to 0
+
+        >>> compare_versions('2.13.2', '2.13', True) == -1
+        >>> compare_versions('2.13.2-1234', '2.13.2', True) == -1
+        >>> compare_versions('2.13.2', '2.13.2', True) == 0
     """
     a_sections = list((int(match) for match in re.findall(r'\d+', version_a)))
     b_sections = list((int(match) for match in re.findall(r'\d+', version_b)))
@@ -49,10 +58,10 @@ def compare_versions(version_a, version_b, zerofill=False):
 
 def requires_swimlane_version(min_version=None, max_version=None):
     """Decorator for SwimlaneResolver methods that verifies Swimlane server is within a given inclusive range
-    
-    Raises InvalidVersion during decorated method call if Swimlane server version is out of provided range
-    
-    Raises ValueError if neither min_version or max_version were provided, or if those values conflict (2.15 < 2.14)
+
+    Raises:
+        InvalidVersion: Raised before decorated method call if Swimlane server version is out of provided range
+        ValueError: If neither min_version or max_version were provided, or if those values conflict (2.15 < 2.14)
     """
 
     if min_version is None and max_version is None:
@@ -81,7 +90,11 @@ def requires_swimlane_version(min_version=None, max_version=None):
 
 
 def get_package_version():
-    """Return swimlane lib package version, or 0.0.0.dev if not available"""
+    """Get swimlane package version
+
+    Returns:
+         str: Installed swimlane lib package version, or 0.0.0.dev if not fully installed
+    """
     try:
         return get_distribution(__name__.split('.')[0]).version
     except DistributionNotFound:

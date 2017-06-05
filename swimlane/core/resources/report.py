@@ -5,7 +5,40 @@ from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ
 
 
 class Report(APIResource):
-    """A report class used for searching"""
+    """A report class used for searching
+
+    Can be iterated over to retrieve results
+
+    Notes:
+        Record retrieval is lazily evaluated and cached internally, adding a filter and attempting to iterate again will
+        not respect the additional filter and will return the same set of records each time
+
+    Examples:
+
+        Lazy retrieval of records with direct iteration over report
+
+        ::
+
+            report = app.reports.build('new-report')
+            report.filter('field_1', 'equals', 'value')
+
+            for record in report:
+                do_thing(record)
+
+        Full immediate retrieval of all records
+
+        ::
+
+            report = app.reports.build('new-report')
+            report.filter('field_1', 'doesNotEqual', 'value')
+
+            records = list(report)
+
+
+    Attributes:
+        app (App): Parent App instance
+        name (str): Report name
+    """
 
     _type = "Core.Models.Search.Report, Core"
 
@@ -47,13 +80,22 @@ class Report(APIResource):
                 if not records or len(records) < self._page_size or page * self._page_size >= count:
                     break
 
-    def filter(self, field, operand, value):
-        """Adds a filter to report from field name, comparison operand, and value"""
+    def filter(self, field_name, operand, value):
+        """Adds a filter to report
+
+        Notes:
+            All filters are currently AND'ed together
+
+        Args:
+            field_name (str): Target field name to filter on
+            operand (str): Operand used in comparison. See `swimlane.core.search` for options
+            value: Target value used in comparision
+        """
         if operand not in self._FILTER_OPERANDS:
             raise ValueError('Operand must be one of {}'.format(', '.join(self._FILTER_OPERANDS)))
 
         self._raw['filters'].append({
-            "fieldId": self.app.get_field_definition_by_name(field)['id'],
+            "fieldId": self.app.get_field_definition_by_name(field_name)['id'],
             "filterType": operand,
             "value": value,
         })

@@ -7,6 +7,7 @@ from swimlane.core.resources import Report
 
 
 class ReportAdapter(SwimlaneResolver):
+    """Handles retrieval and creation of Report resources"""
 
     def __init__(self, app):
         super(ReportAdapter, self).__init__(app._swimlane)
@@ -19,11 +20,7 @@ class ReportAdapter(SwimlaneResolver):
         return self.__ref_app()
 
     def list(self):
-        """Retrieve all reports
-
-        If app is specified, only reports that are a member of that App
-        will be returned. By default, all reports in the system are returned.
-        """
+        """Retrieve all reports for parent app"""
         raw_reports = self._swimlane.request('get', "reports?appId={}".format(self._app.id)).json()
         # Ignore StatsReports for now
         return [Report(self._app, raw_report) for raw_report in raw_reports if raw_report['$type'] == Report._type]

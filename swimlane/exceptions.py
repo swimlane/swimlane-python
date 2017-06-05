@@ -10,7 +10,13 @@ class SwimlaneException(Exception):
 
 
 class UnknownField(SwimlaneException, KeyError):
-    """Raised anytime access is attempted to a field that does not exist on an App or Record"""
+    """Raised anytime access is attempted to a field that does not exist on an App or Record
+
+    Attributes:
+        app (App): App with the unknown field requested
+        field_name (str): Name of the field that was requested
+        similar_field_names (list(str)): List of strings of fields on app that are potentially similar to field_name
+    """
 
     def __init__(self, app, field_name, field_pool):
         self.app = app
@@ -26,7 +32,12 @@ class UnknownField(SwimlaneException, KeyError):
 
 
 class ValidationError(SwimlaneException, ValueError):
-    """Raised when record's field data is invalid"""
+    """Raised when record's field data is invalid
+
+    Attributes:
+        record (Record): Record in context of validation failure
+        failure (str): Reason for record failure
+    """
 
     def __init__(self, record, failure):
         self.record = record
@@ -38,7 +49,13 @@ class ValidationError(SwimlaneException, ValueError):
 
 
 class InvalidServerVersion(SwimlaneException, NotImplementedError):
-    """Raised when method requiring a specific server version range is called when connected to server outside range"""
+    """Raised when method requiring a specific server version range is called when connected to server outside range
+
+    Attributes:
+        swimlane (Swimlane): Swimlane client failing the version check
+        min_version (str): Minimum version specified on version range
+        max_version (str): Maximum version specified on version range
+    """
 
     def __init__(self, swimlane, min_version, max_version):
         self.swimlane = swimlane
@@ -56,7 +73,14 @@ class InvalidServerVersion(SwimlaneException, NotImplementedError):
 
 
 class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
-    """Exception raised when receiving a 400 response with additional context"""
+    """Exception raised when receiving a 400 response with additional context
+
+    Attributes:
+        code (int): Swimlane error code
+        name (str): Human-readable Swimlane error name
+        argument (str): Optional argument included with error or None
+        http_error (HTTPError): Source requests.HTTPError caught and used to generate this exception
+    """
 
     codes = {
         -1: 'Unknown',
@@ -114,10 +138,9 @@ class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
         self.argument = error_content['Argument']
         self.name = self.codes.get(self.code, self.codes[-1])
 
-        if self.argument is None:
-            message = self.name
-        else:
-            message = '{name} ({argument})'.format(name=self.name, argument=self.argument)
+        message = '{}:{}'.format(self.name, self.code)
+        if self.argument is not None:
+            message = '{message} ({argument})'.format(message=message, argument=self.argument)
 
         super(SwimlaneHTTP400Error, self).__init__(
             '{message}: Bad Request for url: {url}'.format(message=message, url=self.http_error.response.url)

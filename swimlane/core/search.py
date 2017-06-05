@@ -1,3 +1,5 @@
+"""Provides handful of constants used in record reports/searches"""
+
 # Filter
 EQ = "equals"
 NOT_EQ = "doesNotEqual"

@@ -8,7 +8,15 @@ import string
 
 
 def random_string(length, source=string.ascii_letters + string.digits):
-    """Return random string of characters from source of specified length"""
+    """Return random string of characters from source of specified length
+
+    Args:
+        length (int): Length of the returned string
+        source (str): String of characters to use as options for randomly selected characters. Defaults to alphanumeric
+
+    Returns:
+        str: String of length number of characters composed of source characters
+    """
     return ''.join(random.choice(source) for _ in range(length))
 
 

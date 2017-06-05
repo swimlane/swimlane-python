@@ -64,17 +64,21 @@ def test_user_get(mock_user, mock_swimlane):
         assert user == mock_user
 
         mock_response.json.return_value = [mock_user._raw]
-        user = mock_swimlane.users.get(username=mock_user.username)
+        user = mock_swimlane.users.get(display_name=mock_user.display_name)
         assert user == mock_user
 
         mock_response.json.return_value = []
         with pytest.raises(ValueError):
-            mock_swimlane.users.get(username=mock_user.username)
+            mock_swimlane.users.get(display_name=mock_user.display_name)
+
+        mock_response.json.return_value = [mock_user._raw, mock_user._raw]
+        with pytest.raises(ValueError):
+            mock_swimlane.users.get(display_name=mock_user.display_name)
 
 
 @pytest.mark.parametrize('kwargs', [
     {'unknown_arg': 'arg'},
-    {'username': 'name', 'id': 'id'},
+    {'display_name': 'name', 'id': 'id'},
     {}
 ])
 def test_user_get_invalid_args(mock_swimlane, kwargs):

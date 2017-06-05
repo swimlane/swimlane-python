@@ -3,7 +3,8 @@ from io import BytesIO
 
 import mock
 
-from swimlane.core.fields.attachment import AttachmentCursor, Attachment
+from swimlane.core.fields.attachment import AttachmentCursor
+from swimlane.core.resources.attachment import Attachment
 
 
 def test_attachment_field(mock_swimlane, mock_record):
