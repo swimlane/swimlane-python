@@ -3,13 +3,16 @@ import datetime
 import sys
 import os
 
+# Ensure same path for all builds
+os.chdir(os.path.dirname(__file__))
+
 # Insert lib path
 sys.path.insert(0, os.path.abspath('..'))
 
 import swimlane
 
 from sphinx.apidoc import main
-main(['-f', '-o', './rst', '../swimlane'])
+main(['-f', '-o', './_build', '../swimlane'])
 
 
 # -- General configuration ------------------------------------------------
@@ -28,12 +31,12 @@ templates_path = ['_templates']
 source_suffix = ['.rst']
 
 # The master toctree document.
-master_doc = 'swimlane'
+master_doc = '_build/swimlane'
 
 # General information about the project.
 project = u'Swimlane Python'
-copyright = u'Swimlane LLC. {}'.format(datetime.datetime.now().year)
 author = u'Swimlane LLC.'
+copyright = u'{} {}'.format(author, datetime.datetime.now().year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -47,7 +50,7 @@ version = '.'.join(release.split('.')[:2])
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+#exclude_patterns = ['_build']
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -86,7 +89,7 @@ html_favicon = 'favicon.ico'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['html/_static']
+#html_static_path = ['html/_static']
 
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = False
