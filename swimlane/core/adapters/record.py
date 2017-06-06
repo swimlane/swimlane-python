@@ -4,7 +4,7 @@ import six
 
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.record import Record, record_factory
-from swimlane.utils import random_string
+from swimlane.utils import random_string, one_of_keyword_only
 
 
 class RecordAdapter(SwimlaneResolver):
@@ -20,7 +20,8 @@ class RecordAdapter(SwimlaneResolver):
         """Resolve app weak reference"""
         return self.__ref_app()
 
-    def get(self, **kwargs):
+    @one_of_keyword_only('id')
+    def get(self, _, value):
         """Get a single record by id
 
         Keyword Args:
@@ -31,18 +32,8 @@ class RecordAdapter(SwimlaneResolver):
 
         Raises:
             TypeError: No id argument provided
-            Swimlane400HTTPError: Unable to find requested record using provided ``id``
         """
-        record_id = kwargs.pop('id', None)
-
-        if kwargs:
-            raise TypeError('Unexpected arguments: {}'.format(kwargs))
-
-        if record_id is None:
-            raise TypeError('Must provide id argument')
-
-        response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.id, record_id))
-
+        response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.id, value))
         return Record(self._app, response.json())
 
     def search(self, *filter_tuples):

@@ -2,6 +2,7 @@ from six.moves.urllib.parse import quote_plus
 
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources import Group, User
+from swimlane.utils import one_of_keyword_only
 
 
 class GroupAdapter(SwimlaneResolver):
@@ -16,7 +17,8 @@ class GroupAdapter(SwimlaneResolver):
         response = self._swimlane.request('get', 'groups')
         return [Group(self._swimlane, raw_group_data) for raw_group_data in response.json().get('groups', [])]
 
-    def get(self, **kwargs):
+    @one_of_keyword_only('id', 'name')
+    def get(self, key, value):
         """Retrieve single group record by id or name
 
         Keyword Args:
@@ -30,31 +32,19 @@ class GroupAdapter(SwimlaneResolver):
         Returns:
             Group: Group instance matching provided inputs
         """
-        group_id = kwargs.pop('id', None)
-        name = kwargs.pop('name', None)
-
-        if kwargs:
-            raise TypeError('Unexpected arguments: {}'.format(kwargs))
-
-        if group_id is None and name is None:
-            raise TypeError('Must provide either id or name argument')
-
-        if group_id and name:
-            raise TypeError('Cannot provide both id and name arguments')
-
-        if group_id:
-            response = self._swimlane.request('get', 'groups/{}'.format(group_id))
+        if key == 'id':
+            response = self._swimlane.request('get', 'groups/{}'.format(value))
             return Group(self._swimlane, response.json())
 
         else:
-            response = self._swimlane.request('get', 'groups/lookup?name={}'.format(name))
+            response = self._swimlane.request('get', 'groups/lookup?name={}'.format(value))
             matched_groups = response.json()
 
             for group_data in matched_groups:
-                if group_data.get('name') == name:
+                if group_data.get('name') == value:
                     return Group(self._swimlane, group_data)
 
-            raise ValueError('Unable to find group with name "{}"'.format(name))
+            raise ValueError('Unable to find group with name "{}"'.format(value))
 
 
 class UserAdapter(SwimlaneResolver):
@@ -69,7 +59,8 @@ class UserAdapter(SwimlaneResolver):
         response = self._swimlane.request('get', "user")
         return [User(self._swimlane, raw_user_data) for raw_user_data in response.json().get('users', [])]
 
-    def get(self, **kwargs):
+    @one_of_keyword_only('id', 'display_name')
+    def get(self, arg, value):
         """Retrieve single user record by id or username
 
         Notes:
@@ -86,24 +77,12 @@ class UserAdapter(SwimlaneResolver):
             TypeError: Unexpected or more than one keyword argument provided
             ValueError: No matching user found based on provided inputs, or multiple Users with same display name
         """
-        user_id = kwargs.pop('id', None)
-        display_name = kwargs.pop('display_name', None)
-
-        if kwargs:
-            raise TypeError('Unexpected arguments: {}'.format(kwargs))
-
-        if user_id is None and display_name is None:
-            raise TypeError('Must provide either id or display_name argument')
-
-        if user_id and display_name:
-            raise TypeError('Cannot provide both id and display_name arguments')
-
-        if user_id:
-            response = self._swimlane.request('get', 'user/{}'.format(user_id))
+        if arg == 'id':
+            response = self._swimlane.request('get', 'user/{}'.format(value))
             return User(self._swimlane, response.json())
 
         else:
-            response = self._swimlane.request('get', 'user/search?query={}'.format(quote_plus(display_name)))
+            response = self._swimlane.request('get', 'user/search?query={}'.format(quote_plus(value)))
             matched_users = response.json()
 
             # Display name not unique, fail if multiple users share the same target display name
@@ -111,17 +90,17 @@ class UserAdapter(SwimlaneResolver):
 
             for user_data in matched_users:
                 user_display_name = user_data.get('displayName')
-                if user_display_name == display_name:
+                if user_display_name == value:
                     target_matches.append(user_data)
 
             # No matches
             if not target_matches:
-                raise ValueError('Unable to find user with display name "{}"'.format(display_name))
+                raise ValueError('Unable to find user with display name "{}"'.format(value))
 
             # Multiple matches
             if len(target_matches) > 1:
                 raise ValueError('Multiple users returned with display name "{}". Matching user IDs: {}'.format(
-                    display_name,
+                    value,
                     ', '.join(['"{}"'.format(r['id']) for r in target_matches])
                 ))
 

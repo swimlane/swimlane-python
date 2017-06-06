@@ -1,11 +1,13 @@
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources import App
+from swimlane.utils import one_of_keyword_only
 
 
 class AppAdapter(SwimlaneResolver):
     """Handles retrieval of Swimlane App resources"""
 
-    def get(self, **kwargs):
+    @one_of_keyword_only('id', 'name')
+    def get(self, key, value):
         """Get single app by one of id or name
 
         Keyword Args:
@@ -19,21 +21,11 @@ class AppAdapter(SwimlaneResolver):
             TypeError: No or multiple keyword arguments provided
             ValueError: No matching app found on server
         """
-        orig_kwargs = kwargs.copy()
-        app_id = kwargs.pop('id', None)
-        name = kwargs.pop('name', None)
-
-        if kwargs:
-            raise TypeError('Unexpected argument(s): {}'.format(kwargs))
-
-        if len(orig_kwargs) != 1:
-            raise TypeError('Must provide only one argument from name, id, or acronym')
-
-        if app_id:
+        if key == 'id':
             # Server returns 204 instead of 404 for a non-existent app id
-            response = self._swimlane.request('get', 'app/{}'.format(app_id))
+            response = self._swimlane.request('get', 'app/{}'.format(value))
             if response.status_code == 204:
-                raise ValueError('No app with id = "{}"'.format(app_id))
+                raise ValueError('No app with id "{}"'.format(value))
 
             return App(
                 self._swimlane,
@@ -43,11 +35,11 @@ class AppAdapter(SwimlaneResolver):
             # Workaround for lack of support for get by name
             # Holdover from previous driver support, to be fixed as part of 3.x
             for app in self.list():
-                if name and name == app.name:
+                if value and value == app.name:
                     return app
 
             # No matching app found
-            raise ValueError('No app matching provided arguments: {}'.format(orig_kwargs))
+            raise ValueError('No app with name "{}"'.format(value))
 
     def list(self):
         """Retrieve list of all apps

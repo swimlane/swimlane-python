@@ -12,6 +12,7 @@ from swimlane.utils import (
     random_string,
     get_recursive_subclasses,
     import_submodules,
+    one_of_keyword_only
 )
 from swimlane.utils.version import (
     compare_versions,
@@ -106,6 +107,45 @@ def test_get_package_version():
 
     with mock.patch('swimlane.utils.version.get_distribution', side_effect=DistributionNotFound):
         assert get_package_version() == '0.0.0.dev'
+
+
+@pytest.mark.parametrize('kwargs,expected', [
+    [
+        {},
+        TypeError
+    ],
+    [
+        {'a': 'a', 'b': 'b'},
+        TypeError
+    ],
+    [
+        {'other': 'value'},
+        TypeError
+    ],
+    [
+        {'a': 'value_a'},
+        'value_a'
+    ],
+    [
+        {'b': 'value_b'},
+        'value_b'
+    ]
+])
+def test_one_of_keyword_only(kwargs, expected):
+    """Test decorator requires exactly one keyword argument from provided list of options"""
+
+    valid_options = ('a', 'b')
+
+    @one_of_keyword_only(*valid_options)
+    def func(key, value):
+        return key in valid_options and value == expected
+
+    if expected is TypeError:
+        with pytest.raises(expected):
+            func(**kwargs)
+
+    else:
+        assert func(**kwargs)
 
 
 class TestRequiresSwimlaneVersion(object):
