@@ -105,7 +105,13 @@ html_theme = 'alabaster'
 #
 html_theme_options = {
     'show_powered_by': False,
-    'show_related': False
+    'description': swimlane.__doc__,
+    'page_width': '1000px',
+    'fixed_sidebar': True,
+    'github_user': 'swimlane',
+    'github_repo': 'swimlane-python',
+    'github_type': 'star',
+    'github_button': True
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -174,7 +180,8 @@ texinfo_documents = [
 ]
 
 
-
-
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/', None),
+    'requests': ('http://docs.python-requests.org/en/latest/', None),
+}

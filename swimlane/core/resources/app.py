@@ -13,8 +13,8 @@ class App(APIResource):
         description (str): App description
         id (str): Full App ID
         tracking_id (str): App tracking ID
-        records (RecordAdapter): RecordAdapter configured for current App
-        reports (ReportAdapter): ReportAdapter configured for current App
+        records (RecordAdapter): :class:`~swimlane.core.adapters.record.RecordAdapter` configured for current App
+        reports (ReportAdapter): :class:`~swimlane.core.adapters.report.ReportAdapter` configured for current App
     """
 
     _type = 'Core.Models.Application.Application, Core'
@@ -52,7 +52,7 @@ class App(APIResource):
             field_name (str): Target field name to get definition for
 
         Raises:
-            UnknownField: Raised when given a field name not found in App
+            swimlane.exceptions.UnknownField: Raised when given a field name not found in App
 
         Returns:
             dict: Field metadata definition
@@ -69,7 +69,7 @@ class App(APIResource):
             field_id (str): Target field ID to get definitino for
 
         Raises:
-            UnknownField: Raised when given a field ID not found in App
+            swimlane.exceptions.UnknownField: Raised when given a field ID not found in App
 
         Returns:
             dict: Field metadata definition

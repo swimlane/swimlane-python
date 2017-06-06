@@ -20,20 +20,38 @@ class ReportAdapter(SwimlaneResolver):
         return self.__ref_app()
 
     def list(self):
-        """Retrieve all reports for parent app"""
+        """Retrieve all reports for parent app
+
+        Returns:
+            :class:`list` of :class:`~swimlane.core.resources.report.Report`: List of all returned reports
+        """
         raw_reports = self._swimlane.request('get', "reports?appId={}".format(self._app.id)).json()
         # Ignore StatsReports for now
         return [Report(self._app, raw_report) for raw_report in raw_reports if raw_report['$type'] == Report._type]
 
     def get(self, report_id):
-        """Retrieve report by ID"""
+        """Retrieve report by ID
+
+        Args:
+            report_id (str): Full report ID
+
+        Returns:
+            Report: Corresponding Report instance
+        """
         return Report(
             self._app,
             self._swimlane.request('get', "reports/{0}".format(report_id)).json()
         )
 
     def build(self, name):
-        """Build a new Report for the App designated by app_id"""
+        """Build a new Report for the App designated by app_id
+
+        Args:
+            name (str): New Report name
+
+        Returns:
+            Report: Newly created local Report instance
+        """
         #pylint: disable=protected-access
         created = pendulum.now().to_rfc3339_string()
         user_model = self._swimlane.user.get_usergroup_selection()

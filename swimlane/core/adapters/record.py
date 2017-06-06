@@ -57,7 +57,8 @@ class RecordAdapter(SwimlaneResolver):
                 )
 
         Returns:
-            :obj:`list` of :class:`Record`: List of Record instances returned from the search results
+            :class:`list` of :class:`~swimlane.core.resources.record.Record`: List of Record instances returned from the
+                search results
         """
         report = self._app.reports.build('search-' + random_string(8))
 
@@ -85,7 +86,7 @@ class RecordAdapter(SwimlaneResolver):
             Record: Newly created Record instance with data as returned from API response
 
         Raises:
-            UnknownField: Raised if any fields are provided that are not available on target app
+            swimlane.exceptions.UnknownField: Raised if any fields are provided that are not available on target app
         """
         # Use temporary Record instance to build fields and inject python values
         new_record = record_factory(self._app)

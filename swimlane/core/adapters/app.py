@@ -45,7 +45,7 @@ class AppAdapter(SwimlaneResolver):
         """Retrieve list of all apps
 
         Returns:
-            :obj:`list` of :obj:`App`: List of all retrieved apps
+            :class:`list` of :class:`~swimlane.core.resources.app.App`: List of all retrieved apps
         """
         response = self._swimlane.request('get', 'app')
         return [App(self._swimlane, item) for item in response.json()]

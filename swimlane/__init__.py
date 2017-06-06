@@ -1,4 +1,4 @@
-"""Swimlane API driver"""
+"""Swimlane Python API driver"""
 
 from __future__ import absolute_import
 

@@ -12,7 +12,7 @@ class GroupAdapter(SwimlaneResolver):
         """Retrieve list of all groups
 
         Returns:
-            :obj:`list` of :obj:`Group`: List of all Groups
+            :class:`list` of :class:`~swimlane.core.resources.usergroup.Group`: List of all Groups
         """
         response = self._swimlane.request('get', 'groups')
         return [Group(self._swimlane, raw_group_data) for raw_group_data in response.json().get('groups', [])]
@@ -54,7 +54,7 @@ class UserAdapter(SwimlaneResolver):
         """Retrieve all users
 
         Returns:
-            :obj:`list` of :obj:`User`: List of all Users
+            :class:`list` of :class:`~swimlane.core.resources.usergroup.User`: List of all Users
         """
         response = self._swimlane.request('get', "user")
         return [User(self._swimlane, raw_user_data) for raw_user_data in response.json().get('users', [])]

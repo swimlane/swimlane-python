@@ -30,10 +30,28 @@ class Swimlane(object):
         default_timeout (int): Default request connect and read timeout in seconds for all requests
 
     Attributes:
-        host (URI): Full RFC-1738 URL pointing to Swimlane host
-        apps (AppAdapter): AppAdapter configured for current Swimlane instance
-        users (UserAdapter): UserAdapter configured for current Swimlane instance
-        groups (GroupAdapter): GroupAdapter configured for current Swimlane instance
+        host (pyuri.URI): Full RFC-1738 URL pointing to Swimlane host
+        apps (AppAdapter): :class:`~swimlane.core.adapters.app.AppAdapter` configured for current Swimlane instance
+        users (UserAdapter): :class:`~swimlane.core.adapters.usergroup.UserAdapter` configured for current
+            Swimlane instance
+        groups (GroupAdapter): :class:`~swimlane.core.adapters.usergroup.GroupAdapter` configured for current
+            Swimlane instance
+
+    Examples:
+
+        ::
+
+            # Establish connection
+            swimlane = Swimlane(
+                'https://192.168.1.1',
+                'username',
+                'password',
+                verify_ssl=False
+            )
+
+            # Retrieve an app
+            app = swimlane.apps.get(name='Target App')
+
     """
 
     _api_root = '/api/'
@@ -69,16 +87,32 @@ class Swimlane(object):
         )
 
     def request(self, method, api_endpoint, **kwargs):
-        """Wrapper for underlying requests Session
+        """Wrapper for underlying :class:`requests.Session`
 
         Handles generating full API URL, session reuse and auth, request defaults, and invalid response status codes
 
-        All provided kwargs are passed to underlying requests call
+        Used throughout library as the core underlying request/response method for all interactions with server
 
-        Raises requests.HTTPError on 4xx/5xx HTTP responses, or Swimlane400Error on 400 responses with well-formatted
-        additional context information about the exception
+        Args:
+            method (str): Request method (get, post, put, etc.)
+            api_endpoint (str): Portion of URL matching API endpoint route as listed in platform /docs help page
+            **kwargs (dict): Remaining arguments passed through to actual request call
 
-        Returns response on successful responses
+        Notes:
+            All other provided kwargs are passed to underlying :meth:`requests.Session.request()` call
+
+        Raises:
+            swimlane.exceptions.SwimlaneHTTP400Error: On 400 responses with additional context about the exception
+            requests.HTTPError: Any other 4xx/5xx HTTP responses
+
+        Returns:
+            requests.Response: Successful response instances
+
+        Examples:
+
+            Request and parse server settings endpoint response
+
+            >>> server_settings = swimlane.request('get', 'settings').json()
         """
         while api_endpoint.startswith('/'):
             api_endpoint = api_endpoint[1:]
