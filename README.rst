@@ -29,12 +29,10 @@ Installation
 Pip
 ---
 
-
-Releases
---------
 ::
 
     pip install swimlane
+
 
 
 -------------
