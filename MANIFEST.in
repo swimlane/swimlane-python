@@ -1,5 +1,5 @@
 include *.txt
-include README.md
+include README.rst
 include LICENSE
 
 global-exclude *.pyc
