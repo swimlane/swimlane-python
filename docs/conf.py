@@ -184,4 +184,5 @@ texinfo_documents = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/', None),
     'requests': ('http://docs.python-requests.org/en/latest/', None),
+    'urllib3': ('http://urllib3.readthedocs.io/en/latest', None)
 }

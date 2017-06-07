@@ -3,7 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-============================
 Swimlane Python v\ |version|
 ============================
 
@@ -27,46 +26,33 @@ Swimlane Python v\ |version|
 
 Python driver for the Swimlane_ API
 
-.. _Swimlane: http://swimlane.com
-
-
+.. _Swimlane: https://swimlane.com
 
 ------------
 
-------------
+
+
+
 Installation
 ------------
 
-Swimlane driver is versioned along with platform, and will support all minor versions below installed version.
-The latest major release should always be installed matching the target platform version.
-
-Newer minor platform releases will typically work as expected, but could have minor inconsistencies or missing features.
-A warning message will be logged when connecting to a newer minor platform release than the current driver release, but
-will otherwise work as expected.
-
-**NOTE:** Major versions of driver and platform are incompatible, and will **NOT** work together.
-
-For example, `swimlane==2.15.0` will fully support platform versions 2.0.0 - 2.15.0, will warn and attempt to work when
-connecting to platform 2.15.1 - 2.x.y, and will fail when connecting to platform 3.0.0+.
 
 Pip
----
+^^^
 
-Install latest release
+Recommended installation method is to install via `pip`.
 
-::
+Install latest release::
 
     pip install swimlane
 
-Install latest release for platform v2.x
-
-::
+Install latest release for platform v2.x::
 
     pip install 'swimlane>=2,<3'
 
 
 Releases
---------
+^^^^^^^^
 
 Manually clone_, checkout, and install specific release::
 
@@ -82,7 +68,27 @@ Alternatively, download directly from `releases page`_, extract archive, and run
 .. _releases page: https://github.com/swimlane/swimlane-python/releases
 
 
------
+Versioning
+^^^^^^^^^^
+
+The Swimlane driver is versioned along with server, and will support all minor versions below installed version.
+The latest major release should always be installed matching the target server version.
+
+Newer minor server releases will typically work as expected, but could have minor inconsistencies or missing features.
+A warning message will be logged when connecting to a newer minor server release than the current driver release, but
+will otherwise work as expected.
+
+.. warning::
+
+    Major versions of driver and server are incompatible, and will **NOT** work together and will raise
+    :class:`swimlane.exceptions.InvalidServerVersion` when attempting to connect.
+
+For example, `swimlane==2.15.0` will fully support platform versions 2.0.0 - 2.15.0, will warn and attempt to work when
+connecting to platform 2.15.1 - 2.x.y, and will fail when connecting to platform 3.0.0+.
+
+
+
+
 Usage
 -----
 
@@ -92,7 +98,7 @@ Connection, authentication, and any additional requests will all be handled by t
 the rest of the examples in the documentation.
 
 Quick Start
------------
+^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -100,12 +106,7 @@ Quick Start
 
 
     # Connect Swimlane client
-    swimlane = Swimlane(
-        'https://192.168.1.1',
-        'username',
-        'password',
-        verify_ssl=False
-    )
+    swimlane = Swimlane('https://192.168.1.1', 'username', 'password')
 
 
     # Retrieve App by name
@@ -131,21 +132,24 @@ Quick Start
 
 
 Examples
---------
+^^^^^^^^
 
-See following more complete examples of all driver functionality, or jump into `API docs`_
+Complete examples and descriptions of all driver functionality
 
-.. _API docs: apidoc/modules
 
 .. toctree::
-    :maxdepth: 2
 
-    examples/resources/index
-    examples/fields/index
+    examples/client
+    examples/resources
+    examples/fields
 
 
-Full Package Docs
------------------
+
+
+Package Docs
+------------
+
+Full API documentation for all package components
 
 .. toctree::
     :titlesonly:

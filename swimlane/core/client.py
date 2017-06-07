@@ -58,7 +58,7 @@ class Swimlane(object):
 
     def __init__(self, host, username, password, verify_ssl=True, default_timeout=60):
         self.host = URI(host)
-        self.host.scheme = self.host.scheme or 'https'
+        self.host.scheme = self.host.scheme.lower() or 'https'
         self.host.path = None
 
         self.__settings = None
@@ -78,6 +78,8 @@ class Swimlane(object):
         self.apps = AppAdapter(self)
         self.users = UserAdapter(self)
         self.groups = GroupAdapter(self)
+
+        # TODO: Warn if higher server minor version, raise InvalidServerVersion if wrong major version
 
     def __repr__(self):
         return '<{cls}: {user} @ {host}>'.format(
