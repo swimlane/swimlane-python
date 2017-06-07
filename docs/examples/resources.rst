@@ -1,9 +1,13 @@
+.. _resource-examples:
 
 
 Resources
 =========
 
 See :mod:`swimlane.core.resources` for full API docs on all resources
+
+
+
 
 
 App
@@ -62,6 +66,10 @@ The newly created record is returned from the create create call after first bei
     })
 
 
+
+
+
+
 Record
 ------
 
@@ -83,6 +91,8 @@ value is done as follows:
 
     assert record['Text'] == 'Some Example Text'
 
+Any fields without a value default to `None`.
+
 
 Setting Field Values
 ^^^^^^^^^^^^^^^^^^^^
@@ -92,7 +102,24 @@ Setting field values works the same as getting values.
 .. code-block:: python
 
     record['Text'] = 'New Text'
+
     assert record['Text'] == 'New Text'
+
+
+Clearing Field Values
+^^^^^^^^^^^^^^^^^^^^^
+
+Clearing field values can be done in one of two way. The following examples are identical, and simply clear the field
+value, setting it back to `None` internally.
+
+.. code-block:: python
+
+
+    # Delete the field
+    del record['Text']
+
+    # Or set directly to None
+    record['Text'] = None
 
 
 Field Validation
@@ -148,3 +175,36 @@ with the invalid field name, as well as potential similar field names in case of
     except UnknownField as error:
         print(error)
 
+
+
+
+UserGroup
+---------
+
+Handling Users, Groups, and UserGroups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Users and Groups both extend from the base UserGroup class. Most values returned from the server are of the base
+UserGroup type, but can be replaced or set by the more specific classes.
+
+.. code-block:: python
+
+    # User / Group fields return UserGroup instances when accessed
+    assert type(record['Created By']) is UserGroup
+
+    # But can be set to the more specific User / Group types directly
+    record['User'] = swimlane.user
+    record['Group'] = swimlane.groups.get(name='Everyone')
+
+
+Comparisons
+^^^^^^^^^^^
+
+Users and Groups and be directly compared to the base UserGroup class, and will be considered equal if the two objects
+represent the same entity
+
+.. code-block:: python
+
+    assert record['Created By'] == swimlane.user
+
+    assert record['Group'] == swimlane.groups.get(name='Everyone')

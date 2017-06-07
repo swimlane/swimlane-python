@@ -128,7 +128,7 @@ Quick Start
     new_record['Numeric Field'] += 100
     assert new_record['Numeric Field'] == 200
 
-    assert new_record['UserGroup Field'].username == swimlane.user.username
+    assert new_record['UserGroup Field'].id == swimlane.user.id
 
 
 Examples
