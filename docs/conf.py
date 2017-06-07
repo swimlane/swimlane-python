@@ -44,7 +44,7 @@ main(['-f', '-e', '-M', '-o', './apidoc', '../swimlane'])
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.napoleon',
+    'sphinx.ext.napoleon'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -107,11 +107,7 @@ html_theme_options = {
     'show_powered_by': False,
     'description': swimlane.__doc__,
     'page_width': '1000px',
-    'fixed_sidebar': True,
-    'github_user': 'swimlane',
-    'github_repo': 'swimlane-python',
-    'github_type': 'star',
-    'github_button': True
+    'fixed_sidebar': True
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

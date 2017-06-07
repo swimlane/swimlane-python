@@ -24,6 +24,8 @@ Swimlane Python v\ |version|
 .. image:: https://api.codacy.com/project/badge/Coverage/215d8281290749bba687a08db1d59d8b
     :target: https://www.codacy.com/app/Swimlane/swimlane-python?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=swimlane/swimlane-python&amp;utm_campaign=Badge_Grade
 
+https://github.com/swimlane/swimlane-python
+
 Python driver for the Swimlane_ API
 
 .. _Swimlane: https://swimlane.com
