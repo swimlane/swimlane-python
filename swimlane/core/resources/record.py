@@ -1,151 +1,178 @@
-"""Provides a Record class."""
+from functools import total_ordering
 
-from datetime import datetime
-from warnings import warn
+import pendulum
+import six
 
-from ..auth import Client
-from .group import Group
-from .resource import Resource
-from .user import User
+from swimlane.core.resources.base import APIResource
+from swimlane.exceptions import UnknownField, ValidationError
 
 
-class Record(Resource):
-    """A simple abstraction over a Swimlane record resource."""
+@total_ordering
+class Record(APIResource):
+    """A single Swimlane Record instance
 
-    def __init__(self, fields):
-        """Init a Record with fields.
+    Attributes:
+        id (str): Full Record ID
+        tracking_id (str): Record tracking ID
+        created (pendulum.Pendulum): Pendulum datetime for Record created date
+        modified (pendulum.Pendulum): Pendulum datetime for Record last modified date
+        is_new (bool): True if Record does not yet exist on server. Other values may be temporarily None if True
+    """
 
-        Args:
-            fields (dict): A dict of fields and values
-        """
-        super(Record, self).__init__(fields)
+    _type = 'Core.Models.Record.Record, Core'
 
-    def _is_new(self):
-        """Returns True if Record has not been created"""
-        return not hasattr(self, 'isNew') or self.isNew is True
+    def __init__(self, app, raw):
+        super(Record, self).__init__(app._swimlane, raw)
 
-    def insert(self):
-        """Insert the current record."""
-        warn(
-            'Record.insert method will be deleted in v0.1.0, use Record.save',
-            category=DeprecationWarning)
-        self.save()
+        self._app = app
 
-    def update(self):
-        """Update the current record."""
-        warn(
-            'Record.update method will be deleted in v0.1.0, use Record.save',
-            category=DeprecationWarning)
-        self.save()
+        self.is_new = self._raw.get('isNew', False)
 
-    def save(self):
-        """Create/update a record."""
-        if self._is_new():
-            self._fields = Client.post(
-                self, "app/{0}/record".format(self.applicationId))
+        # Protect against creation from generic raw data not yet containing server-generated values
+        if self.is_new:
+            self.id = self.tracking_id = self.created = self.modified = None
         else:
-            self._fields = Client.put(
-                self, "app/{0}/record".format(self.applicationId))
+            self.id = self._raw['id']
 
-    def reload(self):
-        """Reload a record instance."""
-        if self._is_new():
-            raise Exception(
-                'Cannot reload an unsaved record, call save() first')
-        r = Record.find(self.applicationId, self.id)
-        self._fields.update(**r._fields)
+            # Combine app acronym + trackingId instead of using trackingFull raw
+            # for guaranteed value (not available through report results)
+            self.tracking_id = '-'.join([
+                self._app.acronym,
+                str(int(self._raw['trackingId']))
+            ])
 
-    def add_comment(self, field_id, user_id, message):
-        """Add a comment to a field.
+            self.created = pendulum.parse(self._raw['createdDate'])
+            self.modified = pendulum.parse(self._raw['modifiedDate'])
 
-        Args:
-            field_id (str): The field ID.
-            user_id (str): The user ID of the commenting user.
-            message (str): The comment message.
+        self._fields = {}
+        self.__premap_fields()
+
+    def __str__(self):
+        if self.is_new:
+            return '{} - New'.format(self._app.acronym)
+
+        return str(self.tracking_id)
+
+    def __setitem__(self, field_name, value):
+        self.get_field(field_name).set_python(value)
+
+    def __getitem__(self, field_name):
+        return self.get_field(field_name).get_python()
+
+    def __delitem__(self, field_name):
+        self[field_name] = None
+
+    def __iter__(self):
+        for field_name, field in six.iteritems(self._fields):
+            yield field_name, field.get_python()
+
+    def __hash__(self):
+        return hash((self.id, self._app))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and hash(self) == hash(other)
+
+    def __lt__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError("Comparisons not supported between instances of '{}' and '{}'".format(
+                other.__class__.__name__,
+                self.__class__.__name__
+            ))
+
+        tracking_number_self = int(self.tracking_id.split('-')[1])
+        tracking_number_other = int(other.tracking_id.split('-')[1])
+
+        return (self._app.name, tracking_number_self) < (other._app.name, tracking_number_other)
+
+    def __premap_fields(self):
+        """Build field instances using field definitions in app manifest
+        
+        Map raw record field data into appropriate field instances with their correct respective types
         """
-        Client.post({
-            "message": message,
-            "createdDate": datetime.utcnow().isoformat() + "Z"
-        }, "app/{0}/record/{1}/{2}/comment".format(
-            self.applicationId, self.id, field_id))
+        # Circular imports
+        from swimlane.core.fields import resolve_field_class
 
-        if not self._is_new():
-            self.reload()
+        for field_definition in self._app._raw['fields']:
+            field_class = resolve_field_class(field_definition)
 
-    def references(self, field_id, record_ids, ref_field_ids):
-        """Get referenced Records.
+            field_instance = field_class(field_definition['name'], self)
+            value = self._raw['values'].get(field_instance.id)
+            field_instance.set_swimlane(value)
 
-        Args:
-            field_id (str): The ID of the field on the current record.
-            record_ids (list): The IDs of any records to retrieve.
-            field_ids (list): The IDs of any fields to retrieve.
+            self._fields[field_instance.name] = field_instance
+
+    def get_field(self, field_name):
+        """Get field instance used to get, set, and serialize internal field value
 
         Returns:
-            A generator that yields all referenced Records.
+            Field: Requested field instance
+
+        Raises:
+             UnknownField: Raised if `field_name` not found in parent App
         """
-        url = ("app/{0}/record/{1}/references"
-               "?recordIds={2}&fieldIds={3}".format(
-                   self.applicationId, self.id,
-                   ",".join(record_ids),
-                   ",".join(ref_field_ids)))
-        return (Record(r) for r in Client.get(url))
+        try:
+            return self._fields[field_name]
+        except KeyError:
+            raise UnknownField(self._app, field_name, self._fields.keys())
 
-    @classmethod
-    def new_for(cls, app_id):
-        """Get a prefilled Record for the App designated by app_id.
+    def validate(self):
+        """Explicitly validate field data
 
-        Args:
-            app_id (str): A valid App ID.
+        Notes:
+            Called automatically during save call before sending data to server
 
-        Return:
-            A dict containing default fields and values for a Record.
+        Raises:
+             ValidationError: If any fields fail validation
         """
-        return Record(Client.get("app/{0}/record".format(app_id)))
+        for field in (_field for _field in six.itervalues(self._fields) if _field.required):
+            if field.get_swimlane() is None:
+                raise ValidationError(self, 'Required field "{}" is not set'.format(field.name))
 
-    @classmethod
-    def find(cls, app_id, record_id):
-        """Find a Record by app_id and record_id.
-
-        Args:
-            app_id (str): A valid App ID
-            record_id (str): A valid Record ID
-
-        Return:
-            A Record
+    def save(self):
+        """Persist record changes on Swimlane server
+        
+        Updates internal raw data with response content from server to guarantee calculated field values match values on
+        server
+        
+        Raises:
+            ValidationError: If any fields fail validation
         """
-        return Record(Client.get("app/{0}/record/{1}".format(app_id,
-                                                             record_id)))
 
-    @classmethod
-    def add_reference(cls, application_id, record_id, field_id,
-                      target_record_ids):
-        """
-        Add a record reference to a reference field in an existing record
-        Args:
-            application_id: The referencing application ID
-            record_id: The ID of the record to add a reference to
-            field_id: The reference field on the application
-            target_record_ids: The record ID(s) to add to the reference field
+        if self.is_new:
+            method = 'post'
+        else:
+            method = 'put'
 
-        """
-        Client.post({
-            "fieldId": field_id,
-            "targetRecordIds": target_record_ids
-        }, "app/{0}/record/{1}/add-references".format(application_id, record_id))
+        self.validate()
 
-    def restrict(self, *user_groups, **kwargs):
-        """
-        Restrict the record to specific users and/or groups.
+        response = self._swimlane.request(
+            method,
+            'app/{}/record'.format(self._app.id),
+            json=self._raw
+        )
 
-        :param user_groups: One or more User/Group instances.
-        :type user_groups: :class:`Group` or :class:`User`
-        :param append: Append users/groups to existing restriction.
-        :type append: bool
-        """
-        allowed = [ug.summary for ug in user_groups
-                   if isinstance(ug, (Group, User))]
-        if 'append' in kwargs and kwargs['append']:
-            allowed = self.allowed + allowed
-        Client.put(allowed, 'app/{0}/record/{1}/restrict'.format(
-            self.applicationId, self.id))
-        return allowed
+        # Reinitialize record with new raw content returned from server to update any calculated fields
+        self.__init__(self._app, response.json())
+
+
+def record_factory(app):
+    """Return a temporary Record instance to be used for field validation and value parsing
+
+    Args:
+        app (App): Target App to create a transient Record instance for
+
+    Returns:
+        Record: Unsaved Record instance to be used for validation, creation, etc.
+    """
+    # pylint: disable=line-too-long
+    return Record(app, {
+        '$type': Record._type,
+        'isNew': True,
+        'applicationId': app.id,
+        'comments': {
+            '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib'
+        },
+        'values': {
+            '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
+        }
+    })
