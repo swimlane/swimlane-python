@@ -161,7 +161,7 @@ Get list of all apps:
 
 .. code-block:: python
 
-    users = swimlane.users.list()
+    apps = swimlane.apps.list()
 
 
 Users
@@ -198,5 +198,5 @@ Get list of all groups:
 
 .. code-block:: python
 
-    users = swimlane.groups.list()
+    groups = swimlane.groups.list()
 

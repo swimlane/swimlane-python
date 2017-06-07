@@ -118,7 +118,7 @@ Returns :class:`pendulum.Pendulum` instances
 Date
 ^^^^
 
-Date of year with no time component (2017-06-1).
+Date of year with no time component (2017-06-01).
 
 Returns :class:`pendulum.Date` instances
 
