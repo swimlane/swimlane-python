@@ -1,6 +1,5 @@
 .. image:: https://raw.githubusercontent.com/swimlane/swimlane-python/master/docs/logo.png
 
-===============
 Swimlane Python
 ===============
 
@@ -22,12 +21,8 @@ Python driver for the Swimlane_ API
 .. _Swimlane: http://swimlane.com
 
 
-------------
 Installation
 ------------
-
-Pip
----
 
 ::
 
@@ -35,7 +30,6 @@ Pip
 
 
 
--------------
 Documentation
 -------------
 
