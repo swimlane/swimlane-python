@@ -1,14 +1,23 @@
 sudo: false
 language: python
 python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
+- '2.7'
+- '3.3'
+- '3.4'
+- '3.5'
+- '3.6'
 install:
-  - pip install -U -r requirements.txt
-  - pip install -U -r test-requirements.txt
-  - pip install codacy-coverage
+- pip install -U -r requirements.txt
+- pip install -U -r test-requirements.txt
+- pip install codacy-coverage
 script: py.test -v --cov=swimlane --cov-report=xml
 after_script: python-codacy-coverage -r coverage.xml
+deploy:
+  provider: pypi
+  user: swimlane
+  password:
+    secure: rvYSJz7tPurPR33bqQDZ8fmabefB8U1MqOmcAvYW8vy/zpJK5Pf2P8OjOuUBYFR9pmChmij2tOxBqSHY0y+aWsvAXvlEweMYwiLTnbllagZ27RxDNPgAY+wmXxg0zQz5PpwjcXms7y4sgMQIoEMXr9i71LtrFPYILY89vvup1CzLfIyZnC2uc7OYJ5lL1EokgCEMVrAGLukak83LO6/pVb3xZ2u0OV3UMi2M5av4ccGpktPWnEJVF43lEtVTk4kOPoZyQoCOQJGEMsREqIHrQ4OT4u1/wqo+/3qOxOuZ/ykmCAKWSDb3J2quOSXbxcSRqy4Jpof7Ema0AJdwC+SfR2Pbl+CpZyhWgBSrCKkZLrAwSdZMaqEVFn+AkA0QADOzOCv4EVAgfLjsy+IamvNVg2lpDSa988pCkHdX07VtDEky/3ytGY7BS1NA8/gd28NsKSpkmOqHtrmwY0QFQil6YbP/9myiJaOz8pd0CFxMeZIY67DDu35mCusHdOJSmCtNz5am8sJw+sYtJ8ovB0gP4S7qCLISvWxqiBjes/DyOU8AoMNVphFEDmq3BQavPD5F0sH+xLa1H8wvWUT5sThlnrZu+Sei1OEQEUMpb/wW9Dp3t89HuX4g0O79EvL5xax9mMGH6WIkC0ZJV+zIfZryS/X4oSjvOcXR8hJ8zXTaqEc=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: swimlane/swimlane-python
