@@ -1,5 +1,9 @@
 import mock
 
+app_id = '123'
+record_id = '456'
+field_id = '789'
+
 
 def test_add_references(mock_swimlane):
     """Test the helper add-references route"""
@@ -29,3 +33,15 @@ def test_add_references(mock_swimlane):
                 'targetRecordIds': target_record_ids
             }
         )
+
+
+def test_add_comment(mock_swimlane):
+    with mock.patch.object(mock_swimlane, 'request') as mock_request:
+        mock_swimlane.helpers.add_comment(
+            app_id,
+            record_id,
+            field_id,
+            'message'
+        )
+
+        assert mock_request.call_count == 1
