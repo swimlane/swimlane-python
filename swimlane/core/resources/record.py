@@ -155,17 +155,18 @@ class Record(APIResource):
         self.__init__(self._app, response.json())
 
 
-def record_factory(app):
+def record_factory(app, fields=None):
     """Return a temporary Record instance to be used for field validation and value parsing
 
     Args:
         app (App): Target App to create a transient Record instance for
+        fields (dict): Optional dict of fields and values to set on new Record instance before returning
 
     Returns:
         Record: Unsaved Record instance to be used for validation, creation, etc.
     """
     # pylint: disable=line-too-long
-    return Record(app, {
+    record = Record(app, {
         '$type': Record._type,
         'isNew': True,
         'applicationId': app.id,
@@ -176,3 +177,10 @@ def record_factory(app):
             '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
         }
     })
+
+    fields = fields or {}
+
+    for name, value in six.iteritems(fields):
+        record[name] = value
+
+    return record

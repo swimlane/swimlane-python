@@ -202,6 +202,8 @@ See various adapter class documentation :mod:`swimlane.core.adapters` for more i
 Apps
 ^^^^
 
+Handles retrieval of App resources.
+
 Retrieve an app by ID or name:
 
 .. code-block:: python
@@ -219,6 +221,8 @@ Get list of all apps:
 
 Users
 ^^^^^
+
+Handles retrieval of User resources.
 
 Retrieve a single user by ID or display name:
 
@@ -238,6 +242,8 @@ Get list of all users:
 Groups
 ^^^^^^
 
+Handles retrieval of Group resources.
+
 Retrieve a single group by ID or name:
 
 .. code-block:: python
@@ -253,3 +259,23 @@ Get list of all groups:
 
     groups = swimlane.groups.list()
 
+
+
+Helpers
+^^^^^^^
+
+Any miscellaneous methods for API endpoints not better suited for other adapters or used for high performance with bulk
+requests.
+
+.. code-block:: python
+
+    swimlane.helpers.add_record_references(
+        app_id='123...456',
+        record_id='789...0ab',
+        target_record_ids=[
+            '123...456',
+            '789...0ab',
+            'cde...f12',
+            ...
+        ]
+    )

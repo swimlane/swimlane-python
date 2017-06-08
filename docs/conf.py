@@ -18,6 +18,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import shutil
 import sys
 from datetime import datetime
 
@@ -29,7 +30,11 @@ import swimlane
 
 from sphinx.apidoc import main
 
-main(['-f', '-e', '-M', '-o', './apidoc', '../swimlane'])
+apidoc_dir = './apidoc'
+if os.path.isdir(apidoc_dir):
+    shutil.rmtree(apidoc_dir)
+
+main(['-f', '-T', '-e', '-M', '-o', apidoc_dir, '../swimlane'])
 
 
 # -- General configuration ------------------------------------------------

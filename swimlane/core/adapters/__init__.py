@@ -4,4 +4,4 @@ from .app import AppAdapter
 from .record import RecordAdapter
 from .report import ReportAdapter
 from .usergroup import UserAdapter, GroupAdapter
-
+from .helper import HelperAdapter

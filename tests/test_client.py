@@ -3,7 +3,7 @@ import mock
 import pytest
 from requests import HTTPError
 
-from swimlane.core.client import SwimlaneAuth
+from swimlane.core.client import SwimlaneAuth, Swimlane
 from swimlane.exceptions import SwimlaneHTTP400Error, InvalidServerVersion
 
 
@@ -67,36 +67,42 @@ def test_request_handling(mock_swimlane):
             raise RuntimeError
 
 
-def test_lazy_settings(mock_swimlane):
+def test_lazy_settings():
     """Test accessing settings is evaluated lazily and cached after first retrieval"""
+    with mock.patch.object(Swimlane, 'request') as mock_request:
+        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+            mock_response = mock.MagicMock()
+            mock_request.return_value = mock_response
 
-    with mock.patch.object(mock_swimlane._session, 'request') as mock_request:
-        mock_response = mock.MagicMock()
-        mock_request.return_value = mock_response
+            # Only include apiVersion setting for current tests
+            data = {
+                'apiVersion': '2.15.0-1234'
+            }
+            mock_response.json.return_value = data
 
-        # Only include apiVersion setting for current tests
-        data = {
-            'apiVersion': '2.15.0-1234'
-        }
-        mock_response.json.return_value = data
+            mock_swimlane = Swimlane('http://host', 'user', 'pass', verify_server_version=False)
 
-        assert mock_request.call_count == 0
+            assert mock_request.call_count == 0
 
-        assert mock_swimlane.settings == data
-        assert mock_swimlane.version == data['apiVersion']
+            assert mock_swimlane.settings == data
+            assert mock_swimlane.version == data['apiVersion']
 
-        assert mock_request.call_count == 1
+            assert mock_request.call_count == 1
 
 
-def test_server_version_checks(mock_swimlane):
+def test_server_version_checks():
     """Test that server version is checked by default, raising InvalidServerVersion exception when failing"""
+    with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
+        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+            with mock.patch.object(Swimlane, 'settings', new_callable=mock.PropertyMock) as mock_settings:
+                mock_settings.return_value = {'apiVersion': '2.15.0'}
 
-    with mock.patch('swimlane.core.client.compare_versions', return_value=0):
-        mock_swimlane._Swimlane__verify_server_version()
+                with mock.patch('swimlane.core.client.compare_versions', return_value=0):
+                    Swimlane('http://host', 'admin', 'password')
 
-    with mock.patch('swimlane.core.client.compare_versions', return_value=1):
-        with pytest.raises(InvalidServerVersion):
-            mock_swimlane._Swimlane__verify_server_version()
+                with mock.patch('swimlane.core.client.compare_versions', return_value=1):
+                    with pytest.raises(InvalidServerVersion):
+                        Swimlane('http://host', 'admin', 'password')
 
 
 def test_auth(mock_swimlane):

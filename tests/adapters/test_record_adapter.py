@@ -4,6 +4,8 @@ import mock
 import pytest
 import six
 
+from swimlane.exceptions import UnknownField
+
 
 def test_get(mock_swimlane, mock_app, mock_record):
     mock_response = mock.MagicMock()
@@ -41,6 +43,23 @@ def test_create(mock_swimlane, mock_app, mock_record):
 
     with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
         assert mock_app.records.create(**fields) == mock_record
+
+
+@pytest.mark.parametrize('records,expected', [
+    ([], TypeError),
+    ([123], TypeError),
+    ([{'Nonexistent': 'Value'}], UnknownField),
+    ([{}], None),
+    ([{'Status': 'Open'}], None),
+    ([{'Status': 'Open'}, {'Status': 'Open'}], None)
+])
+def test_create_batch(mock_app, records, expected):
+    if expected is not None:
+        with pytest.raises(expected):
+            mock_app.records.create_batch(*records)
+
+    else:
+        mock_app.records.create_batch(*records)
 
 
 def test_search(mock_swimlane, mock_app, mock_record):

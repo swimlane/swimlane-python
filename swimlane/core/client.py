@@ -9,7 +9,7 @@ from urllib3.exceptions import InsecureRequestWarning
 from requests.structures import CaseInsensitiveDict
 from six.moves.urllib.parse import urljoin
 
-from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter
+from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter, HelperAdapter
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources import User
 from swimlane.exceptions import SwimlaneHTTP400Error, InvalidServerVersion
@@ -87,6 +87,7 @@ class Swimlane(object):
         self.apps = AppAdapter(self)
         self.users = UserAdapter(self)
         self.groups = GroupAdapter(self)
+        self.helpers = HelperAdapter(self)
 
         if verify_server_version:
             self.__verify_server_version()

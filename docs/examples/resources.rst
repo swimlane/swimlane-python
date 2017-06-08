@@ -50,8 +50,8 @@ Search is done by providing multiple tuples that are applied as filters and AND'
     )
 
 
-Create New Records
-^^^^^^^^^^^^^^^^^^
+Create New Record
+^^^^^^^^^^^^^^^^^
 
 Record creation is done through the :obj:`app.records` adapter, and adheres to all field validation as documented below
 
@@ -66,6 +66,20 @@ The newly created record is returned from the create create call after first bei
     })
 
 
+Batch Record Creation
+^^^^^^^^^^^^^^^^^^^^^
+
+Creating multiple records at once can also done withe the :obj:`app.records` adapter using only a single request.
+
+Any records not passing validation will cause the entire operation to fail.
+
+.. code-block:: python
+
+    records = app.records.create_batch(
+        {'Text Field': 'Value 1', 'Numeric Field': 10, ...},
+        {'Text Field': 'Value 2', 'Numeric Field': 20, ...},
+        ...
+    )
 
 
 

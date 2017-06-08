@@ -1,0 +1,29 @@
+from swimlane.core.resolver import SwimlaneResolver
+from swimlane.utils.version import requires_swimlane_version
+
+
+class HelperAdapter(SwimlaneResolver):
+    """Adapter providing any miscellaneous API calls not better suited for another adapter"""
+
+    @requires_swimlane_version('2.15')
+    def add_record_references(self, app_id, record_id, field_id, target_record_ids):
+        """Bulk operation to directly add record references without making any additional requests
+
+        Warnings:
+            Does not perform any app, record, or target app/record validation
+
+        Args:
+            app_id (str): Full App ID string
+            record_id (str): Full parent Record ID string
+            field_id (str): Full field ID to target reference field on parent Record string
+            target_record_ids (List(str)): List of full target reference Record ID strings
+        """
+
+        self._swimlane.request(
+            'post',
+            'app/{0}/record/{1}/add-references'.format(app_id, record_id),
+            json={
+                'fieldId': field_id,
+                'targetRecordIds': target_record_ids
+            }
+        )
