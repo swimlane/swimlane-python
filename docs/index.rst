@@ -30,6 +30,8 @@ Python driver for the Swimlane_ API
 
 .. _Swimlane: https://swimlane.com
 
+Viewing docs for release v\ |release|
+
 ------------
 
 

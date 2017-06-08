@@ -3,6 +3,7 @@ import pytest
 
 from swimlane.core.client import SwimlaneAuth, Swimlane
 from swimlane.core.resources import App, Record, User, Group, Report
+from swimlane.utils.version import get_package_version
 
 
 @pytest.fixture
@@ -10,8 +11,11 @@ def mock_swimlane():
     """Return a mock Swimlane client"""
     with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
         with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
-            swimlane = Swimlane('http://host', 'admin', 'password')
-            swimlane._session.auth.user = mock_user(swimlane)
+            with mock.patch.object(Swimlane, 'version', new_callable=mock.PropertyMock) as mock_version:
+                mock_version.return_value = get_package_version()
+
+                swimlane = Swimlane('http://host', 'admin', 'password')
+                swimlane._session.auth.user = mock_user(swimlane)
 
     return swimlane
 

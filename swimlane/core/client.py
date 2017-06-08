@@ -2,6 +2,7 @@
 
 import requests
 import urllib3
+import logging
 from pyuri import URI
 from requests.compat import json
 from urllib3.exceptions import InsecureRequestWarning
@@ -11,10 +12,16 @@ from six.moves.urllib.parse import urljoin
 from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources import User
-from swimlane.exceptions import SwimlaneHTTP400Error
+from swimlane.exceptions import SwimlaneHTTP400Error, InvalidServerVersion
+from swimlane.utils.version import get_package_version, compare_versions
 
 # Disable insecure request warnings
 urllib3.disable_warnings(InsecureRequestWarning)
+
+logger = logging.getLogger(__name__)
+
+_lib_full_version = get_package_version()
+_lib_major_version, _lib_minor_version = _lib_full_version.split('.')[0:2]
 
 
 class Swimlane(object):
@@ -28,6 +35,8 @@ class Swimlane(object):
         password (str): Authentication password
         verify_ssl (bool): Verify SSL (ignored on HTTP). Disable to use self-signed certificates
         default_timeout (int): Default request connect and read timeout in seconds for all requests
+        verify_version (bool): Verify server version has same major version as client package. May require additional
+            requests, set False to disable check
 
     Attributes:
         host (pyuri.URI): Full RFC-1738 URL pointing to Swimlane host
@@ -56,7 +65,7 @@ class Swimlane(object):
 
     _api_root = '/api/'
 
-    def __init__(self, host, username, password, verify_ssl=True, default_timeout=60):
+    def __init__(self, host, username, password, verify_ssl=True, default_timeout=60, verify_server_version=True):
         self.host = URI(host)
         self.host.scheme = self.host.scheme.lower() or 'https'
         self.host.path = None
@@ -79,7 +88,26 @@ class Swimlane(object):
         self.users = UserAdapter(self)
         self.groups = GroupAdapter(self)
 
-        # TODO: Warn if higher server minor version, raise InvalidServerVersion if wrong major version
+        if verify_server_version:
+            self.__verify_server_version()
+
+    def __verify_server_version(self):
+        """Verify connected to supported server version
+
+        Notes:
+            Logs warning if connecting to a newer server version
+
+        Raises:
+            swimlane.exceptions.InvalidServerVersion: If server major version is higher than package major version
+        """
+        if compare_versions('.'.join([_lib_major_version, _lib_minor_version]), self.version) > 0:
+            logger.warning('Client version {} connecting to server with newer minor release {}.'.format(
+                _lib_full_version,
+                self.version
+            ))
+
+        if compare_versions(_lib_major_version, self.version) != 0:
+            raise InvalidServerVersion(self, _lib_major_version, str(int(_lib_major_version) + 1))
 
     def __repr__(self):
         return '<{cls}: {user} @ {host}>'.format(

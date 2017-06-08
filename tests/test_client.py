@@ -1,9 +1,10 @@
 """Tests for custom Swimlane errors"""
 import mock
+import pytest
 from requests import HTTPError
 
 from swimlane.core.client import SwimlaneAuth
-from swimlane.exceptions import SwimlaneHTTP400Error
+from swimlane.exceptions import SwimlaneHTTP400Error, InvalidServerVersion
 
 
 def test_request_handling(mock_swimlane):
@@ -85,6 +86,17 @@ def test_lazy_settings(mock_swimlane):
         assert mock_swimlane.version == data['apiVersion']
 
         assert mock_request.call_count == 1
+
+
+def test_server_version_checks(mock_swimlane):
+    """Test that server version is checked by default, raising InvalidServerVersion exception when failing"""
+
+    with mock.patch('swimlane.core.client.compare_versions', return_value=0):
+        mock_swimlane._Swimlane__verify_server_version()
+
+    with mock.patch('swimlane.core.client.compare_versions', return_value=1):
+        with pytest.raises(InvalidServerVersion):
+            mock_swimlane._Swimlane__verify_server_version()
 
 
 def test_auth(mock_swimlane):

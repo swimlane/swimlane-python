@@ -41,6 +41,23 @@ To connect using HTTP, provide it as part of the host URL.
     swimlane = Swimlane('http://192.168.1.1', 'username', 'password')
 
 
+Non-Standard Port
+^^^^^^^^^^^^^^^^^
+
+To connect to Swimlane over a non-standard port, include the port as part of the host URL
+
+.. code-block:: python
+
+    from swimlane import Swimlane
+
+    swimlane = Swimlane(
+        'https://192.168.1.1:8443',
+        'username',
+        'password',
+        verify_ssl=False
+    )
+
+
 SSL Verification
 ^^^^^^^^^^^^^^^^
 
@@ -61,22 +78,15 @@ additional requests made by using the client automatically.
 
     from swimlane import Swimlane
 
-    swimlane = Swimlane('192.168.1.1', 'username', 'password', verify_ssl=False)
+    swimlane = Swimlane(
+        '192.168.1.1',
+        'username',
+        'password',
+        verify_ssl=False
+    )
 
 
 The `verify_ssl` parameter is ignored when connecting over HTTP.
-
-
-Non-Standard Port
-^^^^^^^^^^^^^^^^^
-
-To connect to Swimlane over a non-standard port, include the port as part of the host URL
-
-.. code-block:: python
-
-    from swimlane import Swimlane
-
-    swimlane = Swimlane('https://192.168.1.1:8443', 'username', 'password', verify_ssl=False)
 
 
 Custom Direct Requests
@@ -93,7 +103,13 @@ To perform a custom request and handle the response directly, use the :meth:`swi
 
     swimlane = Swimlane('192.168.1.1', 'username', 'password')
 
-    response = swimlane.request('post', 'some/endpoint', json={...}, params={...}, ...)
+    response = swimlane.request(
+        'post',
+        'some/endpoint',
+        json={...},
+        params={...},
+        ...
+    )
 
 Underlying connection session will be reused, authentication will be handled automatically, and all default request
 configurations will be applied as normal if not provided explicitly.
@@ -113,14 +129,19 @@ timeouts, refer to the `Requests timeout documentation`_.
 
 .. _Requests timeout documentation: http://docs.python-requests.org/en/master/user/quickstart/#timeouts
 
-To override the default global timeout used by all library methods, provide the `default_timeout` parameter as an
-:class:`int` in seconds during client instantiation.
+To override the default global timeout used by all library methods, provide the `default_timeout` parameter in seconds
+during client instantiation.
 
 .. code-block:: python
 
     from swimlane import Swimlane
 
-    swimlane = Swimlane('192.168.1.1', 'username', 'password', default_timeout=300)
+    swimlane = Swimlane(
+        '192.168.1.1',
+        'username',
+        'password',
+        default_timeout=300
+    )
 
 
 The :meth:`swimlane.Swimlane.request` method can also accept an optional `timeout` parameter that will override the
@@ -132,9 +153,41 @@ global default timeout for the single request.
 
     swimlane = Swimlane('192.168.1.1', 'username', 'password')
 
-    # Potentially long-running request
-    response = swimlane.request('post', 'some/endpoint', ..., timeout=600)
+    # Potentially long delay before starting response with 10 minute timeout
+    response = swimlane.request(
+        'post',
+        'some/endpoint',
+        ...,
+        timeout=600
+    )
 
+
+Server Version Verification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default, client will check that the major versions of server and client match, and raise
+:class:`swimlane.exceptions.InvalidServerVersion` if they do not.
+
+This may require an additional request that may not otherwise be required to retrieve the server version, and and be
+disabled by setting `verify_server_version=False`.
+
+.. note::
+
+    Connecting to a newer major server version is not supported, and should not be expected to work as normal if this
+    verification is disabled.
+
+    Only disable this verification when sure you are using the correct client library version.
+
+.. code-block:: python
+
+    from swimlane import Swimlane
+
+    swimlane = Swimlane(
+        '192.168.1.1',
+        'username',
+        'password',
+        verify_server_version=False
+    )
 
 
 
