@@ -48,6 +48,7 @@ main(['-f', '-T', '-e', '-M', '-o', apidoc_dir, '../swimlane'])
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon'
 ]
