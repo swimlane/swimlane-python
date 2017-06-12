@@ -129,7 +129,8 @@ disable=
     no-self-use,
     cyclic-import,
     protected-access,
-    too-many-arguments
+    too-many-arguments,
+    logging-format-interpolation
 
 
 

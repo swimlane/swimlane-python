@@ -20,6 +20,7 @@ urllib3.disable_warnings()
 
 logger = logging.getLogger(__name__)
 
+# pylint: disable=invalid-name
 _lib_full_version = get_package_version()
 _lib_major_version, _lib_minor_version = _lib_full_version.split('.')[0:2]
 
