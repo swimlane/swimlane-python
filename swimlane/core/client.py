@@ -1,11 +1,11 @@
 """Core Swimlane client class"""
 
-import requests
-import urllib3
 import logging
+
+import requests
 from pyuri import URI
 from requests.compat import json
-from urllib3.exceptions import InsecureRequestWarning
+from requests.packages import urllib3
 from requests.structures import CaseInsensitiveDict
 from six.moves.urllib.parse import urljoin
 
@@ -16,7 +16,7 @@ from swimlane.exceptions import SwimlaneHTTP400Error, InvalidServerVersion
 from swimlane.utils.version import get_package_version, compare_versions
 
 # Disable insecure request warnings
-urllib3.disable_warnings(InsecureRequestWarning)
+urllib3.disable_warnings()
 
 logger = logging.getLogger(__name__)
 
