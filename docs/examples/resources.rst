@@ -93,10 +93,11 @@ They provide the ability to interact with field data similar to how it's done in
 and validating field types using various :class:`~swimlane.core.fields.base.field.Field` classes under the hood.
 
 
-Getting Field Values
-^^^^^^^^^^^^^^^^^^^^
+Accessing Field Values
+^^^^^^^^^^^^^^^^^^^^^^
 
-Fields are accessed as keys by their readable field names as seen in the UI.
+Fields are accessed as keys by their readable field names as seen in the UI. Field names are case and whitespace 
+sensitive, and are unique within an individual app.
 
 Assuming a record from an app with a text field called "Text" with a value of "Some Example Text", accessing the field
 value is done as follows:
@@ -111,7 +112,7 @@ Any fields without a value default to `None`.
 Setting Field Values
 ^^^^^^^^^^^^^^^^^^^^
 
-Setting field values works the same as getting values.
+Setting field values works the same as accessing values.
 
 .. code-block:: python
 
