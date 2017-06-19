@@ -63,8 +63,9 @@ class UserAdapter(SwimlaneResolver):
     def get(self, arg, value):
         """Retrieve single user record by id or username
 
-        Notes:
-            If using `display_name`, method will fail if multiple Users are returned with the same display name
+        Warnings:
+            User display names are not unique. If using `display_name`, method will fail if multiple Users are returned
+            with the same display name
 
         Keyword Args:
             id (str): Full User ID
@@ -79,7 +80,13 @@ class UserAdapter(SwimlaneResolver):
         """
         if arg == 'id':
             response = self._swimlane.request('get', 'user/{}'.format(value))
-            return User(self._swimlane, response.json())
+
+            try:
+                user_data = response.json()
+            except ValueError:
+                raise ValueError('Unable to find user with ID "{}"'.format(value))
+
+            return User(self._swimlane, user_data)
 
         else:
             response = self._swimlane.request('get', 'user/search?query={}'.format(quote_plus(value)))

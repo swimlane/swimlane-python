@@ -59,21 +59,31 @@ def test_user_get(mock_user, mock_swimlane):
     mock_response = mock.MagicMock()
 
     with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
+        # Single id match
         mock_response.json.return_value = mock_user._raw
         user = mock_swimlane.users.get(id=mock_user.id)
         assert user == mock_user
 
+        # Single display name match
         mock_response.json.return_value = [mock_user._raw]
         user = mock_swimlane.users.get(display_name=mock_user.display_name)
         assert user == mock_user
 
+        # No users matching display name
         mock_response.json.return_value = []
         with pytest.raises(ValueError):
             mock_swimlane.users.get(display_name=mock_user.display_name)
 
+        # Too many users matching display name
         mock_response.json.return_value = [mock_user._raw, mock_user._raw]
         with pytest.raises(ValueError):
             mock_swimlane.users.get(display_name=mock_user.display_name)
+
+        # Error decoding JSON response body
+        mock_response.json.return_value = [mock_user._raw]
+        mock_response.json.side_effect = ValueError
+        with pytest.raises(ValueError):
+            mock_swimlane.users.get(id=mock_user.id)
 
 
 @pytest.mark.parametrize('kwargs', [

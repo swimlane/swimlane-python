@@ -119,10 +119,14 @@ class RecordAdapter(SwimlaneResolver):
             *records (dict): One or more dicts of new record field names and values
 
         Notes:
+            Requires Swimlane 2.15+
+
             Validates like :meth:`create`, but only sends a single request to create all provided fields, and does not
             return the newly created records
 
             Any validation failures on any of the records will abort the batch creation, not creating any new records
+
+            Does not return the newly created records
 
         Examples:
             Create 3 new records with single request

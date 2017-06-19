@@ -58,7 +58,7 @@ def test_date_set_invalid(mock_record, invalid_date_obj):
 
 @pytest.mark.parametrize('valid_time_obj', [
     datetime_now,
-    datetime_now.time(),
+    datetime_now.astimezone(pytz.UTC).time(),
     pendulum_now,
     UTC.convert(pendulum_now).time()
 ])
