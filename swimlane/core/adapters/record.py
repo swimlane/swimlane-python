@@ -155,7 +155,10 @@ class RecordAdapter(SwimlaneResolver):
         new_records = []
 
         for record_data in records:
-            new_records.append(record_factory(self._app, record_data))
+            record = record_factory(self._app, record_data)
+            record.validate()
+
+            new_records.append(record)
 
         self._swimlane.request(
             'post',
