@@ -16,3 +16,7 @@ class APIResource(SwimlaneResolver):
 
     def __repr__(self):
         return '<{self.__class__.__name__}: {self!s}>'.format(self=self)
+
+    def __ne__(self, other):
+        # Default __ne__ for python 2 compat
+        return not self == other

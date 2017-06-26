@@ -1,3 +1,5 @@
+import copy
+
 from swimlane.exceptions import UnknownField
 
 
@@ -33,3 +35,14 @@ def test_get_field_definitions(mock_app):
         assert error.similar_field_names == ['aqkg3', 'ayqk6', 'aqc6k']
     else:
         raise RuntimeError
+
+
+def test_equality(mock_app):
+    """Test equality and inequality of Apps by name"""
+    app_clone = copy.copy(mock_app)
+    assert app_clone == mock_app
+    assert not app_clone != mock_app
+
+    app_clone.name = mock_app.name + 'test'
+    assert app_clone != mock_app
+    assert not app_clone == mock_app

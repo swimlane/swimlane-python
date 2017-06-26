@@ -1,7 +1,10 @@
+from functools import total_ordering
+
 from swimlane.exceptions import UnknownField
 from .base import APIResource
 
 
+@total_ordering
 class App(APIResource):
     """A single App record instance
 
@@ -44,6 +47,15 @@ class App(APIResource):
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and hash(self) == hash(other)
+
+    def __lt__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError("Comparisons not supported between instances of '{}' and '{}'".format(
+                other.__class__.__name__,
+                self.__class__.__name__
+            ))
+
+        return self.name < other.name
 
     def get_field_definition_by_name(self, field_name):
         """Get JSON field definition for field matching provided name
