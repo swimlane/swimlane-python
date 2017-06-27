@@ -52,7 +52,7 @@ Install latest release::
 
 Install latest release for platform v2.x::
 
-    pip install 'swimlane>=2,<3'
+    pip install "swimlane>=2,<3"
 
 
 Releases
@@ -76,7 +76,8 @@ Versioning
 ^^^^^^^^^^
 
 The Swimlane driver is versioned along with server, and will support all minor versions below installed version.
-The latest major release should always be installed matching the target server version.
+The latest major release should always be installed matching the target server major version. Patch versions can float
+between server and driver, and may not always match.
 
 Newer minor server releases will typically work as expected, but could have minor inconsistencies or missing features.
 A warning message will be logged when connecting to a newer minor server release than the current driver release, but
@@ -87,8 +88,8 @@ will otherwise work as expected.
     Major versions of driver and server are incompatible, and will **NOT** work together and will raise
     :class:`swimlane.exceptions.InvalidServerVersion` when attempting to connect.
 
-For example, `swimlane==2.15.0` will fully support platform versions 2.0.0 - 2.15.0, will warn and attempt to work when
-connecting to platform 2.15.1 - 2.x.y, and will fail when connecting to platform 3.0.0+.
+For example, `swimlane==2.15.0` will fully support platform versions 2.0.0 - 2.15.x, will warn and attempt to work when
+connecting to platform 2.16.0 - 2.y.z, and will fail when connecting to platform 3.0.0+.
 
 
 
