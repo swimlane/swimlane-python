@@ -1,5 +1,7 @@
 import copy
 
+import pytest
+
 from swimlane.exceptions import UnknownField
 
 
@@ -46,3 +48,13 @@ def test_equality(mock_app):
     app_clone.name = mock_app.name + 'test'
     assert app_clone != mock_app
     assert not app_clone == mock_app
+
+
+def test_comparison(mock_app, mock_record):
+    with pytest.raises(TypeError):
+        mock_app < mock_record
+
+    app_clone = copy.copy(mock_app)
+    app_clone.name = mock_app.name + 'test'
+    assert mock_app < app_clone
+    assert app_clone > mock_app
