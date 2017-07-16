@@ -63,8 +63,9 @@ class Report(APIResource):
         self.__records = []
         self.__limit = limit
 
-        # Cap page size at limit if limit is smaller than a single page
-        self._page_size = min(self._page_size, self.__limit)
+        # Cap page size at limit if limit is enabled and smaller than a single page
+        if self.__limit:
+            self._page_size = min(self._page_size, self.__limit)
 
     def __str__(self):
         return self.name
@@ -84,13 +85,13 @@ class Report(APIResource):
                     record = self._build_record(raw_record)
                     self.__records.append(record)
                     yield record
-                    if len(self.__records) >= self.__limit:
+                    if self.__limit and len(self.__records) >= self.__limit:
                         break
 
                 if any([
                     len(raw_records) < self._page_size,
                     page * self._page_size >= count,
-                    len(self.__records) >= self.__limit
+                    (self.__limit and len(self.__records) >= self.__limit)
                 ]):
                     break
 

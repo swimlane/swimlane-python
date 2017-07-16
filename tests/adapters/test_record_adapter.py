@@ -90,6 +90,7 @@ def test_search(mock_swimlane, mock_app, mock_record):
 
         mock_request.return_value = mock_response
 
+        # Access property to ensure call
         user = mock_swimlane.user
 
     mock_response = mock.MagicMock()
@@ -103,4 +104,5 @@ def test_search(mock_swimlane, mock_app, mock_record):
             '58e4bb4407637a0e4c4f9873': [mock_record._raw]}}
 
     with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
-        assert mock_app.records.search(('Tracking Id', 'equals', 'RA-7')) == [mock_record]
+        with mock.patch('swimlane.core.adapters.report.Report._build_record', return_value=mock_record):
+            assert mock_app.records.search(('Tracking Id', 'equals', 'RA-7')) == [mock_record]
