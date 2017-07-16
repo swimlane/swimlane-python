@@ -32,21 +32,25 @@ will fail to be retrieved.
 Search Records
 ^^^^^^^^^^^^^^
 
-Searching is done using the :obj:`app.records` adapter, and leverages temporary :class:`~swimlane.core.resources.report.Report`
-instances to facilitate search underneath.
+Searching is done using the :obj:`app.records` adapter, and uses temporary :class:`~swimlane.core.resources.report.Report`
+instances to handle paginated search results and record retrieval on-demand.
 
 Search is done by providing multiple tuples that are applied as filters and AND'ed together on the underlying report.
 
 .. note::
 
-    Reports are normally iterated and paginated over in batches, using the :obj:`records` adapter loads all
-    records into a list immediately
+    Reports are normally iterated and paginated over in batches. Using the :obj:`app.records.search` method loads all
+    report results into a list before returning, which can be a heavy operation.
+
+    A default limit is placed on reports to prevent this from happening accidentally, use the :obj:`limit` parameter to
+    override the default limit on a search.
 
 .. code-block:: python
 
     records = app.records.search(
         ('Field Name', 'equals', 'value'),
-        ('Other Field', 'doesNotEqual', 'value')
+        ('Other Field', 'doesNotEqual', 'value'),
+        limit=20
     )
 
 

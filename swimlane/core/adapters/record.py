@@ -31,7 +31,8 @@ class RecordAdapter(AppResolver):
             *filter_tuples (tuple): Zero or more filter tuples of (field_name, operator, field_value)
 
         Keyword Args:
-            limit (int): Set maximum number of returned Records, defaults to `Report.default_limit`
+            limit (int): Set maximum number of returned Records, defaults to `Report.default_limit`. Set to 0 to return
+                all records
 
         Notes:
             Uses a temporary Report instance with a random name to facilitate search. Records are normally paginated,
@@ -45,10 +46,20 @@ class RecordAdapter(AppResolver):
 
             ::
 
+                # Return records matching all filters with default limit
+
+                from swimlane.core import search
+
                 records = app.records.search(
                     ('field_name', 'equals', 'field_value'),
                     ('other_field', search.NOT_EQ, 'value')
                 )
+
+            ::
+
+                # Return all records from app
+                records = app.records.search(limit=0)
+
 
         Returns:
             :class:`list` of :class:`~swimlane.core.resources.record.Record`: List of Record instances returned from the
