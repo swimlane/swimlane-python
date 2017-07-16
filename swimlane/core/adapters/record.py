@@ -1,23 +1,12 @@
-import weakref
-
-from swimlane.core.resolver import SwimlaneResolver
+from swimlane.core.resolver import AppResolver
+from swimlane.core.resources.report import Report
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.utils import random_string, one_of_keyword_only
 from swimlane.utils.version import requires_swimlane_version
 
 
-class RecordAdapter(SwimlaneResolver):
+class RecordAdapter(AppResolver):
     """Handles retrieval and creation of Swimlane Record resources"""
-
-    def __init__(self, app):
-        super(RecordAdapter, self).__init__(app._swimlane)
-
-        self.__ref_app = weakref.ref(app)
-
-    @property
-    def _app(self):
-        """Resolve app weak reference"""
-        return self.__ref_app()
 
     @one_of_keyword_only('id')
     def get(self, _, value):
@@ -35,7 +24,7 @@ class RecordAdapter(SwimlaneResolver):
         response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.id, value))
         return Record(self._app, response.json())
 
-    def search(self, *filter_tuples):
+    def search(self, *filter_tuples, limit=Report.default_limit):
         """Shortcut to generate a new temporary search report using provided filters and return the resulting records
 
         Notes:
@@ -59,7 +48,7 @@ class RecordAdapter(SwimlaneResolver):
             :class:`list` of :class:`~swimlane.core.resources.record.Record`: List of Record instances returned from the
                 search results
         """
-        report = self._app.reports.build('search-' + random_string(8))
+        report = self._app.reports.build('search-' + random_string(8), limit=limit)
 
         for filter_tuple in filter_tuples:
             report.filter(*filter_tuple)

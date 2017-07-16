@@ -1,5 +1,7 @@
 import itertools
 
+import pendulum
+
 from swimlane.core.resources.base import APIResource
 from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ
 
@@ -36,7 +38,6 @@ class Report(APIResource):
 
 
     Attributes:
-        app (App): Parent App instance
         name (str): Report name
     """
 
@@ -49,15 +50,21 @@ class Report(APIResource):
         EXCLUDES
     )
 
-    _page_size = 50
+    _page_size = 10
+    default_limit = 50
 
-    def __init__(self, app, raw):
+    def __init__(self, app, raw, limit=default_limit):
         super(Report, self).__init__(app._swimlane, raw)
 
-        self.app = app
         self.name = self._raw['name']
 
+        self._app = app
+
         self.__records = []
+        self.__limit = limit
+
+        # Cap page size at limit if limit is smaller than a single page
+        self._page_size = min(self._page_size, self.__limit)
 
     def __str__(self):
         return self.name
@@ -69,15 +76,22 @@ class Report(APIResource):
                 yield record
         else:
             for page in itertools.count():
-                result_data = self._retrieve_report_page(page)
-                count = result_data['count']
-                records = [self._build_record(raw_data) for raw_data in result_data['results'].get(self.app.id, [])]
+                raw_page_data = self._retrieve_report_page(page)
+                count = raw_page_data['count']
+                raw_records = raw_page_data['results'].get(self._app.id, [])
 
-                for result in records:
-                    self.__records.append(result)
-                    yield result
+                for raw_record in raw_records:
+                    record = self._build_record(raw_record)
+                    self.__records.append(record)
+                    yield record
+                    if len(self.__records) >= self.__limit:
+                        break
 
-                if not records or len(records) < self._page_size or page * self._page_size >= count:
+                if any([
+                    len(raw_records) < self._page_size,
+                    page * self._page_size >= count,
+                    len(self.__records) >= self.__limit
+                ]):
                     break
 
     def filter(self, field_name, operand, value):
@@ -95,9 +109,9 @@ class Report(APIResource):
             raise ValueError('Operand must be one of {}'.format(', '.join(self._FILTER_OPERANDS)))
 
         self._raw['filters'].append({
-            "fieldId": self.app.get_field_definition_by_name(field_name)['id'],
+            "fieldId": self._app.get_field_definition_by_name(field_name)['id'],
             "filterType": operand,
-            "value": value,
+            "value": value
         })
 
     def _retrieve_report_page(self, page=0):
@@ -105,9 +119,8 @@ class Report(APIResource):
         return self._swimlane.request('post', 'search', json=self._get_paginated_body(page)).json()
 
     def _build_record(self, raw_record_data):
-        # Avoid circular imports
-        from swimlane.core.resources import Record
-        return Record(self.app, raw_record_data)
+        """Retrieve full record as workaround for different report format"""
+        return self._app.records.get(id=raw_record_data['id'])
 
     def _get_paginated_body(self, page):
         """Return raw body content formatted with correct pagination and offset values for provided page"""
@@ -117,3 +130,41 @@ class Report(APIResource):
         body['offset'] = page
 
         return body
+
+
+def report_factory(app, report_name, limit=Report.default_limit):
+    """Report instance factory populating boilerplate raw data"""
+    # pylint: disable=protected-access
+    created = pendulum.now().to_rfc3339_string()
+    user_model = app._swimlane.user.get_usergroup_selection()
+
+    return Report(
+        app,
+        {
+            "$type": Report._type,
+            "groupBys": [],
+            "aggregates": [],
+            "applicationIds": [app.id],
+            "columns": [],
+            "sorts": {
+                "$type": "System.Collections.Generic.Dictionary`2"
+                         "[[System.String, mscorlib],"
+                         "[Core.Models.Search.SortTypes, Core]], mscorlib",
+            },
+            "filters": [],
+            "defaultSearchReport": False,
+            "allowed": [],
+            "permissions": {
+                "$type": "Core.Models.Security.PermissionMatrix, Core"
+            },
+            "createdDate": created,
+            "modifiedDate": created,
+            "createdByUser": user_model,
+            "modifiedByUser": user_model,
+            "id": None,
+            "name": report_name,
+            "disabled": False,
+            "keywords": ""
+        },
+        limit=limit
+    )

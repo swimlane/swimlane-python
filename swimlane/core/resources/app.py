@@ -78,7 +78,7 @@ class App(APIResource):
         """Get JSON field definition for field matching provided id
 
         Args:
-            field_id (str): Target field ID to get definitino for
+            field_id (str): Target field ID to get definition for
 
         Raises:
             swimlane.exceptions.UnknownField: Raised when given a field ID not found in App

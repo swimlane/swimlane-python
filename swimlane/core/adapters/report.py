@@ -1,9 +1,8 @@
 import weakref
 
-import pendulum
-
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources import Report
+from swimlane.core.resources.report import report_factory
 
 
 class ReportAdapter(SwimlaneResolver):
@@ -43,44 +42,14 @@ class ReportAdapter(SwimlaneResolver):
             self._swimlane.request('get', "reports/{0}".format(report_id)).json()
         )
 
-    def build(self, name):
-        """Build a new Report for the App designated by app_id
+    def build(self, name, limit=Report.default_limit):
+        """Report instance factory for the adapter's App
 
         Args:
             name (str): New Report name
+            limit (int): Maximum number of records to return when evaluating Report
 
         Returns:
             Report: Newly created local Report instance
         """
-        #pylint: disable=protected-access
-        created = pendulum.now().to_rfc3339_string()
-        user_model = self._swimlane.user.get_usergroup_selection()
-
-        return Report(self._app, {
-            "$type": Report._type,
-            "groupBys": [],
-            "aggregates": [],
-            "applicationIds": [self._app.id],
-            "columns": list(self._app._fields_by_id.keys()),
-            "sorts": {
-                "$type": "System.Collections.Generic.Dictionary`2"
-                         "[[System.String, mscorlib],"
-                         "[Core.Models.Search.SortTypes, Core]], mscorlib",
-            },
-            "filters": [],
-            "pageSize": Report._page_size,
-            "offset": 0,
-            "defaultSearchReport": False,
-            "allowed": [],
-            "permissions": {
-                "$type": "Core.Models.Security.PermissionMatrix, Core"
-            },
-            "createdDate": created,
-            "modifiedDate": created,
-            "createdByUser": user_model,
-            "modifiedByUser": user_model,
-            "id": None,
-            "name": name,
-            "disabled": False,
-            "keywords": ""
-        })
+        return report_factory(self._app, name, limit)
