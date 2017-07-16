@@ -24,8 +24,14 @@ class RecordAdapter(AppResolver):
         response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.id, value))
         return Record(self._app, response.json())
 
-    def search(self, *filter_tuples, limit=Report.default_limit):
+    def search(self, *filter_tuples, **kwargs):
         """Shortcut to generate a new temporary search report using provided filters and return the resulting records
+
+        Args:
+            *filter_tuples (tuple): Zero or more filter tuples of (field_name, operator, field_value)
+
+        Keyword Args:
+            limit (int): Set maximum number of returned Records, defaults to `Report.default_limit`
 
         Notes:
             Uses a temporary Report instance with a random name to facilitate search. Records are normally paginated,
@@ -48,7 +54,10 @@ class RecordAdapter(AppResolver):
             :class:`list` of :class:`~swimlane.core.resources.record.Record`: List of Record instances returned from the
                 search results
         """
-        report = self._app.reports.build('search-' + random_string(8), limit=limit)
+        report = self._app.reports.build(
+            'search-' + random_string(8),
+            limit=kwargs.pop('limit', Report.default_limit)
+        )
 
         for filter_tuple in filter_tuples:
             report.filter(*filter_tuple)
