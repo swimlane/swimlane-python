@@ -13,7 +13,9 @@ class FieldCursor(Cursor, SwimlaneResolver):
 
     def __init__(self, field, initial_elements=None):
         SwimlaneResolver.__init__(self, field.record._swimlane)
-        Cursor.__init__(self, initial_elements)
+        Cursor.__init__(self)
+
+        self._elements = initial_elements or self._elements
 
         self.__record_ref = weakref.ref(field.record)
         self.__field_ref = weakref.ref(field)

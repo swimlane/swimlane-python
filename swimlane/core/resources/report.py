@@ -1,12 +1,11 @@
-import itertools
-
 import pendulum
 
+from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.resources.base import APIResource
 from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ
 
 
-class Report(APIResource):
+class Report(APIResource, PaginatedCursor):
     """A report class used for searching
 
     Can be iterated over to retrieve results
@@ -50,50 +49,30 @@ class Report(APIResource):
         EXCLUDES
     )
 
-    _page_size = 10
     default_limit = 50
 
     def __init__(self, app, raw, limit=default_limit):
-        super(Report, self).__init__(app._swimlane, raw)
+        APIResource.__init__(self, app._swimlane, raw)
+        PaginatedCursor.__init__(self, limit=limit)
 
         self.name = self._raw['name']
 
         self._app = app
 
-        self.__records = []
-        self.__limit = limit
-
-        # Cap page size at limit if limit is enabled and smaller than a single page
-        if self.__limit:
-            self._page_size = min(self._page_size, self.__limit)
-
     def __str__(self):
         return self.name
 
-    def __iter__(self):
-        """Lazily retrieve and paginate report results and build Record instances from returned data"""
-        if self.__records:
-            for record in self.__records:
-                yield record
-        else:
-            for page in itertools.count():
-                raw_page_data = self._retrieve_report_page(page)
-                count = raw_page_data['count']
-                raw_records = raw_page_data['results'].get(self._app.id, [])
+    def _retrieve_raw_elements(self, page):
+        body = self._raw.copy()
 
-                for raw_record in raw_records:
-                    record = self._build_record(raw_record)
-                    self.__records.append(record)
-                    yield record
-                    if self.__limit and len(self.__records) >= self.__limit:
-                        break
+        body['pageSize'] = self.page_size
+        body['offset'] = page
 
-                if any([
-                    len(raw_records) < self._page_size,
-                    page * self._page_size >= count,
-                    (self.__limit and len(self.__records) >= self.__limit)
-                ]):
-                    break
+        response = self._swimlane.request('post', 'search', json=body)
+        return response.json()['results'].get(self._app.id, [])
+
+    def _parse_raw_element(self, raw_element):
+        return self._app.records.get(id=raw_element['id'])
 
     def filter(self, field_name, operand, value):
         """Adds a filter to report
@@ -114,23 +93,6 @@ class Report(APIResource):
             "filterType": operand,
             "value": value
         })
-
-    def _retrieve_report_page(self, page=0):
-        """Retrieve paginated report results for an individual page"""
-        return self._swimlane.request('post', 'search', json=self._get_paginated_body(page)).json()
-
-    def _build_record(self, raw_record_data):
-        """Retrieve full record as workaround for different report format"""
-        return self._app.records.get(id=raw_record_data['id'])
-
-    def _get_paginated_body(self, page):
-        """Return raw body content formatted with correct pagination and offset values for provided page"""
-        body = self._raw.copy()
-
-        body['pageSize'] = self._page_size
-        body['offset'] = page
-
-        return body
 
 
 def report_factory(app, report_name, limit=Report.default_limit):

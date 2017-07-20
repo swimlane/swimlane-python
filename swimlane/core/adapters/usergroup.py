@@ -1,21 +1,43 @@
 from six.moves.urllib.parse import quote_plus
 
+from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources import Group, User
 from swimlane.utils import one_of_keyword_only
 
 
+class GroupListCursor(SwimlaneResolver, PaginatedCursor):
+    """Handles retrieval and pagination of group list endpoint"""
+
+    def __init__(self, swimlane, limit=None):
+        SwimlaneResolver.__init__(self, swimlane)
+        PaginatedCursor.__init__(self, limit)
+
+    def _parse_raw_element(self, raw_element):
+        return Group(self._swimlane, raw_element)
+
+    def _retrieve_raw_elements(self, page):
+        response = self._swimlane.request(
+            'get',
+            'groups',
+            params={
+                'size': self.page_size,
+                'offset': page
+            }
+        )
+        return response.json().get('groups', [])
+
+
 class GroupAdapter(SwimlaneResolver):
     """Handles retrieval of Swimlane Group resources"""
 
-    def list(self):
+    def list(self, limit=None):
         """Retrieve list of all groups
 
         Returns:
             :class:`list` of :class:`~swimlane.core.resources.usergroup.Group`: List of all Groups
         """
-        response = self._swimlane.request('get', 'groups')
-        return [Group(self._swimlane, raw_group_data) for raw_group_data in response.json().get('groups', [])]
+        return GroupListCursor(self._swimlane, limit=limit)
 
     @one_of_keyword_only('id', 'name')
     def get(self, key, value):
@@ -47,17 +69,38 @@ class GroupAdapter(SwimlaneResolver):
             raise ValueError('Unable to find group with name "{}"'.format(value))
 
 
+class UserListCursor(SwimlaneResolver, PaginatedCursor):
+    """Handles retrieval and pagination for user list endpoint"""
+
+    def __init__(self, swimlane, limit=None):
+        SwimlaneResolver.__init__(self, swimlane)
+        PaginatedCursor.__init__(self, limit)
+
+    def _parse_raw_element(self, raw_element):
+        return User(self._swimlane, raw_element)
+
+    def _retrieve_raw_elements(self, page):
+        response = self._swimlane.request(
+            'get',
+            'user',
+            params={
+                'size': self.page_size,
+                'offset': page
+            }
+        )
+        return response.json().get('users', [])
+
+
 class UserAdapter(SwimlaneResolver):
     """Handles retrieval of Swimlane User resources"""
 
-    def list(self):
+    def list(self, limit=None):
         """Retrieve all users
 
         Returns:
-            :class:`list` of :class:`~swimlane.core.resources.usergroup.User`: List of all Users
+            :class:`UserListCursor`: Paginated cursor yielding :class:`User` instances
         """
-        response = self._swimlane.request('get', "user")
-        return [User(self._swimlane, raw_user_data) for raw_user_data in response.json().get('users', [])]
+        return UserListCursor(swimlane=self._swimlane, limit=limit)
 
     @one_of_keyword_only('id', 'display_name')
     def get(self, arg, value):
