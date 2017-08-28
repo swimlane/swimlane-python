@@ -290,7 +290,7 @@ Set User, Group, or UserGroup
 
     assert record['User'] == swimlane.user
 
-Must be UserGroup instance or extension; Usernames, IDs, display names, etc. are all ambiguous
+Value must be a UserGroup instance or extension; Usernames, IDs, display names, etc. are all ambiguous
 
 .. code-block:: python
 
@@ -299,6 +299,7 @@ Must be UserGroup instance or extension; Usernames, IDs, display names, etc. are
     try:
         record['UserGroup'] = 'Everyone'
     except ValidationError:
+        # Will not work, string is ambiguous and not a valid value
         pass
 
     assert record['UserGroup'] == swimlane.user
