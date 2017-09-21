@@ -38,6 +38,10 @@ class Report(APIResource, PaginatedCursor):
 
     Attributes:
         name (str): Report name
+
+    Keyword Args:
+        limit (int): Max number of records to return from report/search
+        keywords (list(str)): List of keywords to use in report/search
     """
 
     _type = "Core.Models.Search.Report, Core"
@@ -51,11 +55,12 @@ class Report(APIResource, PaginatedCursor):
 
     default_limit = 50
 
-    def __init__(self, app, raw, limit=default_limit):
+    def __init__(self, app, raw, **kwargs):
         APIResource.__init__(self, app._swimlane, raw)
-        PaginatedCursor.__init__(self, limit=limit)
+        PaginatedCursor.__init__(self, limit=kwargs.pop('limit', self.default_limit))
 
         self.name = self._raw['name']
+        self.keywords = kwargs.pop('keywords', [])
 
         self._app = app
 
@@ -67,6 +72,7 @@ class Report(APIResource, PaginatedCursor):
 
         body['pageSize'] = self.page_size
         body['offset'] = page
+        body['keywords'] = ', '.join(self.keywords)
 
         response = self._swimlane.request('post', 'search', json=body)
         return response.json()['results'].get(self._app.id, [])
@@ -95,8 +101,16 @@ class Report(APIResource, PaginatedCursor):
         })
 
 
-def report_factory(app, report_name, limit=Report.default_limit):
-    """Report instance factory populating boilerplate raw data"""
+def report_factory(app, report_name, **kwargs):
+    """Report instance factory populating boilerplate raw data
+
+    Args:
+        app (App): Swimlane App instance
+        report_name (str): Generated Report name
+
+    Keyword Args
+        **kwargs: Kwargs to pass to the Report class
+    """
     # pylint: disable=protected-access
     created = pendulum.now().to_rfc3339_string()
     user_model = app._swimlane.user.get_usergroup_selection()
@@ -129,5 +143,5 @@ def report_factory(app, report_name, limit=Report.default_limit):
             "disabled": False,
             "keywords": ""
         },
-        limit=limit
+        **kwargs
     )

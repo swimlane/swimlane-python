@@ -42,14 +42,16 @@ class ReportAdapter(SwimlaneResolver):
             self._swimlane.request('get', "reports/{0}".format(report_id)).json()
         )
 
-    def build(self, name, limit=Report.default_limit):
+    def build(self, name, **kwargs):
         """Report instance factory for the adapter's App
 
         Args:
             name (str): New Report name
-            limit (int): Maximum number of records to return when evaluating Report
+
+        Keyword Args:
+            **kwargs: Extra keyword args passed to Report class
 
         Returns:
             Report: Newly created local Report instance
         """
-        return report_factory(self._app, name, limit)
+        return report_factory(self._app, name, **kwargs)

@@ -31,6 +31,7 @@ class RecordAdapter(AppResolver):
             *filter_tuples (tuple): Zero or more filter tuples of (field_name, operator, field_value)
 
         Keyword Args:
+            keywords (list(str)): List of strings of keywords to use in report search
             limit (int): Set maximum number of returned Records, defaults to `Report.default_limit`. Set to 0 to return
                 all records
 
@@ -57,6 +58,11 @@ class RecordAdapter(AppResolver):
 
             ::
 
+                # Run keyword search with multiple keywords
+                records = app.records.search(keywords=['example', 'test'])
+
+            ::
+
                 # Return all records from app
                 records = app.records.search(limit=0)
 
@@ -67,6 +73,7 @@ class RecordAdapter(AppResolver):
         """
         report = self._app.reports.build(
             'search-' + random_string(8),
+            keywords=kwargs.pop('keywords', []),
             limit=kwargs.pop('limit', Report.default_limit)
         )
 
