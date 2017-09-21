@@ -104,7 +104,8 @@ Returns :class:`pendulum.Pendulum` instances
     assert datetime_field_value.hour == 16
 
     # Set to a datetime/pendulum instance
-    record['Datetime'] = now = pendulum.now()
+    # See warning below
+    record['Datetime'] = now = pendulum.now().replace(microseconds=0)
 
     # Fail on generic timestamp/string (not enough context to guarantee consistent behavior)
     try:
@@ -114,6 +115,66 @@ Returns :class:`pendulum.Pendulum` instances
 
     assert record['Datetime'] == now
 
+
+.. warning::
+
+    Mongo only supports millisecond resolution, datetimes returned from Swimlane API lose nanosecond resolution, leading
+    to potentially slightly inconsistent datetimes before and after saving a record.
+
+    For consistency, nanoseconds are automatically stripped from datetimes when the field is set to a datetime with
+    nanosecond precision.
+
+    Field equality comparisons with `pendulum.now()` or other datetime instances with nanosecond resolution will not be
+    accurate unless the nanoseconds are manually removed from the compared datetime.
+
+    .. code-block:: python
+
+        # 2017-09-20 12:34:56.987654
+        now = pendulum.now()
+
+        # 2017-09-20 12:34:56.987000
+        record['Datetime'] = now
+
+        assert record['Datetime'] != now
+
+
+    For guaranteed equality checks, simplest solution is to remove the microsecond component entirely when setting
+    the field value in cases where sub-second resolution isn't important.
+
+    .. code-block:: python
+
+        # 2017-09-20 12:34:56.000000
+        now = pendulum.now().replace(microsecond=0)
+
+        # 2017-09-20 12:34:56.000000
+        record['Datetime'] = now
+
+        assert record['Datetime'] == now
+
+    Manual rounding or less/greater than comparisons are necessary in cases where millisecond resolution is necessary
+
+    .. code-block:: python
+
+        ## Rounding comparison
+
+        # 2017-09-20 12:34:56.987654
+        now = pendulum.now()
+
+        # 2017-09-20 12:34:56.987000
+        record['Datetime'] = now
+
+        # 2017-09-20 12:34:56.987000
+        rounded_now = now.replace(
+            microsecond=math.floor(now.microsecond / 1000) * 1000
+        )
+
+        assert record['Datetime'] == rounded_now
+
+
+        ## Proximity comparison
+
+        # 0.000654
+        assert abs((record['Datetime'] - now).total_seconds()) < 0.001
 
 Date
 ^^^^

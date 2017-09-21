@@ -88,8 +88,14 @@ def test_time_set_invalid(mock_record, invalid_time_obj):
 def test_strip_trailing_microseconds(mock_record):
     """Test automatic removal of microseconds section during set to match values returned from API"""
     field = 'Incident Created'
-    dt = pendulum.now().replace(microsecond=123456)
-    mock_record[field] = dt
+    now_with_microsecond = pendulum.now().replace(microsecond=123456)
+    mock_record[field] = now_with_microsecond
 
-    assert mock_record[field] != pendulum_now
+    assert mock_record[field] != now_with_microsecond
     assert mock_record[field].microsecond == 123000
+    assert abs((mock_record[field] - now_with_microsecond).total_seconds()) < .001
+
+    now_sans_microsecond = now_with_microsecond.replace(microsecond=0)
+    mock_record[field] = now_sans_microsecond
+
+    assert mock_record[field] == now_sans_microsecond
