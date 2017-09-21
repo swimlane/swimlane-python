@@ -32,6 +32,13 @@ class Record(APIResource):
         if self.is_new:
             self.id = self.tracking_id = self.created = self.modified = None
         else:
+            record_app_id = raw['applicationId']
+            if record_app_id != app.id:
+                raise ValueError('Record applicationId `{}` does not match source app id `{}`'.format(
+                    record_app_id,
+                    app.id
+                ))
+
             self.id = self._raw['id']
 
             # Combine app acronym + trackingId instead of using trackingFull raw

@@ -66,6 +66,15 @@ class TestRecord(object):
         with pytest.raises(TypeError):
             mock_record < mock_app
 
+    def test_incorrect_app_id_failure(self, mock_app):
+        """Test that retrieving a record validates source app has expected application ID"""
+        with pytest.raises(ValueError):
+            Record(mock_app, {
+                '$type': Record._type,
+                'isNew': False,
+                'applicationId': mock_app.id + '1234',
+            })
+
     def test_unknown_field_access(self, mock_record):
         """Test accessing a missing field raises UnknownField"""
 
