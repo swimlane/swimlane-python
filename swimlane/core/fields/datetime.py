@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from datetime import date, datetime, time, timedelta
 
+import math
 import pendulum
 
 from .base import Field
@@ -12,6 +13,8 @@ UTC = pendulum.timezone('UTC')
 class DatetimeField(Field):
 
     field_type = 'Core.Models.Fields.Date.DateField, Core'
+
+    datetime_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
     _type_date = 'date'
     _type_time = 'time'
@@ -50,6 +53,8 @@ class DatetimeField(Field):
 
                 # Convert to Pendulum instance in UTC
                 value = UTC.convert(pendulum.instance(value))
+                # Drop nanosecond precision to match Mongo precision
+                value = value.microsecond_(int(math.floor(value.microsecond / 1000) * 1000))
 
         return super(DatetimeField, self)._set(value)
 
@@ -75,8 +80,13 @@ class DatetimeField(Field):
 
         return value
 
+    @classmethod
+    def format_datetime(cls, target_datetime):
+        """Format datetime as expected by Swimlane API"""
+        return pendulum.timezone('UTC').convert(target_datetime).strftime(cls.datetime_format)
+
     def get_swimlane(self):
-        """Return datetimes as rfc3339 strings and timespans as millisecond epochs"""
+        """Return datetimes formatted as expected by API and timespans as millisecond epochs"""
         value = super(DatetimeField, self).get_swimlane()
 
         if value is None:
@@ -85,4 +95,4 @@ class DatetimeField(Field):
         if self.input_type == self._type_interval:
             return value.in_seconds() * 1000
 
-        return value.to_rfc3339_string()
+        return self.format_datetime(value)

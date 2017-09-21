@@ -1,27 +1,31 @@
+import math
 import pendulum
 import datetime
 import pytz
 
 import pytest
 
+from swimlane.core.fields.datetime import DatetimeField
 from swimlane.exceptions import ValidationError
 
 UTC = pendulum.timezone('UTC')
 
 datetime_now = datetime.datetime.now(pytz.timezone('MST'))
+# Mongo drops portion of microsecond, field truncates automatically for consistency
+datetime_now = datetime_now.replace(microsecond=int(math.floor(datetime_now.microsecond / 1000) * 1000))
 pendulum_now = pendulum.instance(datetime_now)
 
 pendulum_interval = pendulum.interval(minutes=5)
 
 
 @pytest.mark.parametrize('field_name,dt,expected_raw', [
-    ('Incident Closed', pendulum_now, UTC.convert(pendulum_now).to_rfc3339_string()),
+    ('Incident Closed', pendulum_now, DatetimeField.format_datetime(pendulum_now)),
     (
         'Date Field',
         pendulum_now,
-        pendulum.Pendulum(pendulum_now.year, pendulum_now.month, pendulum_now.day).to_rfc3339_string()
+        DatetimeField.format_datetime(pendulum.Pendulum(pendulum_now.year, pendulum_now.month, pendulum_now.day))
     ),
-    ('Time Field', pendulum_now, UTC.convert(pendulum_now).to_rfc3339_string()),
+    ('Time Field', pendulum_now, DatetimeField.format_datetime(pendulum_now)),
     ('Incident Duration', pendulum_interval, pendulum_interval.in_seconds() * 1000)
 ])
 def test_raw_serialization(mock_record, field_name, dt, expected_raw):
@@ -79,3 +83,13 @@ def test_time_set_invalid(mock_record, invalid_time_obj):
     """Test providing invalid data to date field"""
     with pytest.raises(ValidationError):
         mock_record['Time Field'] = invalid_time_obj
+
+
+def test_strip_trailing_microseconds(mock_record):
+    """Test automatic removal of microseconds section during set to match values returned from API"""
+    field = 'Incident Created'
+    dt = pendulum.now().replace(microsecond=123456)
+    mock_record[field] = dt
+
+    assert mock_record[field] != pendulum_now
+    assert mock_record[field].microsecond == 123000
