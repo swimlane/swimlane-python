@@ -1,5 +1,5 @@
-from functools import total_ordering
 
+from functools import total_ordering
 import pendulum
 import six
 
