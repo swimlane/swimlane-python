@@ -36,3 +36,10 @@ Documentation
 See the `Docs on RTD`_ for examples and full documentation
 
 .. _Docs on RTD: http://swimlane-python-driver.readthedocs.io/
+
+
+
+Issues
+------
+
+Open any bug reports or feature requests through the Swimlane support portal at https://support.swimlane.com/
