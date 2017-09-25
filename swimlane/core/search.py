@@ -8,7 +8,8 @@ EXCLUDES = "excludes"
 GT = "greaterThan"
 LT = "lessThan"
 LTE = "lessThanOrEqual"
-GTE = "lessThanOrEqual"
+GTE = "greaterThanOrEqual"
+
 # Aggregate
 AVG = "average"
 COUNT = "count"
