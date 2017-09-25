@@ -53,6 +53,19 @@ Search is done by providing multiple tuples that are applied as filters and AND'
         limit=20
     )
 
+Available operators are just strings as shown above, but are made available as constants in the
+:mod:`~swimlane.core.search` module
+
+.. code-block:: python
+
+    from swimlane.core.search import EQ, NOT_EQ, CONTAINS, EXCLUDES, GT, LT, GTE, LTE
+
+    records = app.records.search(
+        ('Text Field', EQ, 'equal value'),
+        ('Number Field', GTE, 0),
+        ...
+    )
+
 
 Create New Record
 ^^^^^^^^^^^^^^^^^
