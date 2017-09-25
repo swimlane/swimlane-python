@@ -52,7 +52,9 @@ class Report(APIResource, PaginatedCursor):
         CONTAINS,
         EXCLUDES,
         LT,
-        GT
+        GT,
+        LTE,
+        GTE
     )
 
     default_limit = 50

@@ -7,7 +7,8 @@ CONTAINS = "contains"
 EXCLUDES = "excludes"
 GT = "greaterThan"
 LT = "lessThan"
-
+LTE ="lessThanOrEqual"
+GTE ="lessThanOrEqual"
 # Aggregate
 AVG = "average"
 COUNT = "count"
