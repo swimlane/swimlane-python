@@ -2,7 +2,7 @@ import pendulum
 
 from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.resources.base import APIResource
-from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ
+from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ, LT, GT, LTE, GTE
 
 
 class Report(APIResource, PaginatedCursor):
@@ -50,7 +50,11 @@ class Report(APIResource, PaginatedCursor):
         EQ,
         NOT_EQ,
         CONTAINS,
-        EXCLUDES
+        EXCLUDES,
+        LT,
+        GT,
+        LTE,
+        GTE
     )
 
     default_limit = 50

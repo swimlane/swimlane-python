@@ -5,6 +5,10 @@ EQ = "equals"
 NOT_EQ = "doesNotEqual"
 CONTAINS = "contains"
 EXCLUDES = "excludes"
+GT = "greaterThan"
+LT = "lessThan"
+LTE = "lessThanOrEqual"
+GTE = "greaterThanOrEqual"
 
 # Aggregate
 AVG = "average"
