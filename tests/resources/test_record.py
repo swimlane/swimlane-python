@@ -37,6 +37,26 @@ class TestRecord(object):
                 assert mock_validate.call_count == 2
                 assert mock_request.call_count == 1
 
+    def test_delete(self, mock_swimlane, mock_record):
+        """Test record can be deleted when not new and that deleted records lose their ID but maintain their fields"""
+        with mock.patch.object(mock_swimlane, 'request') as mock_request:
+            with mock.patch.object(mock_record, 'validate') as mock_validate:
+
+                mock_record['Numeric'] = 5
+                rec_id = mock_record.id
+
+                mock_record.delete()
+                mock_request.assert_called_once_with(
+                    'delete',
+                    'app/{}/record/{}'.format(mock_record._app.id, rec_id)
+                )
+
+                assert mock_record.id is None
+                assert mock_record['Numeric'] == 5
+
+                with pytest.raises(ValueError):
+                    mock_record.delete()
+
     def test_validate_required_fields(self, mock_record):
         """Test validate method checks for required fields"""
         assert mock_record.validate() is None

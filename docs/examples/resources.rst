@@ -175,12 +175,37 @@ Saving Changes
 ^^^^^^^^^^^^^^
 
 All changes to a record are only done locally until explicitly persisted to the server with
-:meth:`~swimlane.core.resources.record.Record.save`
+:meth:`~swimlane.core.resources.record.Record.save`.
 
 .. code-block:: python
 
     record['Text'] = 'Some New Text'
     record.save()
+
+
+Delete Record
+^^^^^^^^^^^^^
+
+Records can be deleted from Swimlane using :meth:`~swimlane.core.resources.record.Record.delete`. Record will be
+removed from server and marked as a new record, but will retain any field data.
+
+.. code-block:: python
+
+    assert record.tracking_id == 'ABC-123'
+    text_field_data = record['Text']
+
+    # Deletes existing record from server
+    record.delete()
+
+    assert record.id is None
+    assert record['Text'] == text_field_data
+
+    ...
+
+    # Create a new record from the deleted record's field data
+    record.save()
+
+    assert record.tracking_id == 'ABC-124'
 
 
 Field Iteration

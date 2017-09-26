@@ -1,5 +1,7 @@
 
 from functools import total_ordering
+
+import copy
 import pendulum
 import six
 
@@ -160,6 +162,31 @@ class Record(APIResource):
 
         # Reinitialize record with new raw content returned from server to update any calculated fields
         self.__init__(self._app, response.json())
+
+    def delete(self):
+        """Delete record from Swimlane server
+
+        Resets to new state, but leaves field data as-is
+
+        Saving a deleted record will
+
+        Raises
+            ValueError: If record.is_new
+        """
+        if self.is_new:
+            raise ValueError('Cannot delete a new Record')
+
+        self._swimlane.request(
+            'delete',
+            'app/{}/record/{}'.format(self._app.id, self.id)
+        )
+
+        # Modify current raw values indicating an unsaved record but persisting field data
+        raw = copy.deepcopy(self._raw)
+        raw['id'] = None
+        raw['isNew'] = True
+
+        self.__init__(self._app, raw)
 
 
 def record_factory(app, fields=None):
