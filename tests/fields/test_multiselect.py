@@ -1,5 +1,5 @@
 """Tests for multiselect fields"""
-from swimlane.core.resources import UserGroup
+from swimlane.core.resources.usergroup import UserGroup
 from swimlane.exceptions import ValidationError
 
 

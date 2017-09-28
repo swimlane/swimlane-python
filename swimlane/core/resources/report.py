@@ -117,7 +117,7 @@ def report_factory(app, report_name, **kwargs):
     """
     # pylint: disable=protected-access
     created = pendulum.now().to_rfc3339_string()
-    user_model = app._swimlane.user.get_usergroup_selection()
+    user_model = app._swimlane.user.as_usergroup_selection()
 
     return Report(
         app,

@@ -42,11 +42,29 @@ class UserGroup(APIResource):
 
         return self.name < other.name
 
-    def get_usergroup_selection(self):
+    def resolve(self):
+        """Retrieve and return correct User or Group instance from UserGroup
+
+        .. versionadded:: 2.16.1
+
+        Returns:
+            User | Group: Resolved User or Group instance
+        """
+        # Skip resolving if not a generic instance
+        if self.__class__ is not UserGroup:
+            return self
+
+        else:
+            try:
+                return self._swimlane.users.get(id=self.id)
+            except ValueError:
+                return self._swimlane.groups.get(id=self.id)
+
+    def as_usergroup_selection(self):
         """Converts UserGroup to raw UserGroupSelection for populating record
 
         Returns:
-            dict: Formatted UserGroup data as used by some fields
+            dict: Formatted UserGroup data as used by selection fields
         """
         return {
             '$type': 'Core.Models.Utilities.UserGroupSelection, Core',
@@ -56,7 +74,7 @@ class UserGroup(APIResource):
 
 
 class Group(UserGroup):
-    """A class for working with Swimlane groups
+    """Swimlane group record
 
     Attributes:
         description (str): Group description
@@ -71,7 +89,7 @@ class Group(UserGroup):
 
 
 class User(UserGroup):
-    """Encapsulates a single Swimlane user record
+    """Swimlane user record
 
     Attributes:
         username (str): Unique username

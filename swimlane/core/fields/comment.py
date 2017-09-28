@@ -13,7 +13,7 @@ class CommentCursor(FieldCursor):
 
         sw_repr = {
             '$type': 'Core.Models.Record.Comments, Core',
-            'createdByUser': self._record._swimlane.user.get_usergroup_selection(),
+            'createdByUser': self._record._swimlane.user.as_usergroup_selection(),
             'createdDate': pendulum.now().to_rfc3339_string(),
             'message': message
         }

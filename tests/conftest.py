@@ -2,8 +2,10 @@ import mock
 import pytest
 
 from swimlane.core.client import SwimlaneAuth, Swimlane
-from swimlane.core.resources import App, Record, User, Group, Report
-
+from swimlane.core.resources.app import App
+from swimlane.core.resources.record import Record
+from swimlane.core.resources.usergroup import User, Group
+from swimlane.core.resources.report import Report
 
 @pytest.fixture
 def mock_swimlane():

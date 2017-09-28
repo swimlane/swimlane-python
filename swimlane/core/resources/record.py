@@ -1,11 +1,11 @@
-
+import copy
 from functools import total_ordering
 
-import copy
 import pendulum
 import six
 
 from swimlane.core.resources.base import APIResource
+from swimlane.core.resources.usergroup import UserGroup
 from swimlane.exceptions import UnknownField, ValidationError
 
 
@@ -52,6 +52,8 @@ class Record(APIResource):
 
             self.created = pendulum.parse(self._raw['createdDate'])
             self.modified = pendulum.parse(self._raw['modifiedDate'])
+
+        self.__allowed = []
 
         self._fields = {}
         self.__premap_fields()
@@ -166,9 +168,9 @@ class Record(APIResource):
     def delete(self):
         """Delete record from Swimlane server
 
-        Resets to new state, but leaves field data as-is
+        .. versionadded:: 2.16.1
 
-        Saving a deleted record will
+        Resets to new state, but leaves field data as-is. Saving a deleted record will create a new Swimlane record
 
         Raises
             ValueError: If record.is_new
@@ -187,6 +189,75 @@ class Record(APIResource):
         raw['isNew'] = True
 
         self.__init__(self._app, raw)
+
+    @property
+    def restrictions(self):
+        """Returns cached set of retrieved UserGroups in the record's list of allowed accounts"""
+        return [UserGroup(self._swimlane, raw) for raw in self._raw['allowed']]
+
+    def add_restriction(self, *usergroups):
+        """Add UserGroup(s) to list of accounts with access to record
+
+        .. versionadded:: 2.16.1
+
+        UserGroups already in the restricted list can be added multiple times and duplicates will be ignored
+
+        Notes:
+            Does not take effect until calling `record.save()`
+
+        Args:
+            *usergroups (UserGroup): 1 or more Swimlane UserGroup(s) to add to restriction list
+
+        Raises:
+            TypeError: If 0 UserGroups provided or provided a non-UserGroup instance
+        """
+        if not usergroups:
+            raise TypeError('Must provide at least one UserGroup for restriction')
+
+        allowed = copy.copy(self._raw.get('allowed', []))
+
+        for usergroup in usergroups:
+            if not isinstance(usergroup, UserGroup):
+                raise TypeError('Expected UserGroup, received `{}` instead'.format(usergroup))
+
+            selection = usergroup.as_usergroup_selection()
+            if selection not in allowed:
+                allowed.append(selection)
+
+        self._raw['allowed'] = allowed
+
+    def remove_restriction(self, *usergroups):
+        """Remove UserGroup(s) from list of accounts with access to record
+
+        .. versionadded: 2.16.1
+
+        Notes:
+            Does not take effect until calling `record.save()`
+
+        Warnings:
+            Providing no UserGroups will clear the restriction list, opening access to ALL accounts
+
+        Args:
+            *usergroups (UserGroup): 0 or more Swimlane UserGroup(s) to remove from restriction list
+
+        Raises:
+            TypeError: If provided a non-UserGroup instance
+            ValueError: If provided UserGroup not in current restriction list
+        """
+        if usergroups:
+            allowed = copy.copy(self._raw.get('allowed', []))
+
+            for usergroup in usergroups:
+                if not isinstance(usergroup, UserGroup):
+                    raise TypeError('Expected UserGroup, received `{}` instead'.format(usergroup))
+                try:
+                    allowed.remove(usergroup.as_usergroup_selection())
+                except ValueError:
+                    raise ValueError('UserGroup `{}` not in record `{}` restriction list'.format(usergroup, self))
+        else:
+            allowed = []
+
+        self._raw['allowed'] = allowed
 
 
 def record_factory(app, fields=None):

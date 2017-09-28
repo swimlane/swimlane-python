@@ -2,7 +2,7 @@ from io import BytesIO
 
 import pendulum
 
-from swimlane.core.resources import APIResource
+from swimlane.core.resources.base import APIResource
 
 
 class Attachment(APIResource):

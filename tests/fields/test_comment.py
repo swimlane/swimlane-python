@@ -4,7 +4,7 @@ import mock
 
 from swimlane.core.fields.comment import CommentCursor
 from swimlane.core.resources.comment import Comment
-from swimlane.core.resources import UserGroup
+from swimlane.core.resources.usergroup import UserGroup
 
 
 def test_comment_field(mock_record, mock_swimlane):

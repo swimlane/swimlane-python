@@ -2,7 +2,8 @@ import mock
 import pytest
 
 from swimlane.core.fields.reference import ReferenceCursor
-from swimlane.core.resources import Record, App
+from swimlane.core.resources.record import Record
+from swimlane.core.resources.app import App
 from swimlane.exceptions import ValidationError, SwimlaneHTTP400Error
 
 

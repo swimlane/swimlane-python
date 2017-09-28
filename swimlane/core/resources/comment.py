@@ -1,6 +1,7 @@
 import pendulum
 
-from swimlane.core.resources import APIResource, UserGroup
+from swimlane.core.resources.base import APIResource
+from swimlane.core.resources.usergroup import UserGroup
 
 
 class Comment(APIResource):

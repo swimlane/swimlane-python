@@ -1,5 +1,5 @@
 from swimlane.core.resolver import SwimlaneResolver
-from swimlane.core.resources import App
+from swimlane.core.resources.app import App
 from swimlane.utils import one_of_keyword_only
 
 

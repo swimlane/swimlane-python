@@ -11,7 +11,7 @@ from six.moves.urllib.parse import urljoin
 
 from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter, HelperAdapter
 from swimlane.core.resolver import SwimlaneResolver
-from swimlane.core.resources import User
+from swimlane.core.resources.usergroup import User
 from swimlane.exceptions import SwimlaneHTTP400Error, InvalidServerVersion
 from swimlane.utils.version import get_package_version, compare_versions
 

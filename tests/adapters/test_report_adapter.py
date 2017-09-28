@@ -1,6 +1,6 @@
 import mock
 
-from swimlane.core.resources import Report
+from swimlane.core.resources.report import Report
 
 raw_report = {'$type': 'Core.Models.Search.Report, Core',
               'aggregates': [],

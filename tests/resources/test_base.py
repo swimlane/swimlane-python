@@ -1,6 +1,6 @@
 import pytest
 
-from swimlane.core.resources import User
+from swimlane.core.resources.usergroup import User
 
 
 def test_repr(mock_user):

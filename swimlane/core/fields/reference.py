@@ -4,7 +4,7 @@ import six
 from sortedcontainers import SortedDict
 
 from swimlane.core.fields.base import CursorField, FieldCursor
-from swimlane.core.resources import Record
+from swimlane.core.resources.record import Record
 from swimlane.exceptions import ValidationError, SwimlaneHTTP400Error
 
 logger = logging.getLogger(__name__)

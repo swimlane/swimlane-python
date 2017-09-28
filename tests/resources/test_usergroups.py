@@ -4,13 +4,13 @@ import pytest
 class TestUserGroups(object):
 
     def test_get_usergroup_selection(self, mock_user, mock_group):
-        assert mock_user.get_usergroup_selection() == {
+        assert mock_user.as_usergroup_selection() == {
             '$type': 'Core.Models.Utilities.UserGroupSelection, Core',
             'id': '58de1d1c07637a0264c0ca6a',
             'name': 'admin'
         }
 
-        assert mock_group.get_usergroup_selection() == {
+        assert mock_group.as_usergroup_selection() == {
             '$type': 'Core.Models.Utilities.UserGroupSelection, Core',
             'id': '58de1d1c07637a0264c0ca71',
             'name': 'Everyone'

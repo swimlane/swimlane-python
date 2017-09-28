@@ -2,7 +2,7 @@ from six.moves.urllib.parse import quote_plus
 
 from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.resolver import SwimlaneResolver
-from swimlane.core.resources import Group, User
+from swimlane.core.resources.usergroup import Group, User
 from swimlane.utils import one_of_keyword_only
 
 

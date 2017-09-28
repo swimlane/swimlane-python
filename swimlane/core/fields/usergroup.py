@@ -28,6 +28,6 @@ class UserGroupField(MultiSelectField):
     def cast_to_swimlane(self, value):
         """Dump UserGroup back to JSON representation"""
         if value is not None:
-            value = value.get_usergroup_selection()
+            value = value.as_usergroup_selection()
 
         return value
