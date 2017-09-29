@@ -79,6 +79,13 @@ class MultiSelectField(CursorField):
         self._value = value
         self._cursor = None
 
+    def set_python(self, value):
+        """Override to remove key from raw data when empty to work with server 2.16+ validation"""
+        super(MultiSelectField, self).set_python(value)
+
+        if self.is_multiselect and not self._value:
+            self.record._raw['values'].pop(self.id, None)
+
     def set_swimlane(self, value):
         if self.is_multiselect:
             value = value or []
