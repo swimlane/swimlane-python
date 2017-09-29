@@ -47,8 +47,8 @@ class ValuesListField(MultiSelectField):
             'value': value
         }
 
-    def get_for_report(self):
-        swimlane_value = super(ValuesListField, self).get_for_report()
+    def cast_to_report(self, value):
+        swimlane_value = super(ValuesListField, self).cast_to_report(value)
 
         if self.is_multiselect:
             return [r['id'] for r in swimlane_value]
