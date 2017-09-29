@@ -2,6 +2,7 @@ import pendulum
 
 from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.resources.base import APIResource
+from swimlane.core.resources.record import record_factory
 from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ, LT, GT, LTE, GTE
 
 
@@ -98,10 +99,14 @@ class Report(APIResource, PaginatedCursor):
         if operand not in self._FILTER_OPERANDS:
             raise ValueError('Operand must be one of {}'.format(', '.join(self._FILTER_OPERANDS)))
 
+        # Use temp Record instance for target app to translate values into expected API format
+        record_stub = record_factory(self._app, {field_name: value})
+        field = record_stub.get_field(field_name)
+
         self._raw['filters'].append({
-            "fieldId": self._app.get_field_definition_by_name(field_name)['id'],
+            "fieldId": field.id,
             "filterType": operand,
-            "value": value
+            "value": field.get_for_report()
         })
 
 
