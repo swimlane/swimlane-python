@@ -50,9 +50,17 @@ class Field(SwimlaneResolver):
         """Return best swimlane representation of field value"""
         return self.cast_to_swimlane(self._get())
 
-    def get_report(self):
-        """Return representation for report value, defaults to standard swimlane representation"""
-        return self.cast_to_report(self._get())
+    def get_report(self, value):
+        if self.multiselect:
+            value = value or []
+            children = []
+
+            for child in value:
+                children.append(self.cast_to_report(child))
+
+            return children
+
+        return self.cast_to_report(value)
 
     def cast_to_python(self, value):
         """Called during set_swimlane, should accept a single raw value as provided from API
@@ -69,7 +77,7 @@ class Field(SwimlaneResolver):
         return value
 
     def cast_to_report(self, value):
-        """Cast to report format, defaults to cast_to_swimlane(value)"""
+        """Cast single value to report format, defaults to cast_to_swimlane(value)"""
         return self.cast_to_swimlane(value)
 
     def validate_value(self, value):

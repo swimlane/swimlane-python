@@ -164,5 +164,5 @@ class ReferenceField(CursorField):
             except IndexError:
                 return None
 
-    def get_report(self):
-        return self.get_swimlane()
+    def cast_to_report(self, value):
+        return value.id

@@ -56,18 +56,6 @@ class MultiSelectField(CursorField):
 
         return super(MultiSelectField, self).get_swimlane()
 
-    def get_report(self):
-        if self.multiselect:
-            value = self._get()
-            children = []
-
-            for child in value:
-                children.append(self.cast_to_report(child))
-
-            return children
-
-        return super(MultiSelectField, self).get_report()
-
     def _set(self, value):
         """Expect single instance of supported_types or iterable of instances of supported_types when multi-select"""
         if self.multiselect:
