@@ -35,22 +35,28 @@ Search Records
 Searching is done using the :obj:`app.records` adapter, and uses temporary :class:`~swimlane.core.resources.report.Report`
 instances to handle paginated search results and record retrieval on-demand.
 
-Search is done by providing multiple tuples that are applied as filters and AND'ed together on the underlying report.
-
-.. note::
-
-    Reports are normally iterated and paginated over in batches. Using the :obj:`app.records.search` method loads all
-    report results into a list before returning, which can be a heavy operation.
-
-    A default limit is placed on reports to prevent this from happening accidentally, use the :obj:`limit` parameter to
-    override the default limit on a search.
+Filters can be applied using tuples of `(<field_name>, <filter_operator>, <field_value>)` that will be AND'ed together
+on the report.
 
 .. code-block:: python
 
     records = app.records.search(
-        ('Field Name', 'equals', 'value'),
-        ('Other Field', 'doesNotEqual', 'value'),
-        limit=20
+        ('Text Field', 'equals', 'value'),
+        ('Date Field', 'lessThan', pendulum.now()),
+        ('Values List (Multi-Select)', 'equals', ['Option 1', 'Option 2'])
+        ('Reference (Single-Select)', 'equals', target_record)
+    )
+
+Keyword-searches can be performed by providing a `keywords` list parameter. All records with fields matching the
+provided keywords will be returned
+
+.. code-block:: python
+
+    records = app.records.search(
+        keywords=[
+            'target',
+            'keywords'
+        ]
     )
 
 Available operators are just strings as shown above, but are made available as constants in the
@@ -63,8 +69,55 @@ Available operators are just strings as shown above, but are made available as c
     records = app.records.search(
         ('Text Field', EQ, 'equal value'),
         ('Number Field', GTE, 0),
-        ...
     )
+
+.. warning::
+
+    Report results are retrieved during on-demand during iteration, requesting record data from the API before each loop
+    to improve performance and reduce memory footprint.
+
+    Using :obj:`app.records.search` loads all records into a list before returning, which can be an expensive
+    operation, especially with many results.
+
+    A default limit of 50 records is placed on all reports for performance, use the :obj:`limit` parameter to
+    override the default limit on a search, a limit of `0` retrieves all search results.
+
+    .. code-block:: python
+
+        # retrieve all results
+        records = app.records.search(
+            ('Text Field', 'equals', 'value'),
+            ...
+            limit=0
+        )
+
+To operate on large search results as records are returned from API or retrieve only partial results
+:class:`~swimlane.core.resources.report.Report` should be used instead.
+
+.. code-block:: python
+
+    report = app.reports.build('report-name', limit=0)
+
+    # Apply report filters
+    # These work like search filters, but must be applied one-by-one and are NOT tuples like in app.records.search()
+    report.filter('Text Field', 'equals', 'value')
+    report.filter('Numeric Field', 'equals', 0)
+
+    # Each record is retrieved from the API on-demand before each iteration
+    for record in report:
+
+        # Do something with each retrieved record
+        record['Test Field'] = 'modified'
+
+        if some_condition:
+            # No additional records will be retrieved from report after breaking out of loop
+            break
+
+    # Report results are cached after first iteration, will not make additional requests or retrieve any skipped results
+    # Any modifications to records from report are maintained
+    for record in report:
+        assert record['Test Field'] == 'modified'
+
 
 
 Create New Record

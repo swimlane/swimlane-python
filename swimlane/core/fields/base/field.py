@@ -51,6 +51,7 @@ class Field(SwimlaneResolver):
         return self.cast_to_swimlane(self._get())
 
     def get_report(self, value):
+        """Return provided field Python value formatted for use in report filter"""
         if self.multiselect:
             value = value or []
             children = []
