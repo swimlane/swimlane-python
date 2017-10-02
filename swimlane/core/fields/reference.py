@@ -105,6 +105,12 @@ class ReferenceField(CursorField):
 
     def set_swimlane(self, value):
         """Store record ids in separate location for later use, but ignore initial value"""
+
+        # Move single record into list to be handled the same by cursor class
+        if not self.multiselect:
+            if value and not isinstance(value, list):
+                value = [value]
+
         # Values come in as a list of record ids or None
         value = value or []
 
@@ -117,6 +123,10 @@ class ReferenceField(CursorField):
 
     def set_python(self, value):
         """Expect list of record instances, convert to a SortedDict for internal representation"""
+        if not self.multiselect:
+            if value and not isinstance(value, list):
+                value = [value]
+
         value = value or []
 
         records = SortedDict()
@@ -129,4 +139,27 @@ class ReferenceField(CursorField):
 
     def get_swimlane(self):
         """Return list of record ids"""
-        return list(super(ReferenceField, self).get_swimlane().keys())
+        value = super(ReferenceField, self).get_swimlane()
+
+        ids = list(value.keys())
+
+        if self.multiselect:
+            return ids
+        else:
+            try:
+                return ids[0]
+            except IndexError:
+                return None
+
+    def get_python(self):
+        """Return cursor if multi-select, direct value if single-select"""
+        cursor = super(ReferenceField, self).get_python()
+
+        if self.multiselect:
+            return cursor
+
+        else:
+            try:
+                return cursor[0]
+            except IndexError:
+                return None

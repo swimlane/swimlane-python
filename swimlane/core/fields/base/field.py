@@ -28,6 +28,7 @@ class Field(SwimlaneResolver):
         self.input_type = self.field_definition.get('inputType')
         self.required = self.field_definition.get('required', False)
         self.readonly = bool(self.field_definition.get('formula', self.field_definition.get('readOnly', False)))
+        self.multiselect = self.field_definition.get('selectionType', 'single') == 'multi'
 
     def __repr__(self):
         return '<{class_name}: {py!r}>'.format(class_name=self.__class__.__name__, py=self.get_python())
