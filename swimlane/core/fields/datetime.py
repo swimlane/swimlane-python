@@ -85,10 +85,8 @@ class DatetimeField(Field):
         """Format datetime as expected by Swimlane API"""
         return pendulum.timezone('UTC').convert(target_datetime).strftime(cls.datetime_format)
 
-    def get_swimlane(self):
+    def cast_to_swimlane(self, value):
         """Return datetimes formatted as expected by API and timespans as millisecond epochs"""
-        value = super(DatetimeField, self).get_swimlane()
-
         if value is None:
             return value
 

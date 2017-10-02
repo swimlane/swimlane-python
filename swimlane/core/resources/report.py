@@ -102,11 +102,12 @@ class Report(APIResource, PaginatedCursor):
         # Use temp Record instance for target app to translate values into expected API format
         record_stub = record_factory(self._app)
         field = record_stub.get_field(field_name)
+        field.set_python(value)
 
         self._raw['filters'].append({
             "fieldId": field.id,
             "filterType": operand,
-            "value": field.cast_to_report(value)
+            "value": field.get_report()
         })
 
 

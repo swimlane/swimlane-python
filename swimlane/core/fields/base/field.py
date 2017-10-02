@@ -57,8 +57,12 @@ class Field(SwimlaneResolver):
         """Return best swimlane representation of field value"""
         return self.cast_to_swimlane(self._get())
 
+    def get_report(self):
+        """Return representation for report value, defaults to standard swimlane representation"""
+        return self.cast_to_report(self._get())
+
     def cast_to_report(self, value):
-        """Return representation for report value, defaults to cast_to_swimlane(value)"""
+        """Cast to report format, defaults to cast_to_swimlane(value)"""
         return self.cast_to_swimlane(value)
 
     def validate_value(self, value):
