@@ -163,3 +163,6 @@ class ReferenceField(CursorField):
                 return cursor[0]
             except IndexError:
                 return None
+
+    def get_report(self):
+        return self.get_swimlane()

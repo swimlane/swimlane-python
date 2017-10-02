@@ -46,13 +46,6 @@ class Field(SwimlaneResolver):
         """Return best python representation of field value"""
         return self._get()
 
-    def cast_to_swimlane(self, value):
-        """Called during get_swimlane, should accept a python value and return swimlane representation
-        
-        Defaults to no-op
-        """
-        return value
-
     def get_swimlane(self):
         """Return best swimlane representation of field value"""
         return self.cast_to_swimlane(self._get())
@@ -60,6 +53,20 @@ class Field(SwimlaneResolver):
     def get_report(self):
         """Return representation for report value, defaults to standard swimlane representation"""
         return self.cast_to_report(self._get())
+
+    def cast_to_python(self, value):
+        """Called during set_swimlane, should accept a single raw value as provided from API
+
+        Defaults to no-op
+        """
+        return value
+
+    def cast_to_swimlane(self, value):
+        """Called during get_swimlane, should accept a python value and return swimlane representation
+
+        Defaults to no-op
+        """
+        return value
 
     def cast_to_report(self, value):
         """Cast to report format, defaults to cast_to_swimlane(value)"""
@@ -91,13 +98,6 @@ class Field(SwimlaneResolver):
         self.record._raw['values'][self.id] = self.get_swimlane()
 
         return return_value
-
-    def cast_to_python(self, value):
-        """Called during set_swimlane, should accept a single raw value as provided from API
-        
-        Defaults to no-op
-        """
-        return value
 
     def set_swimlane(self, value):
         """Set field internal value from the swimlane representation of field value"""
