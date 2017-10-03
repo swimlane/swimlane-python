@@ -1,10 +1,11 @@
-"""Creates a dist/swimlane-python-offline-installer.zip self-extracting driver installer"""
+"""Creates dist/swimlane-python-offline-installer-win_amd64-<py_version>.zip offline driver installer for windows"""
 
 import os
 import tempfile
 import shutil
 from zipfile import ZipFile
 
+import sys
 from pip import main as pipmain
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -12,6 +13,11 @@ print(ROOT_DIR)
 
 ALL_DEPS_DIR = tempfile.mkdtemp()
 os.chdir(ALL_DEPS_DIR)
+
+
+# Python configs
+PY_VERSION = 'py{}{}'.format(sys.version_info.major, sys.version_info.minor)
+PY_PLATFORM = 'win_amd64'
 
 
 # Collect and build all dependencies
@@ -43,7 +49,7 @@ for f in os.listdir(ALL_DEPS_DIR):
     if pipmain([
         'download',
         '--no-deps',
-        '--platform=win_amd64',
+        '--platform={}'.format(PY_PLATFORM),
         '--only-binary=:all:',
         package
     ]):
@@ -60,7 +66,10 @@ DIST_DIR = os.path.join(ROOT_DIR, '..', 'dist')
 if not os.path.isdir(DIST_DIR):
     os.mkdir(DIST_DIR)
 
-zippath = os.path.join(DIST_DIR, 'swimlane-python-offline-installer.zip')
+zippath = os.path.join(DIST_DIR, 'swimlane-python-offline-installer-{platform}-{py_version}.pyz'.format(
+    platform=PY_PLATFORM,
+    py_version=PY_VERSION
+))
 if os.path.exists(zippath):
     os.remove(zippath)
 
