@@ -55,21 +55,30 @@ Install latest release for platform v2.x::
     pip install "swimlane>=2,<3"
 
 
-Releases
-^^^^^^^^
+Git
+^^^
 
-Manually clone_, checkout, and install specific release::
+Manually clone_, checkout, and install specific branch or release::
 
     git clone https://github.com/swimlane/swimlane-python
     cd swimlane-python
-    git checkout <release>
-    python setup.py install
+    git checkout <branch>
+    pip install .
 
 .. _clone: https://github.com/swimlane/swimlane-python
 
-Alternatively, download directly from `releases page`_, extract archive, and run same install command.
 
-.. _releases page: https://github.com/swimlane/swimlane-python/releases
+Offline Installer
+^^^^^^^^^^^^^^^^^
+
+An installer including bundled dependencies is made available for easy offline installs
+
+Download and run .pyz archive from `Github releases page`_ for the correct platform and python version::
+
+    wget https://github.com/swimlane/swimlane-python/releases/download/<release>/swimlane-python-offline-installer-<platform>-<python>.pyz
+    python ./swimlane-python-offline-installer-<platform>-<python>.pyz
+
+.. _Github releases page: https://github.com/swimlane/swimlane-python/releases
 
 
 Versioning
