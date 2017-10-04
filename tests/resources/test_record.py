@@ -127,3 +127,46 @@ class TestRecord(object):
             assert field_value == mock_record[field_name]
 
         assert num_fields > 0
+
+    def test_add_restriction(self, mock_swimlane, random_mock_user, mock_record):
+        """Test adding usergroup restrictions to a record"""
+
+        with pytest.raises(TypeError):
+            mock_record.add_restriction()
+
+        with pytest.raises(TypeError):
+            mock_record.add_restriction(object())
+
+        assert len(mock_record._raw['allowed']) == 0
+        assert len(mock_record.restrictions) == 0
+
+        mock_record.add_restriction(mock_swimlane.user)
+        assert mock_swimlane.user in mock_record.restrictions
+        assert len(mock_record._raw['allowed']) == 1
+
+        mock_record.add_restriction(mock_swimlane.user)
+        assert len(mock_record.restrictions) == 1
+
+        mock_record.add_restriction(random_mock_user)
+        assert len(mock_record.restrictions) == 2
+
+    def test_remove_restriction(self, mock_swimlane, random_mock_user, mock_record):
+        """Test adding usergroup restrictions to a record"""
+
+        assert len(mock_record.restrictions) == 0
+        mock_record.add_restriction(mock_swimlane.user, random_mock_user)
+
+        with pytest.raises(TypeError):
+            mock_record.remove_restriction(object())
+
+        mock_record.remove_restriction()
+        assert len(mock_record.restrictions) == 0
+
+        with pytest.raises(ValueError):
+            mock_record.remove_restriction(mock_swimlane.user)
+
+        mock_record.add_restriction(mock_swimlane.user, random_mock_user)
+
+        mock_record.remove_restriction(mock_swimlane.user)
+
+        assert random_mock_user in mock_record.restrictions

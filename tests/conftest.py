@@ -1,3 +1,5 @@
+import random
+
 import mock
 import pytest
 
@@ -2455,3 +2457,29 @@ def mock_report(mock_app):
         'permissions': {'$type': 'Core.Models.Security.PermissionMatrix, Core'},
         'sorts': {
             '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[Core.Models.Search.SortTypes, Core]], mscorlib'}})
+
+
+@pytest.fixture
+def random_mock_user(mock_swimlane):
+    idx = random.randint(1, 10000)
+    return User(mock_swimlane, {
+        '$type': 'Core.Models.Identity.ApplicationUser, Core',
+        'active': False,
+        'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
+        'createdDate': '2017-03-31T09:10:52.717Z',
+        'disabled': False,
+        'displayName': 'admin',
+        'groups': [],
+        'id': idx,
+        'name': 'admin{}'.format(idx),
+        'isAdmin': True,
+        'isMe': False,
+        'lastLogin': '2017-04-27T15:45:43.066Z',
+        'lastPasswordChangedDate': '2017-03-31T09:10:52.536Z',
+        'modifiedByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
+        'modifiedDate': '2017-03-31T09:10:52.76Z',
+        'passwordComplexityScore': 3,
+        'passwordHash': 'AQAAAAEAACcQAAAAEESp9LR0jN3qPF2fw5qWdyceYxbeBbawMW5AFt31dA5n3xX16MFJWsU/j82heenFww==',
+        'passwordResetRequired': False,
+        'roles': [],
+        'userName': 'admin'})
