@@ -52,4 +52,6 @@ See the `Docs on RTD`_ for examples and full documentation
 Issues
 ------
 
-Open any bug reports or feature requests through the Swimlane support portal at https://support.swimlane.com/
+Open any bug reports or feature requests through the `Swimlane support portal`_
+
+.. _Swimlane support portal: https://support.swimlane.com/helpdesk/tickets/new
