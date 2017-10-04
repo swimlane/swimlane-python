@@ -103,6 +103,7 @@ class Field(SwimlaneResolver):
 
         return_value = self._set(value)
 
+        # TODO: Move to _set and move validation code into set_python only
         # Set raw value to expected swimlane format once internal set is successful
         self.record._raw['values'][self.id] = self.get_swimlane()
 
