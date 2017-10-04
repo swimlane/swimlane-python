@@ -31,7 +31,7 @@ Install from public repository
     pip install swimlane
 
 
-Download offline installer with bundled dependencies from `releases page`_
+Or use correct offline installer with bundled dependencies from `releases page`_
 
 .. _releases page: https://github.com/swimlane/swimlane-python/releases
 
