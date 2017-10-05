@@ -16,7 +16,7 @@ os.chdir(ALL_DEPS_DIR)
 
 
 # Python configs
-PY_VERSION = 'py{}{}'.format(sys.version_info.major, sys.version_info.minor)
+PY_VERSION = '{}{}'.format(sys.version_info.major, sys.version_info.minor)
 PY_PLATFORM = 'win_amd64'
 
 
@@ -50,6 +50,8 @@ for f in os.listdir(ALL_DEPS_DIR):
         'download',
         '--no-deps',
         '--platform={}'.format(PY_PLATFORM),
+        '--python-version={}'.format(PY_VERSION),
+        '--abi=cp{}m'.format(PY_VERSION),
         '--only-binary=:all:',
         package
     ]):
@@ -66,7 +68,7 @@ DIST_DIR = os.path.join(ROOT_DIR, '..', 'dist')
 if not os.path.isdir(DIST_DIR):
     os.mkdir(DIST_DIR)
 
-zippath = os.path.join(DIST_DIR, 'swimlane-python-offline-installer-{platform}-{py_version}.pyz'.format(
+zippath = os.path.join(DIST_DIR, 'swimlane-python-offline-installer-{platform}-py{py_version}.pyz'.format(
     platform=PY_PLATFORM,
     py_version=PY_VERSION
 ))
