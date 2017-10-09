@@ -3,6 +3,7 @@ from functools import total_ordering
 from swimlane.core.resources.base import APIResource
 
 
+# pylint: disable=abstract-method
 @total_ordering
 class UserGroup(APIResource):
     """Base class for Users and Groups
@@ -87,6 +88,12 @@ class Group(UserGroup):
 
         self.description = self._raw.get('description')
 
+    def get_cache_index_keys(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
 
 class User(UserGroup):
     """Swimlane user record
@@ -105,3 +112,10 @@ class User(UserGroup):
         self.username = self._raw.get('userName')
         self.display_name = self._raw.get('displayName')
         self.email = self._raw.get('email')
+
+    def get_cache_index_keys(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'display_name': self.display_name
+        }

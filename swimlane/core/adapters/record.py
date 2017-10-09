@@ -1,3 +1,4 @@
+from swimlane.core.cache import check_cache
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.report import Report
 from swimlane.core.resources.record import Record, record_factory
@@ -8,9 +9,12 @@ from swimlane.utils.version import requires_swimlane_version
 class RecordAdapter(AppResolver):
     """Handles retrieval and creation of Swimlane Record resources"""
 
+    @check_cache(Record)
     @one_of_keyword_only('id')
     def get(self, _, value):
         """Get a single record by id
+
+        Supports resource cache
 
         Keyword Args:
             id (str): Full record ID

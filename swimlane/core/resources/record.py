@@ -112,6 +112,16 @@ class Record(APIResource):
 
             self._fields[field_instance.name] = field_instance
 
+    def get_cache_index_keys(self):
+        """Return values available for retrieving records, but only for already existing records"""
+        if not self.id or not self.tracking_id:
+            raise NotImplementedError
+
+        return {
+            'id': self.id,
+            'tracking_id': self.tracking_id
+        }
+
     def get_field(self, field_name):
         """Get field instance used to get, set, and serialize internal field value
 
@@ -165,6 +175,9 @@ class Record(APIResource):
         # Reinitialize record with new raw content returned from server to update any calculated fields
         self.__init__(self._app, response.json())
 
+        # Manually cache self after save to keep cache updated with latest data
+        self._swimlane.resources_cache.cache(self)
+
     def delete(self):
         """Delete record from Swimlane server
 
@@ -182,6 +195,8 @@ class Record(APIResource):
             'delete',
             'app/{}/record/{}'.format(self._app.id, self.id)
         )
+
+        del self._swimlane.resources_cache[self]
 
         # Modify current raw values indicating an unsaved record but persisting field data
         raw = copy.deepcopy(self._raw)

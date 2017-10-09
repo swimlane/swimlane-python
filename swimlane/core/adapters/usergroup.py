@@ -1,5 +1,6 @@
 from six.moves.urllib.parse import quote_plus
 
+from swimlane.core.cache import check_cache
 from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.usergroup import Group, User
@@ -39,9 +40,12 @@ class GroupAdapter(SwimlaneResolver):
         """
         return GroupListCursor(self._swimlane, limit=limit)
 
+    @check_cache(Group)
     @one_of_keyword_only('id', 'name')
     def get(self, key, value):
         """Retrieve single group record by id or name
+
+        Supports resource cache
 
         Keyword Args:
             id (str): Full Group ID
@@ -102,6 +106,7 @@ class UserAdapter(SwimlaneResolver):
         """
         return UserListCursor(swimlane=self._swimlane, limit=limit)
 
+    @check_cache(User)
     @one_of_keyword_only('id', 'display_name')
     def get(self, arg, value):
         """Retrieve single user record by id or username
