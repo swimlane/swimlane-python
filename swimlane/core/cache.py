@@ -100,17 +100,24 @@ def check_cache(resource_type):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            adapter = args[0]
-            key, val = kwargs.items()[0]
-            index_key = (resource_type, key, val)
             try:
-                cached_record = adapter._swimlane.resources_cache[index_key]
-            except KeyError:
-                logger.debug('Cache miss: {}'.format(index_key))
-                return func(*args, **kwargs)
+                adapter = args[0]
+                key, val = list(kwargs.items())[0]
+            except IndexError:
+                logger.warning("Couldn't generate full index key, skipping cache")
             else:
-                logger.debug('Cache hit: `{!r}`'.format(cached_record))
-                return cached_record
+
+                index_key = (resource_type, key, val)
+                try:
+                    cached_record = adapter._swimlane.resources_cache[index_key]
+                except KeyError:
+                    logger.debug('Cache miss: {}'.format(index_key))
+                else:
+                    logger.debug('Cache hit: `{!r}`'.format(cached_record))
+                    return cached_record
+
+            # Fallback to default function call
+            return func(*args, **kwargs)
 
         return wrapper
     return decorator
