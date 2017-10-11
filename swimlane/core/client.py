@@ -49,6 +49,7 @@ class Swimlane(object):
             Swimlane instance
         groups (GroupAdapter): :class:`~swimlane.core.adapters.usergroup.GroupAdapter` configured for current
             Swimlane instance
+        resources_cache (ResourcesCache): Cache checked by all supported adapters for current Swimlane instance
 
     Examples:
 

@@ -7,7 +7,7 @@ class APIResourceMetaclass(type):
     """Metaclass for all APIResource classes"""
 
     def __call__(cls, *args, **kwargs):
-        """Hook __init__ call to push resource instance into Swimlane client instance cache after instantiation"""
+        """Hook __init__ call to push resource instance into Swimlane client ResourceCache after instantiation"""
         resource_instance = type.__call__(cls, *args, **kwargs)
 
         resource_instance._swimlane.resources_cache.cache(resource_instance)
@@ -30,6 +30,9 @@ class APIResource(six.with_metaclass(APIResourceMetaclass, SwimlaneResolver)):
 
     def __repr__(self):
         return '<{self.__class__.__name__}: {self!s}>'.format(self=self)
+
+    def __str__(self):
+        return ''
 
     def __ne__(self, other):
         # Default __ne__ for python 2 compat

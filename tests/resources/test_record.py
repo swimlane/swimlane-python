@@ -170,3 +170,12 @@ class TestRecord(object):
         mock_record.remove_restriction(mock_swimlane.user)
 
         assert random_mock_user in mock_record.restrictions
+
+    def test_ignore_caching_when_unsaved(self, mock_record):
+        """Test cache index keys are only returned when record has id, disabling caching when unsaved"""
+
+        assert mock_record.get_cache_index_keys()
+
+        mock_record.id = None
+        with pytest.raises(NotImplementedError):
+            mock_record.get_cache_index_keys()

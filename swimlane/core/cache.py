@@ -1,3 +1,9 @@
+"""Module providing support for automatic APIResource caching
+
+A ResourcesCache instance is provided on all Swimlane client instances automatically
+
+.. versionadded:: 2.16.2
+"""
 import copy
 import functools
 import logging
@@ -16,14 +22,12 @@ class ResourcesCache(object):
 
     Uses separate caches per APIResource type, and provides mapping between available cache keys and real cache
     primary key automatically
-
-    .. versionadded:: 2.16.2
     """
 
     def __init__(self, per_cache_max_size):
         self.__cache_max_size = per_cache_max_size
         self.__caches = defaultdict(self.__cache_factory)
-        self.__cache_key_map = {}
+        self.__cache_index_key_map = {}
 
         if self.__cache_max_size == 0:
             logger.warning('Cache size set to 0, resource caching disabled')
@@ -32,19 +36,27 @@ class ResourcesCache(object):
         """Return sum of all cache sizes"""
         return sum(c.currsize for c in self.__caches.values())
 
+    def __contains__(self, item):
+        """Check if resource is in cache, expects same 3-length tuple key as __getitem__"""
+        index_key = get_cache_index_key(item)
+        cache_key = self.__cache_index_key_map.get(index_key)
+        target_cache = self.__caches[index_key[0]]
+        return cache_key in target_cache
+
     def __getitem__(self, item):
         """Get cached resource, expects item to be 3-length tuple of (resource class, target key, target value)"""
-        cls = item[0]
+        key = get_cache_index_key(item)
+        cls = key[0]
 
         # Check if in any fields index
-        cache_internal_key = self.__cache_key_map[item]
+        cache_internal_key = self.__cache_index_key_map[key]
 
         try:
             # Return copy of cached object
             return copy.copy(self.__caches[cls][cache_internal_key])
         except KeyError:
             # Internal cache miss for target resource, quietly remove from cache key map and let error bubble
-            self.__cache_key_map.pop(item, None)
+            self.__cache_index_key_map.pop(key, None)
             raise
 
     def __delitem__(self, resource):
@@ -57,14 +69,12 @@ class ResourcesCache(object):
 
     def cache(self, resource):
         """Insert a resource instance into appropriate resource cache"""
-        if self.__cache_max_size == 0:
-            # Disable adding any resources to cache
-            return
-
-        resource_type = type(resource)
-
         if not isinstance(resource, APIResource):
-            raise TypeError('Cannot cache type `{}`'.format(resource_type))
+            raise TypeError('Cannot cache `{!r}`, can only cache APIResource instances'.format(resource))
+
+        # Disable inserts to cache when disabled
+        if self.__cache_max_size == 0:
+            return
 
         try:
             cache_internal_key = resource.get_cache_internal_key()
@@ -74,10 +84,12 @@ class ResourcesCache(object):
                 'Not caching `{!r}`, resource did not provide all necessary cache details'.format(resource)
             )
         else:
-            for key, value in cache_index_keys:
-                self.__cache_key_map[(resource_type, key, value)] = cache_internal_key
+            resource_type = type(resource)
 
-            self.__caches[type(resource)][cache_internal_key] = resource
+            for key, value in cache_index_keys:
+                self.__cache_index_key_map[(resource_type, key, value)] = cache_internal_key
+
+            self.__caches[resource_type][cache_internal_key] = resource
 
             logger.debug('Cached `{!r}`'.format(resource))
 
@@ -91,10 +103,37 @@ class ResourcesCache(object):
             del self.__caches[cls]
 
 
+def get_cache_index_key(resource):
+    """Return a usable cache lookup key for an already initialized resource
+
+    Args:
+        resource (APIResource|tuple): APIResource instance or 3-length tuple key returned from this function
+
+    Raises:
+        TypeError: If resource is not an APIResource instance or acceptable 3-length tuple cache key
+    """
+    if isinstance(resource, APIResource):
+        attr, attr_value = list(resource.get_cache_index_keys().items())[0]
+        key = (type(resource), attr, attr_value)
+    else:
+        key = tuple(resource)
+
+    if len(key) != 3:
+        raise TypeError('Cache key must be tuple of (class, key, value), got `{!r}` instead'.format(key))
+
+    if not issubclass(key[0], APIResource):
+        raise TypeError('First value of cache key must be a subclass of APIResource, got `{!r}` instead'.format(key[0]))
+
+    return key
+
+
 def check_cache(resource_type):
     """Decorator for adapter methods to check cache for resource before normally sending requests to retrieve data
 
     Only works with single kwargs, almost always used with @one_of_keyword_only decorator
+
+    Args:
+        resource_type (type(APIResource)): Subclass of APIResource of cache to be checked when called
     """
 
     def decorator(func):
@@ -111,7 +150,7 @@ def check_cache(resource_type):
                 try:
                     cached_record = adapter._swimlane.resources_cache[index_key]
                 except KeyError:
-                    logger.debug('Cache miss: {}'.format(index_key))
+                    logger.debug('Cache miss: `{!r}`'.format(index_key))
                 else:
                     logger.debug('Cache hit: `{!r}`'.format(cached_record))
                     return cached_record

@@ -114,7 +114,7 @@ class Record(APIResource):
 
     def get_cache_index_keys(self):
         """Return values available for retrieving records, but only for already existing records"""
-        if not self.id or not self.tracking_id:
+        if not (self.id and self.tracking_id):
             raise NotImplementedError
 
         return {
