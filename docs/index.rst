@@ -75,8 +75,8 @@ An installer including bundled dependencies is made available for easy offline i
 
 Download and run .pyz archive from `Github releases page`_ for the correct platform and python version::
 
-    wget https://github.com/swimlane/swimlane-python/releases/download/<release>/swimlane-python-offline-installer-<platform>-<python>.pyz
-    python ./swimlane-python-offline-installer-<platform>-<python>.pyz
+    wget https://github.com/swimlane/swimlane-python/releases/download/<release>/swimlane-python-<version>-offline-installer-<platform>-<python>.pyz
+    python ./swimlane-python-<version>-offline-installer-<platform>-<python>.pyz
 
 .. _Github releases page: https://github.com/swimlane/swimlane-python/releases
 
