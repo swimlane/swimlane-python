@@ -53,7 +53,7 @@ class Revision(APIResource):
 
         # Avoid circular imports
         from swimlane.core.resources.record import Record
-        self.version = Record(self.record._app, self._raw['version'])
+        self.version = Record(self.record.app, self._raw['version'])
 
     def __str__(self):
         return '{} ({})'.format(self.version, self.revision_number)

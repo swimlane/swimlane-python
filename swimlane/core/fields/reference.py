@@ -83,14 +83,14 @@ class ReferenceField(CursorField):
 
             super(ReferenceField, self).validate_value(value)
 
-            if value._app != self.target_app:
+            if value.app != self.target_app:
                 raise ValidationError(
                     self.record,
                     "Reference field '{}' has target app '{}', cannot reference record '{}' from app '{}'".format(
                         self.name,
                         self.target_app,
                         value,
-                        value._app
+                        value.app
                     )
                 )
 

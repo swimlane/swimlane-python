@@ -23,7 +23,7 @@ class Field(SwimlaneResolver):
         self.__record_ref = weakref.ref(record)
         self._value = self._unset
 
-        self.field_definition = self.record._app.get_field_definition_by_name(self.name)
+        self.field_definition = self.record.app.get_field_definition_by_name(self.name)
         self.id = self.field_definition['id']
         self.input_type = self.field_definition.get('inputType')
         self.required = self.field_definition.get('required', False)
