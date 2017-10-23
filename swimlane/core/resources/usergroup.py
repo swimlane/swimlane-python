@@ -81,6 +81,7 @@ class Group(UserGroup):
 
     Attributes:
         description (str): Group description
+        users (list): List of users belonging to group.
     """
 
     _type = 'Core.Models.Groups.Group, Core'
