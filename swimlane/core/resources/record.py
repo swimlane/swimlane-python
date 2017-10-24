@@ -47,7 +47,7 @@ class Record(APIResource):
             # Combine app acronym + trackingId instead of using trackingFull raw
             # for guaranteed value (not available through report results)
             self.tracking_id = '-'.join([
-                self.__app.acronym,
+                self.app.acronym,
                 str(int(self._raw['trackingId']))
             ])
 
@@ -65,7 +65,7 @@ class Record(APIResource):
 
     def __str__(self):
         if self.is_new:
-            return '{} - New'.format(self.__app.acronym)
+            return '{} - New'.format(self.app.acronym)
 
         return str(self.tracking_id)
 
@@ -83,7 +83,7 @@ class Record(APIResource):
             yield field_name, field.get_python()
 
     def __hash__(self):
-        return hash((self.id, self.__app))
+        return hash((self.id, self.app))
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and hash(self) == hash(other)
@@ -98,7 +98,7 @@ class Record(APIResource):
         tracking_number_self = int(self.tracking_id.split('-')[1])
         tracking_number_other = int(other.tracking_id.split('-')[1])
 
-        return (self.__app.name, tracking_number_self) < (other.app.name, tracking_number_other)
+        return (self.app.name, tracking_number_self) < (other.app.name, tracking_number_other)
 
     def __premap_fields(self):
         """Build field instances using field definitions in app manifest
@@ -108,7 +108,7 @@ class Record(APIResource):
         # Circular imports
         from swimlane.core.fields import resolve_field_class
 
-        for field_definition in self.__app._raw['fields']:
+        for field_definition in self.app._raw['fields']:
             field_class = resolve_field_class(field_definition)
 
             field_instance = field_class(field_definition['name'], self)
@@ -139,7 +139,7 @@ class Record(APIResource):
         try:
             return self._fields[field_name]
         except KeyError:
-            raise UnknownField(self.__app, field_name, self._fields.keys())
+            raise UnknownField(self.app, field_name, self._fields.keys())
 
     def validate(self):
         """Explicitly validate field data
@@ -173,12 +173,12 @@ class Record(APIResource):
 
         response = self._swimlane.request(
             method,
-            'app/{}/record'.format(self.__app.id),
+            'app/{}/record'.format(self.app.id),
             json=self._raw
         )
 
         # Reinitialize record with new raw content returned from server to update any calculated fields
-        self.__init__(self.__app, response.json())
+        self.__init__(self.app, response.json())
 
         # Manually cache self after save to keep cache updated with latest data
         self._swimlane.resources_cache.cache(self)
@@ -198,7 +198,7 @@ class Record(APIResource):
 
         self._swimlane.request(
             'delete',
-            'app/{}/record/{}'.format(self.__app.id, self.id)
+            'app/{}/record/{}'.format(self.app.id, self.id)
         )
 
         del self._swimlane.resources_cache[self]
@@ -208,7 +208,7 @@ class Record(APIResource):
         raw['id'] = None
         raw['isNew'] = True
 
-        self.__init__(self.__app, raw)
+        self.__init__(self.app, raw)
 
     @property
     def restrictions(self):
