@@ -81,7 +81,7 @@ class Group(UserGroup):
 
     Attributes:
         description (str): Group description
-        users (list): List of users belonging to group.
+
     """
 
     _type = 'Core.Models.Groups.Group, Core'
@@ -94,6 +94,10 @@ class Group(UserGroup):
 
     @property
     def users(self):
+        """Returns a GroupUsersCursor with list of User instances for this Group
+
+        .. versionadded:: 2.16.2
+        """
         if self.__users is None:
             self.__users = GroupUsersCursor(swimlane=self._swimlane, user_ids=self.__user_ids)
         return self.__users
