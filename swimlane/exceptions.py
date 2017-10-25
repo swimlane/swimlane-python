@@ -116,6 +116,8 @@ class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
         5008: 'ModelValidationError',
         5009: 'UpgradeInProcess',
         5010: 'RequiredFieldMissing',
+        5011: 'UnableToRetrieveEncryptionKey',
+        5012: 'PathNotFound',
         6000: 'ConnectionDataNotProvided',
         7000: 'RegexNotDefined',
         7001: 'AssetNotFound',
