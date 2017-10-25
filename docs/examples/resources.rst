@@ -313,9 +313,9 @@ UserGroup
 Handling Users, Groups, and UserGroups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The :class:`~swimlane.core.resources.usergroup.Users` and :class:`~swimlane.core.resources.usergroup.Groups` both extend
-from the base :class:`~swimlane.core.resources.usergroup.UserGroup` class. Most values returned from the server are of
-the base UserGroup type, but can be replaced or set by the more specific classes.
+The :class:`~swimlane.core.resources.usergroup.User` and :class:`~swimlane.core.resources.usergroup.Group` classes both
+extend from the base :class:`~swimlane.core.resources.usergroup.UserGroup` class. Most values returned from the server
+are of the base UserGroup type, but can be replaced or set by the more specific classes.
 
 .. code-block:: python
 
@@ -338,12 +338,16 @@ automatically to avoid additional requests where the base UserGroup is sufficien
 .. code-block:: python
 
     # Resolve to actual User instance
+    assert type(record['User']) is UserGroup
     user = record['User'].resolve()
+    assert type(user) is User
 
     # Resolve to actual Group instance
+    assert type(record['Group']) is UserGroup
     group = record['Group'].resolve()
+    assert type(group) is Group
 
-    # Calling .resolve() again on resolved instances returns the same instance immediately
+    # Calling .resolve() on already resolved instances returns the same instance immediately
     assert user is user.resolve()
     assert group is group.resolve()
 
