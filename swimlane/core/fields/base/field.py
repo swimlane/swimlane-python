@@ -83,6 +83,8 @@ class Field(SwimlaneResolver):
 
     def validate_value(self, value):
         """Validate value is an acceptable type during _set operation"""
+        if self.readonly:
+            raise ValidationError(self.record, "Cannot set readonly field '{}'".format(self.name))
         if value not in (None, self._unset):
             if self.supported_types and not isinstance(value, tuple(self.supported_types)):
                 raise ValidationError(self.record, "Field '{}' expects one of {}, got '{}' instead".format(
@@ -93,21 +95,13 @@ class Field(SwimlaneResolver):
 
     def _set(self, value):
         """Default setter used for both representations unless overridden"""
-        self.validate_value(value)
         self._value = value
 
     def set_python(self, value):
         """Set field internal value from the python representation of field value"""
-        if self.readonly:
-            raise ValidationError(self.record, "Cannot set readonly field '{}'".format(self.name))
-
-        return_value = self._set(value)
-
-        # TODO: Move to _set and move validation code into set_python only
-        # Set raw value to expected swimlane format once internal set is successful
+        self.validate_value(value)
+        self._set(value)
         self.record._raw['values'][self.id] = self.get_swimlane()
-
-        return return_value
 
     def set_swimlane(self, value):
         """Set field internal value from the swimlane representation of field value"""
