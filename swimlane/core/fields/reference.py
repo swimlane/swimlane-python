@@ -119,7 +119,7 @@ class ReferenceField(CursorField):
         for record_id in value:
             records[record_id] = self._unset
 
-        return super(ReferenceField, self).set_swimlane(records)
+        return self._set(records)
 
     def set_python(self, value):
         """Expect list of record instances, convert to a SortedDict for internal representation"""
@@ -135,7 +135,7 @@ class ReferenceField(CursorField):
             self.validate_value(record)
             records[record.id] = record
 
-        return super(ReferenceField, self).set_python(records)
+        self._set(value)
 
     def get_swimlane(self):
         """Return list of record ids"""
