@@ -1,7 +1,7 @@
 """Base classes used to build field abstractions"""
 from .cursor import CursorField, FieldCursor
 from .field import Field
-from .multiselect import MultiSelectField
+from .multiselect import MultiSelectField, MultiSelectCursor
 
 
 class ReadOnly(Field):

@@ -1,7 +1,3 @@
-"""Tests for multiselect fields"""
-from swimlane.core.resources import UserGroup
-from swimlane.exceptions import ValidationError
-
 
 def test_values_list_single_select_field(mock_record):
     """Test a ValuesList field in single-select mode"""
@@ -85,54 +81,11 @@ def test_cursor_repr(mock_record):
     assert repr(mock_record['Values List']) == '<MultiSelectCursor: RA-7 (2)>'
 
 
-def test_usergroup_single_field(mock_record, mock_group, mock_user):
-    """Test single-select UserGroupField"""
+def test_get_report(mock_record):
+    """Test behavior of values list get_report()"""
+    field = mock_record.get_field('Values List')
 
-    # Get usergroup from UserGroupField
-    usergroup = mock_record['Incident Owner']
-
-    assert isinstance(usergroup, UserGroup)
-    assert usergroup.id == '58de1d1c07637a0264c0ca71'
-    assert usergroup.name == 'Everyone'
-
-    # UserGroup comparisons with specific User/Group instances
-    assert usergroup == mock_group
-
-    # Set User, Group, or UserGroup
-    mock_record['Incident Owner'] = mock_user
-    assert mock_record['Incident Owner'] == mock_user
-
-    try:
-        mock_record['Incident Owner'] = 'Everyone'
-    except ValidationError:
-        pass
-    else:
-        raise RuntimeError
-
-    assert mock_record['Incident Owner'] == mock_user
-
-
-def test_usergroup_multi_field(mock_record, mock_group, mock_user):
-    """Test multi-select UserGroupField"""
-
-    field_name = 'User/Groups'
-
-    orig_value = mock_record[field_name]
-
-    mock_record[field_name] = [mock_group, mock_user]
-
-    assert list(mock_record[field_name]) == [mock_group, mock_user]
-
-    mock_record[field_name] = orig_value
-
-
-def test_usergroup_from_report(mock_record):
-    """Test workaround for extraneous data returned from report without any selected users/groups on a multiselect field"""
-
-    field_name = 'User/Groups'
-
-    field = mock_record._fields[field_name]
-
-    field.set_swimlane([{'$type': 'Core.Models.Utilities.UserGroupSelection, Core'}])
-
-    assert list(mock_record[field_name]) == []
+    assert field.get_report(field.get_python()) == [
+        '58fae4c59173122945a7cff6',
+        '58fae4eafef0eead26dee65c'
+    ]

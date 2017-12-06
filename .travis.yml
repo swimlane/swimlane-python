@@ -11,8 +11,18 @@ install:
 - pip install codacy-coverage
 script: py.test -v --cov=swimlane --cov-report=xml
 after_script: python-codacy-coverage -r coverage.xml
+before_deploy: python offline_installer/build_installer.py
 deploy:
-  provider: pypi
+- provider: releases
+  api_key:
+    secure: cJWvvnIxF67OgjUfpahgLbsQC/XEjgwkX1Ohb32FY9rhKEJcqjU46+31N9vGKkPMFi42K0/lrfuM6w9oCiM4IyOM3y8AGro5XoMwyIMBvglyS0HHPF5gVNu+WLj4M2Zx47MechgHcAxqw8NMYMqxIIx5vBzHabWnMt2Z16Q9r4olcwBxzLqJHowchACU9XIY9EH+i3OonDRdyUScAQq1aw4BJfkdZKy3KUl3H2/yyRlJmhLHJ6/XaypWrdPCprs65Rtfw20M7bDa2+EJLq3GkzBYflWvW2qYYcJoZZUD3YnqApEgxkPtaYF+Wt6sjENiqHEyrOxA0OVapbLskm8aN66lFRr/n/7WeJaPPaN39Qs2ToVBH5AYLiq2id+/9sq0tM35XolM7bFrIB8tad2u/0+uWnt7E+g/26b0KFLRX0ReZGBL+zHYTM2AGlkpUZpKlaGlUd7HNbdTUjBnQYMeGA/O/QJ0ExPRjRjdDw/VZrW6zk83ynqAg5qmpNV/tG/oTj4h/e7yfMvJpDuFZ8DkVs9RRdnY462AOToby6oooM+b012fY9UykMgfcEXeq4YNiUnvdsmNXFGyv0s+/VvIZdcl6QGNV8dy//qLUdhQ3s59AI4Q4YxH318pkoQDEl7kxbSvcf5dkE7W29/6SUulPc4+2hK5cmQcddPASsHmrNY=
+  file_glob: true
+  file: dist/*offline-installer*
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: swimlane/swimlane-python
+- provider: pypi
   user: swimlane
   distributions: sdist bdist_wheel
   password:

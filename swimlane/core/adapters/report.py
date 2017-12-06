@@ -1,8 +1,7 @@
 import weakref
 
 from swimlane.core.resolver import SwimlaneResolver
-from swimlane.core.resources import Report
-from swimlane.core.resources.report import report_factory
+from swimlane.core.resources.report import Report, report_factory
 
 
 class ReportAdapter(SwimlaneResolver):

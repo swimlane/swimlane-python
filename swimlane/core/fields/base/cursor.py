@@ -53,11 +53,15 @@ class CursorField(Field):
         """Return initial elements to be passed with cursor instantiation"""
         return self._get()
 
-    def get_python(self):
-        """Create, cache, and return the appropriate cursor instance"""
+    @property
+    def cursor(self):
+        """Cache and return cursor_class instance"""
         if self._cursor is None:
             # pylint: disable=not-callable
             self._cursor = self.cursor_class(self, self.get_initial_elements())
 
         return self._cursor
 
+    def get_python(self):
+        """Create, cache, and return the appropriate cursor instance"""
+        return self.cursor

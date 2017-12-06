@@ -24,10 +24,20 @@ Python driver for the Swimlane_ API
 Installation
 ------------
 
+Install from public repository
+
 ::
 
     pip install swimlane
 
+
+Or use correct offline installer with bundled dependencies from `releases page`_
+
+.. _releases page: https://github.com/swimlane/swimlane-python/releases
+
+::
+
+    python swimlane-python-offline-installer-<platform>-<python_version>.pyz
 
 
 Documentation
@@ -42,4 +52,6 @@ See the `Docs on RTD`_ for examples and full documentation
 Issues
 ------
 
-Open any bug reports or feature requests through the Swimlane support portal at https://support.swimlane.com/
+Open any bug reports or feature requests through the `Swimlane support portal`_
+
+.. _Swimlane support portal: https://support.swimlane.com/helpdesk/tickets/new

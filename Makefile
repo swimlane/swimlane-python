@@ -1,4 +1,4 @@
-.PHONY: local test docs release
+.PHONY: local test docs release build-offline-installer
 
 local:
 	pip install -e .
@@ -12,3 +12,6 @@ docs:
 
 release:
 	python setup.py sdist bdist_wheel upload -r swimlane
+
+build-offline-installer:
+	python2.7 offline_installer/build_installer.py

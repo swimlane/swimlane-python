@@ -46,30 +46,49 @@ Pip
 
 Recommended installation method is to install via `pip`.
 
-Install latest release::
+Install/upgrade to latest release::
 
-    pip install swimlane
+    pip install -U swimlane
 
-Install latest release for platform v2.x::
+Install/upgrade to latest release for platform v2.x::
 
-    pip install "swimlane>=2,<3"
+    pip install -U "swimlane>=2,<3"
 
 
-Releases
-^^^^^^^^
+Offline Installer
+^^^^^^^^^^^^^^^^^
 
-Manually clone_, checkout, and install specific release::
+An installer including bundled dependencies is made available for easy offline installs
+
+Download and run .pyz self-extracting archive from `Github releases page`_ for the correct platform and python version::
+
+    wget https://github.com/swimlane/swimlane-python/releases/download/<release>/swimlane-python-<version>-offline-installer-<platform>-<python>.pyz
+    python ./swimlane-python-<version>-offline-installer-<platform>-<python>.pyz
+
+.. _Github releases page: https://github.com/swimlane/swimlane-python/releases
+
+.. note::
+
+    Offline installer requires pip v9+, installation will fail when attempting to use an earlier version. Verify pip
+    version with `pip -V`.
+
+
+Git
+^^^
+
+Manually clone from `Github repository`_, checkout, and install specific branch or release::
 
     git clone https://github.com/swimlane/swimlane-python
     cd swimlane-python
-    git checkout <release>
-    python setup.py install
+    git checkout <branch>
+    pip install .
 
-.. _clone: https://github.com/swimlane/swimlane-python
+.. _Github repository: https://github.com/swimlane/swimlane-python
 
-Alternatively, download directly from `releases page`_, extract archive, and run same install command.
+.. note::
 
-.. _releases page: https://github.com/swimlane/swimlane-python/releases
+    Installing via Git will install as a working version, and should only be used for driver development. Some features
+    like server/client version compatibility checking may not work as expected when not installing production releases.
 
 
 Versioning

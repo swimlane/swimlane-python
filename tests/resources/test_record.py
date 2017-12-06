@@ -37,6 +37,26 @@ class TestRecord(object):
                 assert mock_validate.call_count == 2
                 assert mock_request.call_count == 1
 
+    def test_delete(self, mock_swimlane, mock_record):
+        """Test record can be deleted when not new and that deleted records lose their ID but maintain their fields"""
+        with mock.patch.object(mock_swimlane, 'request') as mock_request:
+            with mock.patch.object(mock_record, 'validate') as mock_validate:
+
+                mock_record['Numeric'] = 5
+                rec_id = mock_record.id
+
+                mock_record.delete()
+                mock_request.assert_called_once_with(
+                    'delete',
+                    'app/{}/record/{}'.format(mock_record._app.id, rec_id)
+                )
+
+                assert mock_record.id is None
+                assert mock_record['Numeric'] == 5
+
+                with pytest.raises(ValueError):
+                    mock_record.delete()
+
     def test_validate_required_fields(self, mock_record):
         """Test validate method checks for required fields"""
         assert mock_record.validate() is None
@@ -107,3 +127,55 @@ class TestRecord(object):
             assert field_value == mock_record[field_name]
 
         assert num_fields > 0
+
+    def test_add_restriction(self, mock_swimlane, random_mock_user, mock_record):
+        """Test adding usergroup restrictions to a record"""
+
+        with pytest.raises(TypeError):
+            mock_record.add_restriction()
+
+        with pytest.raises(TypeError):
+            mock_record.add_restriction(object())
+
+        assert len(mock_record._raw['allowed']) == 0
+        assert len(mock_record.restrictions) == 0
+
+        mock_record.add_restriction(mock_swimlane.user)
+        assert mock_swimlane.user in mock_record.restrictions
+        assert len(mock_record._raw['allowed']) == 1
+
+        mock_record.add_restriction(mock_swimlane.user)
+        assert len(mock_record.restrictions) == 1
+
+        mock_record.add_restriction(random_mock_user)
+        assert len(mock_record.restrictions) == 2
+
+    def test_remove_restriction(self, mock_swimlane, random_mock_user, mock_record):
+        """Test adding usergroup restrictions to a record"""
+
+        assert len(mock_record.restrictions) == 0
+        mock_record.add_restriction(mock_swimlane.user, random_mock_user)
+
+        with pytest.raises(TypeError):
+            mock_record.remove_restriction(object())
+
+        mock_record.remove_restriction()
+        assert len(mock_record.restrictions) == 0
+
+        with pytest.raises(ValueError):
+            mock_record.remove_restriction(mock_swimlane.user)
+
+        mock_record.add_restriction(mock_swimlane.user, random_mock_user)
+
+        mock_record.remove_restriction(mock_swimlane.user)
+
+        assert random_mock_user in mock_record.restrictions
+
+    def test_ignore_caching_when_unsaved(self, mock_record):
+        """Test cache index keys are only returned when record has id, disabling caching when unsaved"""
+
+        assert mock_record.get_cache_index_keys()
+
+        mock_record.id = None
+        with pytest.raises(NotImplementedError):
+            mock_record.get_cache_index_keys()

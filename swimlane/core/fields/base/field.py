@@ -28,6 +28,7 @@ class Field(SwimlaneResolver):
         self.input_type = self.field_definition.get('inputType')
         self.required = self.field_definition.get('required', False)
         self.readonly = bool(self.field_definition.get('formula', self.field_definition.get('readOnly', False)))
+        self.multiselect = self.field_definition.get('selectionType', 'single') == 'multi'
 
     def __repr__(self):
         return '<{class_name}: {py!r}>'.format(class_name=self.__class__.__name__, py=self.get_python())
@@ -45,16 +46,40 @@ class Field(SwimlaneResolver):
         """Return best python representation of field value"""
         return self._get()
 
-    def cast_to_swimlane(self, value):
-        """Called during get_swimlane, should accept a python value and return swimlane representation
-        
+    def get_swimlane(self):
+        """Return best swimlane representation of field value"""
+        return self.cast_to_swimlane(self._get())
+
+    def get_report(self, value):
+        """Return provided field Python value formatted for use in report filter"""
+        if self.multiselect:
+            value = value or []
+            children = []
+
+            for child in value:
+                children.append(self.cast_to_report(child))
+
+            return children
+
+        return self.cast_to_report(value)
+
+    def cast_to_python(self, value):
+        """Called during set_swimlane, should accept a single raw value as provided from API
+
         Defaults to no-op
         """
         return value
 
-    def get_swimlane(self):
-        """Return best swimlane representation of field value"""
-        return self.cast_to_swimlane(self._get())
+    def cast_to_swimlane(self, value):
+        """Called during get_swimlane, should accept a python value and return swimlane representation
+
+        Defaults to no-op
+        """
+        return value
+
+    def cast_to_report(self, value):
+        """Cast single value to report format, defaults to cast_to_swimlane(value)"""
+        return self.cast_to_swimlane(value)
 
     def validate_value(self, value):
         """Validate value is an acceptable type during _set operation"""
@@ -78,17 +103,11 @@ class Field(SwimlaneResolver):
 
         return_value = self._set(value)
 
+        # TODO: Move to _set and move validation code into set_python only
         # Set raw value to expected swimlane format once internal set is successful
         self.record._raw['values'][self.id] = self.get_swimlane()
 
         return return_value
-
-    def cast_to_python(self, value):
-        """Called during set_swimlane, should accept a single raw value as provided from API
-        
-        Defaults to no-op
-        """
-        return value
 
     def set_swimlane(self, value):
         """Set field internal value from the swimlane representation of field value"""

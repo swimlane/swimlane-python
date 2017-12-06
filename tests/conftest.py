@@ -1,9 +1,13 @@
+import random
+
 import mock
 import pytest
 
 from swimlane.core.client import SwimlaneAuth, Swimlane
-from swimlane.core.resources import App, Record, User, Group, Report
-
+from swimlane.core.resources.app import App
+from swimlane.core.resources.record import Record
+from swimlane.core.resources.usergroup import User, Group
+from swimlane.core.resources.report import Report
 
 @pytest.fixture
 def mock_swimlane():
@@ -69,6 +73,17 @@ def mock_app(mock_swimlane):
                     'helpTextType': 'none',
                     'id': 'agbsz',
                     'name': 'Additional Crowdstrike Comments'},
+                   {'$type': 'Core.Models.Fields.Reference.ReferenceField, Core',
+                    'canAdd': True,
+                    'columns': ['5938252e8895010e08b70ef4'],
+                    'controlType': 'select',
+                    'createLink': False,
+                    'fieldType': 'reference',
+                    'helpTextType': 'none',
+                    'id': 'akotp',
+                    'name': 'Reference (Select Single)',
+                    'selectionType': 'single',
+                    'targetId': '58e4bb4407637a0e4c4f9873'},
                    {'$type': 'Core.Models.Fields.TextField, Core',
                     'fieldType': 'text',
                     'helpTextType': 'none',
@@ -115,6 +130,22 @@ def mock_app(mock_swimlane):
                     'id': 'apwi0',
                     'maxSize': 100000,
                     'name': 'CSV Feed File'},
+                   {'$type': 'Core.Models.Fields.UserGroupField, Core',
+                    'controlType': 'select',
+                    'defaults': [],
+                    'fieldType': 'userGroup',
+                    'helpTextType': 'none',
+                    'id': 'manuallyAddedFieldDef',
+                    'inputType': 'userGroup',
+                    'members': [{'$type': 'Core.Models.Fields.UserGroup.UserGroupValues, Core',
+                                 'id': 'aN99r5xmQ__wW',
+                                 'itemType': 'group',
+                                 'name': 'Everyone',
+                                 'selectionType': 'groups'}],
+                    'name': 'User/Groups (Multi Restricted)',
+                    'selectionType': 'multi',
+                    'showAllGroups': False,
+                    'showAllUsers': False},
                    {'$type': 'Core.Models.Fields.Date.DateField, Core',
                     'calculatedDiff': False,
                     'defaultValueType': 'none',
@@ -2437,3 +2468,29 @@ def mock_report(mock_app):
         'permissions': {'$type': 'Core.Models.Security.PermissionMatrix, Core'},
         'sorts': {
             '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[Core.Models.Search.SortTypes, Core]], mscorlib'}})
+
+
+@pytest.fixture
+def random_mock_user(mock_swimlane):
+    idx = random.randint(1, 10000)
+    return User(mock_swimlane, {
+        '$type': 'Core.Models.Identity.ApplicationUser, Core',
+        'active': False,
+        'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
+        'createdDate': '2017-03-31T09:10:52.717Z',
+        'disabled': False,
+        'displayName': 'admin',
+        'groups': [],
+        'id': idx,
+        'name': 'admin{}'.format(idx),
+        'isAdmin': True,
+        'isMe': False,
+        'lastLogin': '2017-04-27T15:45:43.066Z',
+        'lastPasswordChangedDate': '2017-03-31T09:10:52.536Z',
+        'modifiedByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
+        'modifiedDate': '2017-03-31T09:10:52.76Z',
+        'passwordComplexityScore': 3,
+        'passwordHash': 'AQAAAAEAACcQAAAAEESp9LR0jN3qPF2fw5qWdyceYxbeBbawMW5AFt31dA5n3xX16MFJWsU/j82heenFww==',
+        'passwordResetRequired': False,
+        'roles': [],
+        'userName': 'admin'})

@@ -10,8 +10,9 @@ from requests.structures import CaseInsensitiveDict
 from six.moves.urllib.parse import urljoin
 
 from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter, HelperAdapter
+from swimlane.core.cache import ResourcesCache
 from swimlane.core.resolver import SwimlaneResolver
-from swimlane.core.resources import User
+from swimlane.core.resources.usergroup import User
 from swimlane.exceptions import SwimlaneHTTP400Error, InvalidServerVersion
 from swimlane.utils.version import get_package_version, compare_versions
 
@@ -36,8 +37,10 @@ class Swimlane(object):
         password (str): Authentication password
         verify_ssl (bool): Verify SSL (ignored on HTTP). Disable to use self-signed certificates
         default_timeout (int): Default request connect and read timeout in seconds for all requests
-        verify_version (bool): Verify server version has same major version as client package. May require additional
-            requests, set False to disable check
+        verify_server_version (bool): Verify server version has same major version as client package. May require
+            additional requests, set False to disable check
+        resource_cache_size (int): Maximum number of each resource type to keep in memory cache. Set 0 to disable
+            caching. Disabled by default
 
     Attributes:
         host (pyuri.URI): Full RFC-1738 URL pointing to Swimlane host
@@ -46,6 +49,7 @@ class Swimlane(object):
             Swimlane instance
         groups (GroupAdapter): :class:`~swimlane.core.adapters.usergroup.GroupAdapter` configured for current
             Swimlane instance
+        resources_cache (ResourcesCache): Cache checked by all supported adapters for current Swimlane instance
 
     Examples:
 
@@ -66,10 +70,21 @@ class Swimlane(object):
 
     _api_root = '/api/'
 
-    def __init__(self, host, username, password, verify_ssl=True, default_timeout=60, verify_server_version=True):
+    def __init__(
+            self,
+            host,
+            username,
+            password,
+            verify_ssl=True,
+            default_timeout=60,
+            verify_server_version=True,
+            resource_cache_size=0
+    ):
         self.host = URI(host)
         self.host.scheme = self.host.scheme.lower() or 'https'
         self.host.path = None
+
+        self.resources_cache = ResourcesCache(resource_cache_size)
 
         self.__settings = None
         self.__user = None

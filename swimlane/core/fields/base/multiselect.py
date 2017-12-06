@@ -37,21 +37,15 @@ class MultiSelectField(CursorField):
 
     cursor_class = MultiSelectCursor
 
-    def __init__(self, *args, **kwargs):
-        super(MultiSelectField, self).__init__(*args, **kwargs)
-
-        selection_type = self.field_definition.get('selectionType', 'single')
-        self.is_multiselect = selection_type == 'multi'
-
     def get_python(self):
         """Only return cursor instance if configured for multiselect"""
-        if self.is_multiselect:
+        if self.multiselect:
             return super(MultiSelectField, self).get_python()
 
         return self._get()
 
     def get_swimlane(self):
-        if self.is_multiselect:
+        if self.multiselect:
             value = self._get()
             children = []
 
@@ -64,7 +58,7 @@ class MultiSelectField(CursorField):
 
     def _set(self, value):
         """Expect single instance of supported_types or iterable of instances of supported_types when multi-select"""
-        if self.is_multiselect:
+        if self.multiselect:
             value = value or []
             elements = []
 
@@ -79,8 +73,15 @@ class MultiSelectField(CursorField):
         self._value = value
         self._cursor = None
 
+    def set_python(self, value):
+        """Override to remove key from raw data when empty to work with server 2.16+ validation"""
+        super(MultiSelectField, self).set_python(value)
+
+        if self.multiselect and not self._value:
+            self.record._raw['values'].pop(self.id, None)
+
     def set_swimlane(self, value):
-        if self.is_multiselect:
+        if self.multiselect:
             value = value or []
             children = []
 

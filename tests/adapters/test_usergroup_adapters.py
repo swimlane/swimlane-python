@@ -1,7 +1,7 @@
 import mock
 import pytest
 
-from swimlane.core.resources import Group, User
+from swimlane.core.resources.usergroup import Group, User
 
 
 def test_group_list(mock_group, mock_swimlane):

@@ -89,6 +89,58 @@ additional requests made by using the client automatically.
 The `verify_ssl` parameter is ignored when connecting over HTTP.
 
 
+Resource Caching
+^^^^^^^^^^^^^^^^
+
+.. versionadded:: 2.16.2
+
+The Swimlane client supports automatic caching for most API resources. When enabled, requests for resource data will
+first check the client's cache for the requested resource, returning it without making an additional request if found.
+
+To enable caching, set the `resource_cache_size` parameter when initializing the Swimlane client. The cache size applies
+to each resource type individually, meaning a cache size of 20 would cause the client to cache up to 20 of each of the
+following supported resource types at a time:
+
+- App
+- Record
+- User
+- Group
+
+Once a cache is full, items are removed using "Least Frequently Used (LFU)" priority, meaning the resources that are
+most often accessed will be kept in the cache longer than less-frequently accessed resources.
+
+.. code-block:: python
+
+    # Enable basic logging to print requests and cache hits/misses
+    import logging; logging.basicConfig(level=logging.DEBUG)
+
+    from swimlane import Swimlane
+
+    # Enable caching up to 20 different instances of each supported resource type
+    swimlane = Swimlane(
+        '192.168.1.1',
+        'username',
+        'password',
+        resource_cache_size=20
+    )
+
+    # Slow code making multiple requests for the same App, Record, and referenced Records in a loop
+    # With caching enabled, performance is much higher as requests are sent only for resources not already in the cache
+    for _ in range(5):
+        app = swimlane.apps.get(id='abc...123')
+        print(app)
+
+        record = app.records.get(id='def...456')
+        print(record)
+
+        for reference_record in record['Reference Field']:
+            print(reference_record)
+
+
+Resource caching can provide a big performance boost when requesting the same resources multiple times, especially when
+performing multiple searches or accessing references fields pointing to the same set of records.
+
+
 Custom Direct Requests
 ^^^^^^^^^^^^^^^^^^^^^^
 

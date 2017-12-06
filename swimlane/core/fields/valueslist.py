@@ -46,3 +46,9 @@ class ValuesListField(MultiSelectField):
             'id': self.selection_to_id_map[value],
             'value': value
         }
+
+    def cast_to_report(self, value):
+        value = super(ValuesListField, self).cast_to_report(value)
+
+        if value:
+            return value['id']

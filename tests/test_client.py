@@ -201,3 +201,9 @@ def test_auth(mock_swimlane):
 
 def test_repr(mock_swimlane):
     assert repr(mock_swimlane) == '<Swimlane: admin @ http://host>'
+
+
+def test_cache_default_disabled(mock_swimlane, mock_record):
+    """Test caching is disabled with default Swimlane arguments"""
+    mock_swimlane.resources_cache.cache(mock_record)
+    assert len(mock_swimlane.resources_cache) == 0

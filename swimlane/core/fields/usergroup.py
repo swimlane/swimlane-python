@@ -1,4 +1,5 @@
 from swimlane.core.resources.usergroup import UserGroup
+from swimlane.exceptions import ValidationError
 from .base import MultiSelectField
 
 
@@ -8,6 +9,26 @@ class UserGroupField(MultiSelectField):
     field_type = 'Core.Models.Fields.UserGroupField, Core'
 
     supported_types = [UserGroup]
+
+    def __init__(self, *args, **kwargs):
+        super(UserGroupField, self).__init__(*args, **kwargs)
+
+        self._allowed_member_ids = [r['id'] for r in self.field_definition.get('members', [])]
+
+    def validate_value(self, value):
+        """Validate user/group value is in set of field members for allowed User/Group restrictions"""
+        super(UserGroupField, self).validate_value(value)
+
+        if value and self._allowed_member_ids:
+            if value.id not in self._allowed_member_ids:
+                raise ValidationError(
+                    self.record,
+                    'UserGroup ID `{}` not allowed in field `{}` allowed User/Group IDs: {}'.format(
+                        value.id,
+                        self.name,
+                        self._allowed_member_ids
+                    )
+                )
 
     def set_swimlane(self, value):
         """Workaround for reports returning an empty usergroup field as a single element list with no id/name"""
@@ -28,6 +49,6 @@ class UserGroupField(MultiSelectField):
     def cast_to_swimlane(self, value):
         """Dump UserGroup back to JSON representation"""
         if value is not None:
-            value = value.get_usergroup_selection()
+            value = value.as_usergroup_selection()
 
         return value

@@ -3,7 +3,7 @@ from datetime import datetime
 import mock
 
 from swimlane.core.fields.history import RevisionCursor, Revision
-from swimlane.core.resources import UserGroup
+from swimlane.core.resources.usergroup import UserGroup
 
 raw_revision_data = [
     {'$type': 'Core.Models.History.Revision, Core',

@@ -57,6 +57,14 @@ class App(APIResource):
 
         return self.name < other.name
 
+    def get_cache_index_keys(self):
+        """Return all fields available when retrieving apps"""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'acroynm': self.acronym
+        }
+
     def get_field_definition_by_name(self, field_name):
         """Get JSON field definition for field matching provided name
 
