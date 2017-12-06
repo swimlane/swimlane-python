@@ -70,12 +70,11 @@ class MultiSelectField(CursorField):
         else:
             self.validate_value(value)
 
-        self._value = value
-        self._cursor = None
+        super(MultiSelectField, self)._set(value)
 
     def set_python(self, value):
         """Override to remove key from raw data when empty to work with server 2.16+ validation"""
-        super(MultiSelectField, self).set_python(value)
+        self._set(value)
 
         if self.multiselect and not self._value:
             self.record._raw['values'].pop(self.id, None)

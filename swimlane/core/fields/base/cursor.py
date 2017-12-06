@@ -53,6 +53,10 @@ class CursorField(Field):
         """Return initial elements to be passed with cursor instantiation"""
         return self._get()
 
+    def _set(self, value):
+        self._cursor = None
+        super(CursorField, self)._set(value)
+
     @property
     def cursor(self):
         """Cache and return cursor_class instance"""
