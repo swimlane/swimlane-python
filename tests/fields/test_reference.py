@@ -1,6 +1,5 @@
 import mock
 import pytest
-from sortedcontainers import SortedDict
 
 from swimlane.core.fields.reference import ReferenceCursor
 from swimlane.core.resources.record import Record
@@ -34,6 +33,7 @@ class TestReferenceField(object):
 
             assert field.get_python() is None
 
+            # Assert setting to None adds the field's key to raw values
             field.set_python(None)
             assert mock_record._raw['values'][field.id] is None
 

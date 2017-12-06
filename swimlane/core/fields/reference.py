@@ -95,11 +95,6 @@ class ReferenceField(CursorField):
                 )
 
     def _set(self, value):
-        value = value or SortedDict()
-
-        for record in six.itervalues(value):
-            self.validate_value(record)
-
         self._cursor = None
         self._value = value
 
@@ -135,7 +130,10 @@ class ReferenceField(CursorField):
             self.validate_value(record)
             records[record.id] = record
 
-        return super(ReferenceField, self).set_python(records)
+        return_value = self._set(records)
+        self.record._raw['values'][self.id] = self.get_swimlane()
+
+        return return_value
 
     def get_swimlane(self):
         """Return list of record ids"""
