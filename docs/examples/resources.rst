@@ -286,6 +286,25 @@ with the invalid field name, as well as potential similar field names in case of
         print(error)
 
 
+Restrict Record
+^^^^^^^^^^^^^^^
+
+Record restrictions can be modified using :meth:`~swimlane.core.resources.record.Record.add_restriction` and
+:meth:`~swimlane.core.resources.record.Record.remove_restriction` methods
+
+.. code-block:: python
+
+    # Add user(s) to set of users allowed to modify record
+    record.add_restriction(swimlane.user, other_user)
+    record.save()
+
+    # Remove one or more users from restriction set
+    record.remove_restriction(swimlane.user)
+    record.save()
+
+    # Clear the entire restricted user set
+    record.remove_restriction()
+    record.save()
 
 
 UserGroup
@@ -294,8 +313,9 @@ UserGroup
 Handling Users, Groups, and UserGroups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Users and Groups both extend from the base UserGroup class. Most values returned from the server are of the base
-UserGroup type, but can be replaced or set by the more specific classes.
+The :class:`~swimlane.core.resources.usergroup.User` and :class:`~swimlane.core.resources.usergroup.Group` classes both
+extend from the base :class:`~swimlane.core.resources.usergroup.UserGroup` class. Most values returned from the server
+are of the base UserGroup type, but can be replaced or set by the more specific classes.
 
 .. code-block:: python
 
@@ -305,6 +325,31 @@ UserGroup type, but can be replaced or set by the more specific classes.
     # But can be set to the more specific User / Group types directly
     record['User'] = swimlane.user
     record['Group'] = swimlane.groups.get(name='Everyone')
+
+
+Resolve UserGroups
+^^^^^^^^^^^^^^^^^^
+
+The base :class:`~swimlane.core.resources.usergroup.UserGroup` instances can be easily resolved into the more specific
+:class:`~swimlane.core.resources.usergroup.User` or :class:`~swimlane.core.resources.usergroup.Group` instances when
+necessary using the :meth:`~swimlane.core.resources.usergroup.UserGroup.resolve` method. This method is not called
+automatically to avoid additional requests where the base UserGroup is sufficient.
+
+.. code-block:: python
+
+    # Resolve to actual User instance
+    assert type(record['User']) is UserGroup
+    user = record['User'].resolve()
+    assert type(user) is User
+
+    # Resolve to actual Group instance
+    assert type(record['Group']) is UserGroup
+    group = record['Group'].resolve()
+    assert type(group) is Group
+
+    # Calling .resolve() on already resolved instances returns the same instance immediately
+    assert user is user.resolve()
+    assert group is group.resolve()
 
 
 Comparisons
