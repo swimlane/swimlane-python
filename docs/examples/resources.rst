@@ -363,3 +363,15 @@ represent the same entity
     assert record['Created By'] == swimlane.user
 
     assert record['Group'] == swimlane.groups.get(name='Everyone')
+
+
+Users in Groups
+^^^^^^^^^^^^^^^
+
+To iterate over individual users in a group, use group.users property
+
+.. code-block:: python
+
+    group = swimlane.groups.get(name='Everyone')
+    for user in group.users:
+        assert isinstance(user, User)

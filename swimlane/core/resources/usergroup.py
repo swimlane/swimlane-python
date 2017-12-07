@@ -1,5 +1,7 @@
 from functools import total_ordering
 
+from swimlane.core.cursor import Cursor
+from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.base import APIResource
 
 
@@ -79,14 +81,26 @@ class Group(UserGroup):
 
     Attributes:
         description (str): Group description
+
     """
 
     _type = 'Core.Models.Groups.Group, Core'
 
     def __init__(self, swimlane, raw):
         super(Group, self).__init__(swimlane, raw)
-
+        self.__user_ids = [item['id'] for item in self._raw.get('users')]
         self.description = self._raw.get('description')
+        self.__users = None
+
+    @property
+    def users(self):
+        """Returns a GroupUsersCursor with list of User instances for this Group
+
+        .. versionadded:: 2.16.2
+        """
+        if self.__users is None:
+            self.__users = GroupUsersCursor(swimlane=self._swimlane, user_ids=self.__user_ids)
+        return self.__users
 
     def get_cache_index_keys(self):
         return {
@@ -119,3 +133,23 @@ class User(UserGroup):
             'username': self.username,
             'display_name': self.display_name
         }
+
+
+class GroupUsersCursor(SwimlaneResolver, Cursor):
+    """Handles retrieval for user endpoint"""
+
+    def __init__(self, swimlane, user_ids=None):
+        SwimlaneResolver.__init__(self, swimlane)
+        Cursor.__init__(self)
+        self.__user_ids = user_ids
+
+    def _evaluate(self):
+        """Lazily retrieve and build User instances from returned data"""
+        if self._elements:
+            for element in self._elements:
+                yield element
+        else:
+            for user_id in self.__user_ids:
+                element = self._swimlane.users.get(id=user_id)
+                self._elements.append(element)
+                yield element
