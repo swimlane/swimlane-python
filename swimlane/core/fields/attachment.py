@@ -1,7 +1,8 @@
 import mimetypes
 
 from swimlane.core.resources.attachment import Attachment
-from .base import CursorField, FieldCursor, ReadOnly
+from swimlane.exceptions import ValidationError
+from .base import CursorField, FieldCursor
 
 
 class AttachmentCursor(FieldCursor):
@@ -36,7 +37,7 @@ class AttachmentCursor(FieldCursor):
         return attachment
 
 
-class AttachmentsField(ReadOnly, CursorField):
+class AttachmentsField(CursorField):
 
     field_type = 'Core.Models.Fields.AttachmentField, Core'
     cursor_class = AttachmentCursor
@@ -45,3 +46,11 @@ class AttachmentsField(ReadOnly, CursorField):
         raw_value = self.get_swimlane() or []
 
         return [Attachment(self.record._swimlane, raw) for raw in raw_value]
+
+    def set_python(self, value):
+        """Override to remove key from raw data when empty to work with server 2.16+ validation"""
+        if value is None:
+            super(CursorField, self).set_python([])
+            self._cursor = None
+        else:
+            raise ValidationError(self.record, 'Value can only be set to None, to add attachments use AttachmentCursor.add()')

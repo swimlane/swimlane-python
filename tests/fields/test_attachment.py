@@ -2,9 +2,10 @@ from datetime import datetime
 from io import BytesIO
 
 import mock
-
+import pytest
 from swimlane.core.fields.attachment import AttachmentCursor
 from swimlane.core.resources.attachment import Attachment
+from swimlane.exceptions import ValidationError
 
 
 def test_attachment_field(mock_swimlane, mock_record):
@@ -41,3 +42,15 @@ def test_attachment_field(mock_swimlane, mock_record):
         new_attachment = attachments.add('filename.txt', BytesIO(b'file contents in stream/handle object'))
         assert isinstance(new_attachment, Attachment)
         assert len(attachments) == 2
+
+
+def test_attachment_remove(mock_record):
+    attachments = mock_record['PCAP Attachment']
+
+    with pytest.raises(ValidationError):
+        mock_record['PCAP Attachment'] = 'invalid'
+
+    mock_record['PCAP Attachment'] = None
+    assert mock_record._raw['values']['aep2e'] == []
+
+    assert mock_record['PCAP Attachment'] is not attachments
