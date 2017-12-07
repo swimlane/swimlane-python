@@ -28,7 +28,7 @@ class TestReferenceField(object):
     def test_single_select(self, mock_swimlane, mock_record):
         """Test single-select get/set"""
 
-        with mock.patch.object(mock_swimlane.apps, 'get', return_value=mock_record._app):
+        with mock.patch.object(mock_swimlane.apps, 'get', return_value=mock_record.app):
             field = mock_record.get_field(self.single_field_name)
 
             assert field.get_python() is None

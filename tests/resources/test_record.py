@@ -8,7 +8,7 @@ from swimlane.exceptions import UnknownField, ValidationError
 class TestRecord(object):
     def test_repr(self, mock_record):
         assert repr(mock_record) == '<Record: RA-7>'
-        assert repr(record_factory(mock_record._app)) == '<Record: RA - New>'
+        assert repr(record_factory(mock_record.app)) == '<Record: RA - New>'
 
     def test_save(self, mock_swimlane, mock_record):
         """Test save endpoint called with correct args"""
@@ -24,7 +24,7 @@ class TestRecord(object):
                 mock_validate.assert_called_once_with()
                 mock_request.assert_called_once_with(
                     'put',
-                    'app/{}/record'.format(mock_record._app.id),
+                    'app/{}/record'.format(mock_record.app.id),
                     json=mock_record._raw
                 )
 
@@ -48,7 +48,7 @@ class TestRecord(object):
                 mock_record.delete()
                 mock_request.assert_called_once_with(
                     'delete',
-                    'app/{}/record/{}'.format(mock_record._app.id, rec_id)
+                    'app/{}/record/{}'.format(mock_record.app.id, rec_id)
                 )
 
                 assert mock_record.id is None
@@ -69,7 +69,7 @@ class TestRecord(object):
             mock_record.validate()
 
     def test_ordering(self, mock_record, mock_app):
-        record_copy = Record(mock_record._app, mock_record._raw)
+        record_copy = Record(mock_record.app, mock_record._raw)
 
         # Equality by id and app id
         assert record_copy == mock_record
@@ -104,7 +104,7 @@ class TestRecord(object):
         except UnknownField as error:
             assert error.field_name == 'Muneric'
             assert error.similar_field_names == ['Numeric']
-            assert error.app is mock_record._app
+            assert error.app is mock_record.app
         else:
             raise RuntimeError
 
@@ -114,7 +114,7 @@ class TestRecord(object):
         except UnknownField as error:
             assert error.field_name == 'Muneric'
             assert error.similar_field_names == ['Numeric']
-            assert error.app is mock_record._app
+            assert error.app is mock_record.app
         else:
             raise RuntimeError
 
