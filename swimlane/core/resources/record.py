@@ -19,6 +19,7 @@ class Record(APIResource):
         created (pendulum.Pendulum): Pendulum datetime for Record created date
         modified (pendulum.Pendulum): Pendulum datetime for Record last modified date
         is_new (bool): True if Record does not yet exist on server. Other values may be temporarily None if True
+        app (App): App instance that Record belongs to
     """
 
     _type = 'Core.Models.Record.Record, Core'
@@ -26,7 +27,7 @@ class Record(APIResource):
     def __init__(self, app, raw):
         super(Record, self).__init__(app._swimlane, raw)
 
-        self._app = app
+        self.__app = app
 
         self.is_new = self._raw.get('isNew', False)
 
@@ -46,7 +47,7 @@ class Record(APIResource):
             # Combine app acronym + trackingId instead of using trackingFull raw
             # for guaranteed value (not available through report results)
             self.tracking_id = '-'.join([
-                self._app.acronym,
+                self.app.acronym,
                 str(int(self._raw['trackingId']))
             ])
 
@@ -58,9 +59,13 @@ class Record(APIResource):
         self._fields = {}
         self.__premap_fields()
 
+    @property
+    def app(self):
+        return self.__app
+
     def __str__(self):
         if self.is_new:
-            return '{} - New'.format(self._app.acronym)
+            return '{} - New'.format(self.app.acronym)
 
         return str(self.tracking_id)
 
@@ -78,7 +83,7 @@ class Record(APIResource):
             yield field_name, field.get_python()
 
     def __hash__(self):
-        return hash((self.id, self._app))
+        return hash((self.id, self.app))
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and hash(self) == hash(other)
@@ -93,7 +98,7 @@ class Record(APIResource):
         tracking_number_self = int(self.tracking_id.split('-')[1])
         tracking_number_other = int(other.tracking_id.split('-')[1])
 
-        return (self._app.name, tracking_number_self) < (other._app.name, tracking_number_other)
+        return (self.app.name, tracking_number_self) < (other.app.name, tracking_number_other)
 
     def __premap_fields(self):
         """Build field instances using field definitions in app manifest
@@ -103,7 +108,7 @@ class Record(APIResource):
         # Circular imports
         from swimlane.core.fields import resolve_field_class
 
-        for field_definition in self._app._raw['fields']:
+        for field_definition in self.app._raw['fields']:
             field_class = resolve_field_class(field_definition)
 
             field_instance = field_class(field_definition['name'], self)
@@ -134,7 +139,7 @@ class Record(APIResource):
         try:
             return self._fields[field_name]
         except KeyError:
-            raise UnknownField(self._app, field_name, self._fields.keys())
+            raise UnknownField(self.app, field_name, self._fields.keys())
 
     def validate(self):
         """Explicitly validate field data
@@ -168,12 +173,12 @@ class Record(APIResource):
 
         response = self._swimlane.request(
             method,
-            'app/{}/record'.format(self._app.id),
+            'app/{}/record'.format(self.app.id),
             json=self._raw
         )
 
         # Reinitialize record with new raw content returned from server to update any calculated fields
-        self.__init__(self._app, response.json())
+        self.__init__(self.app, response.json())
 
         # Manually cache self after save to keep cache updated with latest data
         self._swimlane.resources_cache.cache(self)
@@ -193,7 +198,7 @@ class Record(APIResource):
 
         self._swimlane.request(
             'delete',
-            'app/{}/record/{}'.format(self._app.id, self.id)
+            'app/{}/record/{}'.format(self.app.id, self.id)
         )
 
         del self._swimlane.resources_cache[self]
@@ -203,7 +208,7 @@ class Record(APIResource):
         raw['id'] = None
         raw['isNew'] = True
 
-        self.__init__(self._app, raw)
+        self.__init__(self.app, raw)
 
     @property
     def restrictions(self):

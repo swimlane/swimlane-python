@@ -31,7 +31,7 @@ pendulum_interval = pendulum.interval(minutes=5)
 def test_raw_serialization(mock_record, field_name, dt, expected_raw):
     """Test that datetime field values are appropriately serialized to raw"""
     mock_record[field_name] = dt
-    field_id = mock_record._app.get_field_definition_by_name(field_name)['id']
+    field_id = mock_record.app.get_field_definition_by_name(field_name)['id']
     assert mock_record._raw['values'][field_id] == expected_raw
 
 
