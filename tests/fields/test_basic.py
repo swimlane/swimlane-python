@@ -2,10 +2,12 @@
 import numbers
 
 import pytest
+import six
 
-from swimlane.core.fields import resolve_field_class, _FIELD_TYPE_MAP
+from swimlane.core.fields import resolve_field_class, _FIELD_TYPE_MAP, Field, _build_field_type_map
 from swimlane.core.fields.base import ReadOnly, FieldCursor
 from swimlane.exceptions import ValidationError
+from swimlane.utils import get_recursive_subclasses
 
 
 def test_text_field(mock_record):
@@ -44,8 +46,32 @@ def test_default_repr(mock_record):
 
 def test_resolve_field_class():
     """Test looking up field by field $type"""
+    # Check for error on known invalid type
     with pytest.raises(KeyError):
         resolve_field_class({'$type': 'Not a valid type'})
+
+    # Check all fields with a type are resolvable by their types
+    for cls in get_recursive_subclasses(Field):
+        if cls.field_type:
+            if isinstance(cls.field_type, six.string_types):
+                types = [cls.field_type]
+            else:
+                types = cls.field_type
+
+            for field_type in types:
+                assert resolve_field_class({'$type': field_type}) is cls
+
+
+def test_error_on_invalid_field_type():
+    """Make sure an exception is raised when building type map if field_type is not a tuple or string"""
+    class Base(object):
+        field_type = None
+
+    class Invalid(Base):
+        field_type = 12345
+
+    with pytest.raises(ValueError):
+        _build_field_type_map(Base)
 
 
 @pytest.mark.parametrize(

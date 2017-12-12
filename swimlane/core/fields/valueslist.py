@@ -6,7 +6,10 @@ from .base import MultiSelectField
 
 class ValuesListField(MultiSelectField):
 
-    field_type = 'Core.Models.Fields.ValuesListField, Core'
+    field_type = (
+        'Core.Models.Fields.ValuesListField, Core',
+        'Core.Models.Fields.ValuesList.ValuesListField, Core'
+    )
     supported_types = six.string_types
 
     def __init__(self, *args, **kwargs):

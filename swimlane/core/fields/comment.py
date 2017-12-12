@@ -29,7 +29,10 @@ class CommentCursor(FieldCursor):
 
 class CommentsField(ReadOnly, CursorField):
 
-    field_type = 'Core.Models.Fields.CommentsField, Core'
+    field_type = (
+        'Core.Models.Fields.CommentsField, Core',
+        'Core.Models.Fields.Comments.CommentsField, Core'
+    )
     cursor_class = CommentCursor
 
     def get_initial_elements(self):
