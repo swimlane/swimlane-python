@@ -6,7 +6,10 @@ from .base import MultiSelectField
 class UserGroupField(MultiSelectField):
     """Manages getting/setting users from record User/Group fields"""
 
-    field_type = 'Core.Models.Fields.UserGroupField, Core'
+    field_type = (
+        'Core.Models.Fields.UserGroupField, Core',
+        'Core.Models.Fields.UserGroup.UserGroupField, Core'
+    )
 
     supported_types = [UserGroup]
 

@@ -1,6 +1,8 @@
 """Abstractions for Swimlane app field types to simplify getting/setting values on records"""
-from swimlane.core.fields.base import Field
 
+from six import string_types as _string_types
+
+from swimlane.core.fields.base import Field
 from swimlane.utils import (
     get_recursive_subclasses as _get_recursive_subclasses,
     import_submodules as _import_submodules
@@ -8,8 +10,28 @@ from swimlane.utils import (
 
 _import_submodules(__name__)
 
-# Lookup corresponding field given a Swimlane "$type" key
-_FIELD_TYPE_MAP = {f.field_type: f for f in _get_recursive_subclasses(Field) if f.field_type}
+
+def _build_field_type_map(base_class):
+    """Create mapping from all $type values to their respective Field classes"""
+    mapping = {}
+
+    for cls in _get_recursive_subclasses(base_class):
+        if cls.field_type:
+            if isinstance(cls.field_type, tuple):
+                for field_type in cls.field_type:
+                    mapping[field_type] = cls
+            elif isinstance(cls.field_type, _string_types):
+                mapping[cls.field_type] = cls
+            else:
+                raise ValueError('Field type must be str or tuple, cannot understand type "{}" on class "{}"'.format(
+                    type(cls.field_type),
+                    cls
+                ))
+
+    return mapping
+
+
+_FIELD_TYPE_MAP = _build_field_type_map(Field)
 
 
 def resolve_field_class(field_definition):

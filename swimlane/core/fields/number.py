@@ -6,7 +6,10 @@ from .base import Field
 
 class NumberField(Field):
 
-    field_type = 'Core.Models.Fields.NumericField, Core'
+    field_type = (
+        'Core.Models.Fields.NumericField, Core',
+        'Core.Models.Fields.Numeric.NumericField, Core'
+    )
 
     supported_types = [numbers.Number]
 

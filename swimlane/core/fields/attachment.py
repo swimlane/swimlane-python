@@ -38,7 +38,10 @@ class AttachmentCursor(FieldCursor):
 
 class AttachmentsField(ReadOnly, CursorField):
 
-    field_type = 'Core.Models.Fields.AttachmentField, Core'
+    field_type = (
+        'Core.Models.Fields.AttachmentField, Core',
+        'Core.Models.Fields.Attachment.AttachmentField, Core'
+    )
     cursor_class = AttachmentCursor
 
     def get_initial_elements(self):
