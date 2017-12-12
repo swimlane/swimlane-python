@@ -1,8 +1,26 @@
 import pytest
 from mock import patch
+import mock
+import copy
 
 from swimlane.core.cache import ResourcesCache
-from swimlane.core.resources.usergroup import UserGroup
+from swimlane.core.resources.usergroup import UserGroup, User, GroupUsersCursor
+
+
+def test_group_users(mock_group, mock_user, mock_swimlane):
+
+    mock_user2 = copy.copy(mock_user)
+    mock_user3 = copy.copy(mock_user)
+    mock_user2.id = mock_user2.id+'123'
+    mock_user3.id = mock_user3.id+'abc'
+    mock_group.user_ids = [mock_user.id, mock_user2.id, mock_user3.id]
+
+    with mock.patch.object(mock_swimlane.users, 'get') as mock_user_get:
+        mock_user_get.side_effect = [mock_user, mock_user2, mock_user3]
+        assert isinstance(mock_group.users, GroupUsersCursor)
+        for user in mock_group.users:
+            assert isinstance(user, User)
+        assert list(mock_group.users) == [mock_user, mock_user2, mock_user3]
 
 
 def test_get_usergroup_selection(mock_user, mock_group):
