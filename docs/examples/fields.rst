@@ -413,6 +413,18 @@ Upload new attachment with filename and stream or file handle
 
     Association with attachment on server is not persisted until calling :meth:`record.save`.
 
+Clear all attachments
+
+.. code-block:: python
+
+    assert len(record['Attachment']) == 1
+
+    del record['Attachment']
+    assert len(record['Attachment']) == 0
+    
+    # Not cleared on server until saved
+    record.save()
+
 
 ReferenceField
 --------------
