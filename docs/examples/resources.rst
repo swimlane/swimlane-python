@@ -21,19 +21,27 @@ Retrieve apps using the `apps` adapter available on the :class:`swimlane.Swimlan
 Retrieve Records
 ^^^^^^^^^^^^^^^^
 
-Records can be retrieved by full IDs. Only records in the source app are returned, IDs matching records from other apps
-will fail to be retrieved.
+Records can be retrieved by tracking ID or record ID. Only records in the source app are returned, IDs matching records
+from other apps will fail to be retrieved.
 
 .. code-block:: python
 
-    record = app.records.get(id='58f...387')
+    app = swimlane.apps.get(acronym='APP')
+
+    # Get by Tracking ID
+    record_from_tracking = app.records.get(tracking_id='APP-1')
+    # Get by Record ID
+    record_from_id = app.records.get(id='58f...387')
+
+    assert record_from_tracking == record_from_id
 
 
 Search Records
 ^^^^^^^^^^^^^^
 
-Searching is done using the :obj:`app.records` adapter, and uses temporary :class:`~swimlane.core.resources.report.Report`
-instances to handle paginated search results and record retrieval on-demand.
+Searching is done using the :obj:`app.records` adapter, and uses temporary
+:class:`~swimlane.core.resources.report.Report` instances to handle paginated search results and
+record retrieval on-demand.
 
 Filters can be applied using tuples of `(<field_name>, <filter_operator>, <field_value>)` that will be AND'ed together
 on the report.
