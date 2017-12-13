@@ -14,6 +14,14 @@ def test_get(mock_swimlane, mock_app, mock_record):
     with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
         assert mock_app.records.get(id='record_id') == mock_record
 
+def test_get_by_tracking_id(mock_swimlane, mock_app, mock_record):
+    mock_response = mock.MagicMock()
+    # tracking_id = mock_record.tracking_id
+    mock_response.json.return_value = mock_record._raw
+
+    with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
+        assert mock_app.records.get(tracking_id='record_tracking_id') == mock_record
+
 
 @pytest.mark.parametrize('kwargs', [
     {'unknown_arg': 'arg'},

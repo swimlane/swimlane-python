@@ -10,14 +10,17 @@ class RecordAdapter(AppResolver):
     """Handles retrieval and creation of Swimlane Record resources"""
 
     @check_cache(Record)
-    @one_of_keyword_only('id')
-    def get(self, _, value):
+    @one_of_keyword_only('id', 'tracking_id')
+    def get(self, key, value):
         """Get a single record by id
 
         Supports resource cache
 
+        .. versionchanged:: 2.17.0 Able to retrieve record by tracking_id
+
         Keyword Args:
             id (str): Full record ID
+            tracking_id (str): Record Tracking ID
 
         Returns:
             Record: Matching Record instance returned from API
@@ -25,8 +28,12 @@ class RecordAdapter(AppResolver):
         Raises:
             TypeError: No id argument provided
         """
-        response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.id, value))
-        return Record(self._app, response.json())
+        if key == 'id':
+            response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.id, value))
+            return Record(self._app, response.json())
+        if key == 'tracking_id':
+            response = self._swimlane.request('get', "app/{0}/record/tracking/{1}".format(self._app.id, value))
+            return Record(self._app, response.json())
 
     def search(self, *filter_tuples, **kwargs):
         """Shortcut to generate a new temporary search report using provided filters and return the resulting records
