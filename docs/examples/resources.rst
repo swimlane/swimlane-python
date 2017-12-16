@@ -204,9 +204,19 @@ value is done as follows:
 
 .. code-block:: python
 
+    # The "Text" field has a value of 'Some Example Text'
     assert record['Text'] == 'Some Example Text'
 
-Any fields without a value default to `None`.
+    # Any fields without a value default to `None`.
+    assert record['Empty Field'] == None
+
+
+Field can also be accessed by their optional field keys
+
+.. code-block:: python
+
+    # The field key points to the same field as the field name
+    assert record['Field'] == record['field-key']
 
 
 Setting Field Values
