@@ -42,6 +42,7 @@ def mock_app(mock_swimlane):
                     'inputType': 'text',
                     'lengthType': 'none',
                     'name': 'Action',
+                    'key': 'action-key',
                     'readOnly': False,
                     'required': False,
                     'visualize': False,

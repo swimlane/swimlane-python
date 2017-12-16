@@ -39,6 +39,16 @@ def test_get_field_definitions(mock_app):
         raise RuntimeError
 
 
+def test_resolve_field_name(mock_app):
+    """Test that fields keys + names resolve to field name or None if not found"""
+    # Field name
+    assert mock_app.resolve_field_name('Action') == 'Action'
+    # Key
+    assert mock_app.resolve_field_name('action-key') == 'Action'
+    # Missing
+    assert mock_app.resolve_field_name('unknown field name/key') is None
+
+
 def test_equality(mock_app):
     """Test equality and inequality of Apps by name"""
     app_clone = copy.copy(mock_app)
