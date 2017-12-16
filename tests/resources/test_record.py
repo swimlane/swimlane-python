@@ -179,3 +179,13 @@ class TestRecord(object):
         mock_record.id = None
         with pytest.raises(NotImplementedError):
             mock_record.get_cache_index_keys()
+
+    def test_record_field_resolvable_by_key(self, mock_record):
+        """Test that fields can be resolved by their keys"""
+        assert mock_record.get_field('Action') is mock_record.get_field('action-key')
+
+    def test_record_keys_not_included_in_field_names(self, mock_record):
+        """Make sure fields keys don't show up when iterating a record"""
+        assert 'action-key' not in dict(mock_record)
+
+

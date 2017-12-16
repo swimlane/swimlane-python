@@ -130,6 +130,9 @@ class Record(APIResource):
     def get_field(self, field_name):
         """Get field instance used to get, set, and serialize internal field value
 
+        Args:
+            field_name (str): Field name or key to retrieve
+
         Returns:
             Field: Requested field instance
 
@@ -137,7 +140,7 @@ class Record(APIResource):
              UnknownField: Raised if `field_name` not found in parent App
         """
         try:
-            return self._fields[field_name]
+            return self._fields[self.app.resolve_field_name(field_name)]
         except KeyError:
             raise UnknownField(self.app, field_name, self._fields.keys())
 
