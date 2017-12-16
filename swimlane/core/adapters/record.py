@@ -36,11 +36,11 @@ class RecordAdapter(AppResolver):
             response = self._swimlane.request('get', "app/{0}/record/tracking/{1}".format(self._app.id, value))
             return Record(self._app, response.json())
 
-    def search(self, *filter_tuples, **kwargs):
+    def search(self, *filters, **kwargs):
         """Shortcut to generate a new temporary search report using provided filters and return the resulting records
 
         Args:
-            *filter_tuples (tuple): Zero or more filter tuples of (field_name, operator, field_value)
+            *filters (tuple): Zero or more filter tuples of (field_name, operator, field_value)
 
         Keyword Args:
             keywords (list(str)): List of strings of keywords to use in report search
@@ -89,8 +89,8 @@ class RecordAdapter(AppResolver):
             limit=kwargs.pop('limit', Report.default_limit)
         )
 
-        for filter_tuple in filter_tuples:
-            report.filter(*filter_tuple)
+        for filter_tuples in filters:
+            report.filter(*filter_tuples)
 
         return list(report)
 
@@ -194,34 +194,109 @@ class RecordAdapter(AppResolver):
             json=[r._raw for r in new_records]
         )
 
+
     @requires_swimlane_version('2.17')
-    def bulk_delete(self, *filters_or_records):
-        """Shortcut to bulk delete records
-
+    def bulk_modify(self, *filters_or_records, **kwargs):
+        """Shortcut to bulk modify records
         .. versionadded:: 2.17.0
-
         Args:
             *filters_or_records (tuple) or (Records): Either a list of Records, or a list of filters.
+
+        Keyword Args:
+            values (dict): Dictionary of one or more 'field_name': 'new_value' pairs to update
 
 
         Examples:
 
             ::
 
-                # Bulk delete records by filter
+                # Bulk update records by filter
 
-                app.records.bulk_delete(('Field_1', 'equals', value1),
-                                        ('Field_2', 'equals', value2))
+                app.records.bulk_modify(('Field_1', 'equals', value1),
+                                        ('Field_2', 'equals', value2),
+                                        values={
+                                                "Field3": value3,
+                                                "Field_4": value4
+                                                })
 
-                # Bulk delete records
+                # Bulk update records
 
                 record1 = app.records.get(tracking_id='APP-1')
                 record2 = app.records.get(tracking_id='APP-2')
                 record3 = app.records.get(tracking_id='APP-3')
 
+                app.records.bulk_modify(record1, record2, record3, values={"Field_Name": new_value})
+
+
+
+                """
+        values = kwargs.pop('values', None)
+
+        if kwargs:
+            raise ValueError('Unexpected arguments: {}'.format(kwargs))
+
+        if not values:
+            raise ValueError('Must provide "values" as keyword argument')
+
+        if not isinstance(values, dict):
+            raise ValueError("values parameter must be dict of {'field_name': 'update_value'} pairs")
+
+        validate_filters_or_records(filters_or_records)
+
+        data_dict = {}
+        record_stub = record_factory(self._app)
+
+        # build record_id list
+        if isinstance(filters_or_records[0], Record):
+            record_ids = []
+            for record in filters_or_records:
+                record_ids.append(record.id)
+            data_dict['recordIds'] = record_ids
+
+        # build filters
+        elif isinstance(filters_or_records[0], tuple):
+            filters = []
+            for filter_tuples in filters_or_records:
+                field = record_stub.get_field(filter_tuples[0])
+                filters.append({
+                    "fieldId": field.id,
+                    "filterType": filter_tuples[1],
+                    "value": field.get_report(filter_tuples[2])
+                })
+            data_dict['filters'] = filters
+
+        # build modifications
+        modifications = []
+        for field_name, update_value in values.items():
+            mod_field = record_stub.get_field(field_name)
+            modifications.append({
+                "fieldId": {
+                    "value": mod_field.id,
+                    "type": "Id"
+                },
+                "value": mod_field.get_report(update_value),
+                "type": "Create"
+            })
+        data_dict['modifications'] = modifications
+
+        self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=data_dict)
+
+    @requires_swimlane_version('2.17')
+    def bulk_delete(self, *filters_or_records):
+        """Shortcut to bulk delete records
+        .. versionadded:: 2.17.0
+        Args:
+            *filters_or_records (tuple) or (Records): Either a list of Records, or a list of filters.
+        Examples:
+            ::
+                # Bulk delete records by filter
+                app.records.bulk_delete(('Field_1', 'equals', value1),
+                                        ('Field_2', 'equals', value2))
+                # Bulk delete records
+                record1 = app.records.get(tracking_id='APP-1')
+                record2 = app.records.get(tracking_id='APP-2')
+                record3 = app.records.get(tracking_id='APP-3')
                 app.records.bulk_delete(record1, record2, record3)
-
-
             """
 
         _type = validate_filters_or_records(filters_or_records)
