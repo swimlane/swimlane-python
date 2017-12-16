@@ -16,7 +16,8 @@ class RecordAdapter(AppResolver):
 
         Supports resource cache
 
-        .. versionchanged:: 2.17.0 Able to retrieve record by tracking_id
+        .. versionchanged:: 2.17.0 
+            Added option to retrieve record by tracking_id
 
         Keyword Args:
             id (str): Full record ID
