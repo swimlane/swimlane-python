@@ -191,14 +191,23 @@ Bulk modify records by filter or by list of records. Invalid function inputs wil
 .. code-block:: python
 
     # List of all records in app
-    records = app.records.search(limit=0)
-    # Modify by record
-    new_value = "My New Value"
-    app.records.bulk_modify(records[0], records[1], ..., values={"Field_Name": new_value, 'Numeric Field': 10, ...})
+    record1 = app.records.get(tracking_id='APP-1')
+    record2 = app.records.get(tracking_id='APP-2')
+    record3 = app.records.get(tracking_id='APP-3')
+
+    app.records.bulk_modify(record1, record2, record3, values={"Field_Name": new_value})
 
     # Modify by filter(s)
-    app.records.bulk_modify(("Text Field", "equals", "Value"), ("Number Field", "equals", 2), ...,
-                            values={"Field_Name": new_value, 'Numeric Field': 10, ...})
+    app.records.bulk_modify(
+    # Query filters
+    ("Text Field", "equals", "Value"),
+    ("Number Field", "equals", 2),
+    # New values for records
+    values={
+        "Field_Name": new_value,
+        "Numeric Field": 10
+        }
+      )
 
 Record
 ------

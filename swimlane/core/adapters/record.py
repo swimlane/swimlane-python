@@ -200,7 +200,7 @@ class RecordAdapter(AppResolver):
         """Shortcut to bulk modify records
         .. versionadded:: 2.17.0
         Args:
-            *filters_or_records (tuple) or (Records): Either a list of Records, or a list of filters.
+            *filters_or_records (tuple) or (Record): Either a list of Records, or a list of filters.
 
         Keyword Args:
             values (dict): Dictionary of one or more 'field_name': 'new_value' pairs to update
@@ -212,12 +212,16 @@ class RecordAdapter(AppResolver):
 
                 # Bulk update records by filter
 
-                app.records.bulk_modify(('Field_1', 'equals', value1),
-                                        ('Field_2', 'equals', value2),
-                                        values={
-                                                "Field3": value3,
-                                                "Field_4": value4
-                                                })
+                app.records.bulk_modify(
+                # Query filters
+                ('Field_1', 'equals', value1),
+                ('Field_2', 'equals', value2),
+                # New values for records
+                values={
+                       "Field3": value3,
+                       "Field_4": value4
+                        }
+                 )
 
                 # Bulk update records
 
@@ -274,7 +278,7 @@ class RecordAdapter(AppResolver):
                     "value": mod_field.id,
                     "type": "Id"
                 },
-                "value": mod_field.get_report(update_value),
+                "value": mod_field.cast_to_swimlane(update_value),
                 "type": "Create"
             })
         data_dict['modifications'] = modifications
