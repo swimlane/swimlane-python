@@ -160,6 +160,28 @@ Any records not passing validation will cause the entire operation to fail.
     )
 
 
+Batch Record Delete
+^^^^^^^^^^^^^^^^^^^
+Delete multiple records at once.
+
+.. code-block:: python
+
+    # Delete by record
+    record1 = app.records.get(tracking_id='APP-1')
+    record2 = app.records.get(tracking_id='APP-2')
+    record3 = app.records.get(tracking_id='APP-3')
+
+    app.records.bulk_delete(record1, record2, record3)
+
+Delete multiple records at once by filters using filter format from search.
+
+.. code-block:: python
+
+    # Delete by filter
+    records = app.records.batch_delete(
+        ('Field_1', 'equals', value1),
+        ('Field_2', 'equals', value2)
+    )
 
 
 Record
