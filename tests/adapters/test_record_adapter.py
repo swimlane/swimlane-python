@@ -5,6 +5,7 @@ import pytest
 import six
 
 from swimlane.exceptions import UnknownField
+from swimlane.core.adapters.record import validate_filters_or_records
 
 
 def test_get(mock_swimlane, mock_app, mock_record):
@@ -114,3 +115,47 @@ def test_search(mock_swimlane, mock_app, mock_record):
     with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
         with mock.patch('swimlane.core.adapters.report.Report._parse_raw_element', return_value=mock_record):
             assert mock_app.records.search(('Tracking Id', 'equals', 'RA-7')) == [mock_record]
+
+
+def test_bulk_delete(mock_swimlane, mock_app, mock_record):
+
+    # Set API version for @required_swimlane_version
+    mock_swimlane._Swimlane__settings = {
+                'apiVersion': '2.17.0'
+            }
+
+    # test that requests is called with proper object for filters
+    with mock.patch.object(mock_swimlane, 'request', return_value=None) as mock_func:
+        mock_app.records.bulk_delete(('Numeric', 'equals', 1))
+    mock_func.assert_called_once_with('DELETE', "app/{0}/record/batch".format(mock_app.id), json=
+    {
+        'filters': [{
+            'fieldId': 'aqkg3', 'filterType': 'equals', 'value': 1
+        }],
+    })
+
+    # test that requests is called with proper object for records
+    with mock.patch.object(mock_swimlane, 'request', return_value=None) as mock_func:
+        mock_app.records.bulk_delete(mock_record)
+    mock_func.assert_called_once_with('DELETE', "app/{0}/record/batch".format(mock_app.id), json=
+    {
+        'recordIds': ['58ebb22807637a02d4a14bd6']
+    })
+
+    # test value error
+    with pytest.raises(ValueError):
+        mock_app.records.bulk_delete(mock_record, ('Numeric', 'equals', 1))
+
+
+def test_filters_or_records_validation(mock_record):
+    # No values provided should raise ValueError
+    with pytest.raises(ValueError):
+        validate_filters_or_records([])
+
+    # Invalid type should raise ValueError
+    with pytest.raises(ValueError):
+        validate_filters_or_records(["not supported type"])
+    #
+    with pytest.raises(ValueError):
+        validate_filters_or_records([mock_record, ('Number', 'equals', 1)])
+

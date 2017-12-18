@@ -193,3 +193,74 @@ class RecordAdapter(AppResolver):
             'app/{}/record/batch'.format(self._app.id),
             json=[r._raw for r in new_records]
         )
+
+    @requires_swimlane_version('2.17')
+    def bulk_delete(self, *filters_or_records):
+        """Shortcut to bulk delete records
+
+        .. versionadded:: 2.17.0
+
+        Args:
+            *filters_or_records (tuple) or (Records): Either a list of Records, or a list of filters.
+
+
+        Examples:
+
+            ::
+
+                # Bulk delete records by filter
+
+                app.records.bulk_delete(('Field_1', 'equals', value1),
+                                        ('Field_2', 'equals', value2))
+
+                # Bulk delete records by id
+
+                # Return all records from app
+                records = app.records.search(limit=0)
+
+                app.records.bulk_delete(records)
+
+
+            """
+
+        _type = validate_filters_or_records(filters_or_records)
+        data_dict = {}
+
+        # build record_id list
+        if isinstance(filters_or_records[0], Record):
+            record_ids = []
+            for record in filters_or_records:
+                record_ids.append(record.id)
+            data_dict['recordIds'] = record_ids
+
+        # build filters
+        else:
+            filters = []
+            record_stub = record_factory(self._app)
+            for filter_tuples in filters_or_records:
+                field = record_stub.get_field(filter_tuples[0])
+                filters.append({
+                    "fieldId": field.id,
+                    "filterType": filter_tuples[1],
+                    "value": field.get_report(filter_tuples[2])
+                })
+            data_dict['filters'] = filters
+
+        self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict)
+
+
+def validate_filters_or_records(filters_or_records):
+    """Validation for filters_or_records variable bassed into bulk_modify and bulk_delete"""
+    # If filters_or_records is empty, fail
+    if not filters_or_records:
+        raise ValueError('Must provide at least one filter tuples or Records')
+    # If filters_or_records is not list of Record or tuple, fail
+    if not isinstance(filters_or_records[0], (Record, tuple)):
+        raise ValueError('Cannot provide both filter tuples and Records')
+    # If filters_or_records is not list of either Record or only tuple, fail
+    _type = type(filters_or_records[0])
+    for item in filters_or_records:
+        if not isinstance(item, _type):
+            raise ValueError("Expected filter tuple or Record, received {0}".format(item))
+
+    return _type
