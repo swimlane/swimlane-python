@@ -215,10 +215,11 @@ class RecordAdapter(AppResolver):
 
                 # Bulk delete records by id
 
-                # Return all records from app
-                records = app.records.search(limit=0)
+                record1 = app.records.get(tracking_id='APP-1')
+                record2 = app.records.get(tracking_id='APP-2')
+                record3 = app.records.get(tracking_id='APP-3')
 
-                app.records.bulk_delete(records)
+                app.records.bulk_delete(record1, record2, record3)
 
 
             """

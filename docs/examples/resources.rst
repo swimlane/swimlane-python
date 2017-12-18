@@ -167,9 +167,11 @@ Delete multiple records at once.
 .. code-block:: python
 
     # Delete by record
-    records = app.records.search(limit=0) # list all records
+    record1 = app.records.get(tracking_id='APP-1')
+    record2 = app.records.get(tracking_id='APP-2')
+    record3 = app.records.get(tracking_id='APP-3')
 
-    app.records.bulk_delete(records)
+    app.records.bulk_delete(record1, record2, record3)
 
 Delete multiple records at once by filters using filter format from search.
 
