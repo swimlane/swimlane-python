@@ -213,7 +213,7 @@ class RecordAdapter(AppResolver):
                 app.records.bulk_delete(('Field_1', 'equals', value1),
                                         ('Field_2', 'equals', value2))
 
-                # Bulk delete records by id
+                # Bulk delete records
 
                 record1 = app.records.get(tracking_id='APP-1')
                 record2 = app.records.get(tracking_id='APP-2')
