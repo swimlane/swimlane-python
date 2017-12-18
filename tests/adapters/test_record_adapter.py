@@ -119,10 +119,6 @@ def test_search(mock_swimlane, mock_app, mock_record):
 
 def test_bulk_delete(mock_swimlane, mock_app, mock_record):
 
-    # Set API version for @required_swimlane_version
-    mock_swimlane._Swimlane__settings = {
-                'apiVersion': '2.17.0'
-            }
 
     # test that requests is called with proper object for filters
     with mock.patch.object(mock_swimlane, 'request', return_value=None) as mock_func:
