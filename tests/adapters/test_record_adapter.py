@@ -155,7 +155,7 @@ def test_filters_or_records_validation(mock_record):
 
 
 def test_bulk_modify_by_filter(mock_swimlane, mock_app):
-    """Test bulk modify by filter tuples updates records with 'Numeric' fields equal to 1 setting value to 2"""
+    """Test bulk modify by filter tuples updates records"""
     # patch swimlane.requests method to assert_called_once_with
     with mock.patch.object(mock_swimlane, 'request', return_value=None) as mock_func:
         mock_app.records.bulk_modify(('Numeric', 'equals', 1), values={'Numeric': 2})
@@ -175,11 +175,11 @@ def test_bulk_modify_by_filter(mock_swimlane, mock_app):
 
 
 def test_bulk_modify_by_record(mock_swimlane, mock_app, mock_record):
-    """Test bulk modify by record update by record/list of records setting Numeric field to 2"""
+    """Test bulk modify by record/list of records"""
     # patch swimlane.requests method to assert_called_once_with
     with mock.patch.object(mock_swimlane, 'request', return_value=None) as mock_func:
         mock_app.records.bulk_modify(mock_record, values={'Numeric': 2})
-    mock_func.assert_called_once_with('put', "app/{0}/record/batch".format(mock_app.id),json=
+    mock_func.assert_called_once_with('put', "app/{0}/record/batch".format(mock_app.id), json=
         {'modifications': [{
             'fieldId': {
                 'type': 'Id', 'value': 'aqkg3'
@@ -189,7 +189,9 @@ def test_bulk_modify_by_record(mock_swimlane, mock_app, mock_record):
             'recordIds': ['58ebb22807637a02d4a14bd6']
         }
     )
+    # Ensure record field is being set
     assert mock_record['Numeric'] == 2
+
 
 def test_bulk_modify_errors(mock_app, mock_record):
     """Test bulk modify for expected ValueError on invalid inputs"""

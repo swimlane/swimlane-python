@@ -1,3 +1,4 @@
+import six
 from swimlane.core.cache import check_cache
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.report import Report
@@ -194,7 +195,6 @@ class RecordAdapter(AppResolver):
             json=[r._raw for r in new_records]
         )
 
-
     @requires_swimlane_version('2.17')
     def bulk_modify(self, *filters_or_records, **kwargs):
         """Shortcut to bulk modify records
@@ -245,17 +245,14 @@ class RecordAdapter(AppResolver):
         if not isinstance(values, dict):
             raise ValueError("values parameter must be dict of {'field_name': 'update_value'} pairs")
 
-        validate_filters_or_records(filters_or_records)
+        _type = validate_filters_or_records(filters_or_records)
 
         data_dict = {}
         record_stub = record_factory(self._app)
 
         # build record_id list
-        if isinstance(filters_or_records[0], Record):
-            record_ids = []
-            for record in filters_or_records:
-                record_ids.append(record.id)
-            data_dict['recordIds'] = record_ids
+        if _type is Record:
+            data_dict['recordIds'] = [record.id for record in filters_or_records]
 
         # build filters
         else:
@@ -285,9 +282,9 @@ class RecordAdapter(AppResolver):
 
         self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=data_dict)
 
-        if isinstance(filters_or_records[0], Record):
+        if _type is Record:
             for record in filters_or_records:
-                for field, val in values.items():
+                for field, val in six.iteritems(values):
                     record[field] = val
 
     @requires_swimlane_version('2.17')
@@ -295,7 +292,7 @@ class RecordAdapter(AppResolver):
         """Shortcut to bulk delete records
         .. versionadded:: 2.17.0
         Args:
-            *filters_or_records (tuple) or (Records): Either a list of Records, or a list of filters.
+            *filters_or_records (tuple) or (Record): Either a list of Records, or a list of filters.
         Examples:
             ::
                 # Bulk delete records by filter
@@ -312,7 +309,7 @@ class RecordAdapter(AppResolver):
         data_dict = {}
 
         # build record_id list
-        if isinstance(filters_or_records[0], Record):
+        if _type is Record:
             record_ids = []
             for record in filters_or_records:
                 record_ids.append(record.id)
@@ -335,7 +332,7 @@ class RecordAdapter(AppResolver):
 
 
 def validate_filters_or_records(filters_or_records):
-    """Validation for filters_or_records variable bassed into bulk_modify and bulk_delete"""
+    """Validation for filters_or_records variable based into bulk_modify and bulk_delete"""
     # If filters_or_records is empty, fail
     if not filters_or_records:
         raise ValueError('Must provide at least one filter tuples or Records')

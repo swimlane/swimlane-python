@@ -132,6 +132,7 @@ disable=
     logging-format-interpolation,
     duplicate-code,
     abstract-method
+    too-many-locals
 
 
 

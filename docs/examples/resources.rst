@@ -160,7 +160,7 @@ Any records not passing validation will cause the entire operation to fail.
     )
 
 
-Batch Record Delete
+Bulk Record Delete
 ^^^^^^^^^^^^^^^^^^^
 Delete multiple records at once.
 
@@ -186,7 +186,7 @@ Delete multiple records at once by filters using filter format from search.
 Bulk Record Modify
 ^^^^^^^^^^^^^^^^^^^
 
-Bulk modify records by records. Invalid function inputs will cause entire operation to fail.
+Bulk modify records by list of Record instances. Invalid function inputs will cause entire operation to fail.
 
 .. code-block:: python
 
@@ -197,7 +197,7 @@ Bulk modify records by records. Invalid function inputs will cause entire operat
 
     app.records.bulk_modify(record1, record2, record3, values={"Field_Name": new_value})
 
-Bulk modify records by filter. Invalid function inputs will cause entire operation to fail.
+Bulk modify records by filter tuples. Invalid function inputs will cause entire operation to fail.
 
 .. code-block:: python
 
@@ -211,7 +211,7 @@ Bulk modify records by filter. Invalid function inputs will cause entire operati
             "Field_Name": "New Value",
             "Numeric Field": 10
         }
-      )
+    )
 
 Record
 ------
