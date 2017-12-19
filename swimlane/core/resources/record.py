@@ -252,7 +252,7 @@ class Record(APIResource):
     def remove_restriction(self, *usergroups):
         """Remove UserGroup(s) from list of accounts with access to record
 
-        .. versionadded: 2.16.1
+        .. versionadded:: 2.16.1
 
         Notes:
             Does not take effect until calling `record.save()`

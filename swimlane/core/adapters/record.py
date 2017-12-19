@@ -1,8 +1,11 @@
+import warnings
+
 import six
+
 from swimlane.core.cache import check_cache
 from swimlane.core.resolver import AppResolver
-from swimlane.core.resources.report import Report
 from swimlane.core.resources.record import Record, record_factory
+from swimlane.core.resources.report import Report
 from swimlane.utils import random_string, one_of_keyword_only
 from swimlane.utils.version import requires_swimlane_version
 
@@ -140,8 +143,23 @@ class RecordAdapter(AppResolver):
 
         return new_record
 
+    def create_batch(self, *args, **kwargs):
+        """Old method name before bulk_create, bulk_modify, and bulk_delete were added
+
+        Calls :meth:`bulk_create` with whatever arguments have been passed and emits a DeprecationWarning
+
+        .. deprecated:: 2.17.0
+           Use :meth:`bulk_create` instead
+        """
+        warnings.warn(
+            '"app.records.create_batch(...)" has been deprecated and will be removed in next major release. '
+            'Use "app.records.bulk_create(...)" instead.',
+            DeprecationWarning
+        )
+        return self.bulk_create(*args, **kwargs)
+
     @requires_swimlane_version('2.15')
-    def create_batch(self, *records):
+    def bulk_create(self, *records):
         """Create and validate multiple records in associated app
 
         Args:
@@ -162,7 +180,7 @@ class RecordAdapter(AppResolver):
 
             ::
 
-                app.records.create_batch(
+                app.records.bulk_create(
                     {'Field 1': 'value 1', ...},
                     {'Field 1': 'value 2', ...},
                     {'Field 1': 'value 3', ...}

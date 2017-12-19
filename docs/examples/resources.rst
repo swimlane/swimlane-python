@@ -144,8 +144,8 @@ The newly created record is returned from the create create call after first bei
     })
 
 
-Batch Record Creation
-^^^^^^^^^^^^^^^^^^^^^
+Bulk Record Create
+^^^^^^^^^^^^^^^^^^
 
 Creating multiple records at once can also done withe the :obj:`app.records` adapter using only a single request.
 
@@ -153,15 +153,23 @@ Any records not passing validation will cause the entire operation to fail.
 
 .. code-block:: python
 
-    records = app.records.create_batch(
+    records = app.records.bulk_create(
         {'Text Field': 'Value 1', 'Numeric Field': 10, ...},
         {'Text Field': 'Value 2', 'Numeric Field': 20, ...},
         ...
     )
 
+.. note::
+
+    .. versionchanged:: 2.17.0
+        Method was renamed from `create_batch()` -> `bulk_create()`
+
+
+    `create_batch()` will be removed in next major release.
+
 
 Bulk Record Delete
-^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 Delete multiple records at once.
 
 .. code-block:: python
