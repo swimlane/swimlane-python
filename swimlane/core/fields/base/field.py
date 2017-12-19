@@ -24,6 +24,7 @@ class Field(SwimlaneResolver):
         self._value = self._unset
 
         self.field_definition = self.record.app.get_field_definition_by_name(self.name)
+        self.key = self.field_definition.get('key')
         self.id = self.field_definition['id']
         self.input_type = self.field_definition.get('inputType')
         self.required = self.field_definition.get('required', False)

@@ -1,5 +1,7 @@
 from functools import total_ordering
 
+import six
+
 from swimlane.exceptions import UnknownField
 from .base import APIResource
 
@@ -31,8 +33,15 @@ class App(APIResource):
         self.id = self._raw['id']
         self.tracking_id = self._raw.get('trackingFieldId')
 
-        self._fields_by_name = {f['name']: f for f in self._raw['fields']}
         self._fields_by_id = {f['id']: f for f in self._raw['fields']}
+        self._fields_by_name = {f['name']: f for f in self._raw['fields']}
+        self._keys_to_field_names = {}
+        for name, field_def in six.iteritems(self._fields_by_name):
+            # Include original name to simplify name resolution
+            self._keys_to_field_names[name] = name
+            key = field_def.get('key')
+            if key:
+                self._keys_to_field_names[key] = name
 
         # Avoid circular import
         from swimlane.core.adapters import RecordAdapter, ReportAdapter
@@ -64,6 +73,10 @@ class App(APIResource):
             'name': self.name,
             'acroynm': self.acronym
         }
+
+    def resolve_field_name(self, field_key):
+        """Return the field name matching the given key or None. Searches field keys first, falls back to field names"""
+        return self._keys_to_field_names.get(field_key)
 
     def get_field_definition_by_name(self, field_name):
         """Get JSON field definition for field matching provided name
