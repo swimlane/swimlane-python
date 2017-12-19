@@ -4,6 +4,8 @@ from swimlane.core.resources.report import Report
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.utils import random_string, one_of_keyword_only
 from swimlane.utils.version import requires_swimlane_version
+from swimlane.exceptions import ValidationError
+import swimlane.core.fields.base.field
 
 
 class RecordAdapter(AppResolver):
@@ -37,6 +39,19 @@ class RecordAdapter(AppResolver):
             return Record(self._app, response.json())
 
     def search(self, *filter_tuples, **kwargs):
+
+        def validate_value(self, value):
+            """Validate value has read only checking by default, ignoring read only during search"""
+            if value not in (None, self._unset):
+                if self.supported_types and not isinstance(value, tuple(self.supported_types)):
+                    raise ValidationError(self.record, "Field '{}' expects one of {}, got '{}' instead".format(
+                        self.name,
+                        ', '.join([repr(t.__name__) for t in self.supported_types]),
+                        type(value).__name__)
+                                          )
+        """runtime patch to negate read only checking during search"""
+        swimlane.core.fields.base.field.Field.validate_value = validate_value
+
         """Shortcut to generate a new temporary search report using provided filters and return the resulting records
 
         Args:
