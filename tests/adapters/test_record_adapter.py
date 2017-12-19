@@ -189,7 +189,7 @@ def test_bulk_modify_by_record(mock_swimlane, mock_app, mock_record):
             'recordIds': ['58ebb22807637a02d4a14bd6']
         }
     )
-
+    assert mock_record['Numeric'] == 2
 
 def test_bulk_modify_errors(mock_app, mock_record):
     """Test bulk modify for expected ValueError on invalid inputs"""

@@ -178,15 +178,15 @@ Delete multiple records at once by filters using filter format from search.
 .. code-block:: python
 
     # Delete by filter
-    records = app.records.batch_delete(
+    records = app.records.bulk_delete(
         ('Field_1', 'equals', value1),
         ('Field_2', 'equals', value2)
     )
 
-Batch Record Modify
+Bulk Record Modify
 ^^^^^^^^^^^^^^^^^^^
 
-Bulk modify records by filter or by list of records. Invalid function inputs will cause entire operation to fail.
+Bulk modify records by records. Invalid function inputs will cause entire operation to fail.
 
 .. code-block:: python
 
@@ -197,15 +197,19 @@ Bulk modify records by filter or by list of records. Invalid function inputs wil
 
     app.records.bulk_modify(record1, record2, record3, values={"Field_Name": new_value})
 
+Bulk modify records by filter. Invalid function inputs will cause entire operation to fail.
+
+.. code-block:: python
+
     # Modify by filter(s)
     app.records.bulk_modify(
-    # Query filters
-    ("Text Field", "equals", "Value"),
-    ("Number Field", "equals", 2),
-    # New values for records
-    values={
-        "Field_Name": new_value,
-        "Numeric Field": 10
+        # Query filters
+        ("Text Field", "equals", "Value"),
+        ("Number Field", "equals", 2),
+        # New values for records
+        values={
+            "Field_Name": "New Value",
+            "Numeric Field": 10
         }
       )
 

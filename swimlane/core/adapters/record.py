@@ -258,7 +258,7 @@ class RecordAdapter(AppResolver):
             data_dict['recordIds'] = record_ids
 
         # build filters
-        elif isinstance(filters_or_records[0], tuple):
+        else:
             filters = []
             for filter_tuples in filters_or_records:
                 field = record_stub.get_field(filter_tuples[0])
@@ -284,6 +284,11 @@ class RecordAdapter(AppResolver):
         data_dict['modifications'] = modifications
 
         self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=data_dict)
+
+        if isinstance(filters_or_records[0], Record):
+            for record in filters_or_records:
+                for field, val in values.items():
+                    record[field] = val
 
     @requires_swimlane_version('2.17')
     def bulk_delete(self, *filters_or_records):
