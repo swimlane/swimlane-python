@@ -101,10 +101,7 @@ class Field(SwimlaneResolver):
     def set_python(self, value):
         """Set field internal value from the python representation of field value"""
         self.validate_value(value)
-        return_value = self._set(value)
-
-
-        return return_value
+        return self._set(value)
 
     def set_swimlane(self, value):
         """Set field internal value from the swimlane representation of field value"""
