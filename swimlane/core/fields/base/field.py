@@ -96,12 +96,13 @@ class Field(SwimlaneResolver):
     def _set(self, value):
         """Default setter used for both representations unless overridden"""
         self._value = value
+        self.record._raw['values'][self.id] = self.get_swimlane()
 
     def set_python(self, value):
         """Set field internal value from the python representation of field value"""
         self.validate_value(value)
         return_value = self._set(value)
-        self.record._raw['values'][self.id] = self.get_swimlane()
+
 
         return return_value
 
