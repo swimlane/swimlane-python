@@ -1,4 +1,5 @@
 import numbers
+import warnings
 
 import mock
 import pytest
@@ -14,6 +15,7 @@ def test_get(mock_swimlane, mock_app, mock_record):
 
     with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
         assert mock_app.records.get(id='record_id') == mock_record
+
 
 def test_get_by_tracking_id(mock_swimlane, mock_app, mock_record):
     mock_response = mock.MagicMock()
@@ -62,13 +64,24 @@ def test_create(mock_swimlane, mock_app, mock_record):
     ([{'Status': 'Open'}], None),
     ([{'Status': 'Open'}, {'Status': 'Open'}], None)
 ])
-def test_create_batch(mock_app, records, expected):
+def test_bulk_create(mock_app, records, expected):
     if expected is not None:
         with pytest.raises(expected):
-            mock_app.records.create_batch(*records)
+            mock_app.records.bulk_create(*records)
 
     else:
-        mock_app.records.create_batch(*records)
+        mock_app.records.bulk_create(*records)
+
+
+def test_create_batch_deprecated(mock_app):
+    """Verify DeprecationWarning is emitted for create_batch method"""
+    with warnings.catch_warnings(record=True) as caught_warnings:
+        warnings.simplefilter("always")
+        mock_app.records.create_batch({}, {})
+
+        assert len(caught_warnings) == 1
+        assert issubclass(caught_warnings[-1].category, DeprecationWarning)
+        assert "create_batch" in str(caught_warnings[-1].message)
 
 
 def test_search(mock_swimlane, mock_app, mock_record):
