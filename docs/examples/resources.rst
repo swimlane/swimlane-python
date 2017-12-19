@@ -162,7 +162,9 @@ Any records not passing validation will cause the entire operation to fail.
 .. note::
 
     .. versionchanged:: 2.17.0
-       Method was renamed from `create_batch()` -> `bulk_create()`
+        Method was renamed from `create_batch()` -> `bulk_create()`
+
+    `create_batch()` will be removed in next major release.
 
 
 Bulk Record Delete
