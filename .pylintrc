@@ -131,7 +131,7 @@ disable=
     too-many-arguments,
     logging-format-interpolation,
     duplicate-code,
-    abstract-method
+    abstract-method,
     too-many-locals
 
 
