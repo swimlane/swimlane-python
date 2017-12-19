@@ -54,6 +54,7 @@ class AttachmentsField(CursorField):
         """Override setter, allow clearing cursor"""
         self.validate_value(value)
         self._value = value
+        self.record._raw['values'][self.id] = self.get_swimlane()
         self._cursor = None
 
     def set_python(self, value):
