@@ -1,8 +1,7 @@
 import mimetypes
 
+from swimlane.core.fields.base import MultiSelectField, FieldCursor
 from swimlane.core.resources.attachment import Attachment
-from swimlane.exceptions import ValidationError
-from .base import CursorField, FieldCursor
 
 
 class AttachmentCursor(FieldCursor):
@@ -31,39 +30,42 @@ class AttachmentCursor(FieldCursor):
         attachment = Attachment(self._record._swimlane, raw_attachment_data)
         self._elements.append(attachment)
 
-        self._record._raw['values'].setdefault(self._field.id, [])
-        self._record._raw['values'][self._field.id].append(attachment._raw)
+        self._sync_field()
 
         return attachment
 
 
-class AttachmentsField(CursorField):
+class AttachmentsField(MultiSelectField):
 
     field_type = (
         'Core.Models.Fields.AttachmentField, Core',
         'Core.Models.Fields.Attachment.AttachmentField, Core'
     )
     cursor_class = AttachmentCursor
+    supported_types = [Attachment]
+
+    def __init__(self, *args, **kwargs):
+        """Override to force-set multiselect to always True"""
+        super(AttachmentsField, self).__init__(*args, **kwargs)
+        self.multiselect = True
 
     def get_initial_elements(self):
         raw_value = self.get_swimlane() or []
 
-        return [Attachment(self.record._swimlane, raw) for raw in raw_value]
+        return [self.cast_to_python(raw) for raw in raw_value]
 
     def _set(self, value):
         """Override setter, allow clearing cursor"""
-        self.validate_value(value)
-        self._value = value
-        self.record._raw['values'][self.id] = self.get_swimlane()
+        super(AttachmentsField, self)._set(value)
         self._cursor = None
 
-    def set_python(self, value):
-        """Override to set key to None"""
-        if value is None:
-            value = []
-            super(AttachmentsField, self).set_python(value)
-        else:
-            raise ValidationError(
-                self.record,
-                'Value can only be set to None, to add attachments use AttachmentCursor.add()'
-            )
+    def cast_to_python(self, value):
+        return Attachment(self._swimlane, value)
+
+    def cast_to_swimlane(self, value):
+        return value._raw
+
+    def get_swimlane(self):
+        attachments = super(AttachmentsField, self).get_swimlane()
+
+        return attachments

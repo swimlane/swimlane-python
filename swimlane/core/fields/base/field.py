@@ -83,7 +83,7 @@ class Field(SwimlaneResolver):
         return self.cast_to_swimlane(value)
 
     def validate_value(self, value):
-        """Validate value is an acceptable type during _set operation"""
+        """Validate value is an acceptable type during set_python operation"""
         if self.readonly:
             raise ValidationError(self.record, "Cannot set readonly field '{}'".format(self.name))
         if value not in (None, self._unset):

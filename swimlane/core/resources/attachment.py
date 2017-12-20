@@ -26,6 +26,9 @@ class Attachment(APIResource):
     def __str__(self):
         return str(self.filename)
 
+    def __hash__(self):
+        return hash(self.file_id)
+
     def download(self, chunk_size=1024):
         """Download attachment
 
