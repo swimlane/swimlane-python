@@ -64,8 +64,3 @@ class AttachmentsField(MultiSelectField):
 
     def cast_to_swimlane(self, value):
         return value._raw
-
-    def get_swimlane(self):
-        attachments = super(AttachmentsField, self).get_swimlane()
-
-        return attachments
