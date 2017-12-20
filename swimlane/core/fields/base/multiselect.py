@@ -56,8 +56,8 @@ class MultiSelectField(CursorField):
 
         return super(MultiSelectField, self).get_swimlane()
 
-    def _set(self, value):
-        """Expect single instance of supported_types or iterable of instances of supported_types when multi-select"""
+    def set_python(self, value):
+        """Override to remove key from raw data when empty to work with server 2.16+ validation"""
         if self.multiselect:
             value = value or []
             elements = []
@@ -70,10 +70,6 @@ class MultiSelectField(CursorField):
         else:
             self.validate_value(value)
 
-        super(MultiSelectField, self)._set(value)
-
-    def set_python(self, value):
-        """Override to remove key from raw data when empty to work with server 2.16+ validation"""
         self._set(value)
 
         if self.multiselect and not self._value:

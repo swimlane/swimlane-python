@@ -34,6 +34,7 @@ class UserGroup(APIResource):
         return hash((self.id, self.name))
 
     def __eq__(self, other):
+        """Override to allow equality comparisons across UserGroup, User, and Group instances"""
         return isinstance(other, UserGroup) and hash(self) == hash(other)
 
     def __lt__(self, other):

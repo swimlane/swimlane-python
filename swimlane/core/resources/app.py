@@ -54,9 +54,6 @@ class App(APIResource):
     def __hash__(self):
         return hash((self.id, self.name))
 
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and hash(self) == hash(other)
-
     def __lt__(self, other):
         if not isinstance(other, self.__class__):
             raise TypeError("Comparisons not supported between instances of '{}' and '{}'".format(

@@ -21,7 +21,11 @@ class FieldCursor(Cursor, SwimlaneResolver):
         self.__field_ref = weakref.ref(field)
 
     def __repr__(self):
-        return '<{self.__class__.__name__}: {self._record} ({length})>'.format(self=self, length=len(self))
+        # pylint: disable=missing-format-attribute
+        return '<{self.__class__.__name__}: {self._record}["{self._field.name}"] ({length})>'.format(
+            self=self,
+            length=len(self)
+        )
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and other._record.id == self._record.id

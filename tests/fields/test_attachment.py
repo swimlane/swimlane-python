@@ -45,20 +45,41 @@ def test_attachment_field(mock_swimlane, mock_record):
 
 
 def test_attachment_remove(mock_record):
-    attachments = mock_record['PCAP Attachment']
-    # ensure attachments are present
+    field_name = 'PCAP Attachment'
+    field = mock_record.get_field(field_name)
+    attachments = mock_record[field_name]
+    # ensure attachments are present, and record values has the expected field id for the attachments field
     assert len(attachments) > 0
+    assert field.id in mock_record._raw['values']
 
     # ensure ValidationError on setting to value other than 'None'
     with pytest.raises(ValidationError):
-        mock_record['PCAP Attachment'] = 'invalid'
+        mock_record[field_name] = 'invalid'
 
-    mock_record['PCAP Attachment'] = None
+    mock_record[field_name] = None
 
-    # ensure record is now set to empty list
-    assert mock_record._raw['values']['aep2e'] == []
+    # ensure field id has been removed from record values
+    assert field.id not in mock_record._raw['values']
 
     # assert new cursor
-    newattachments = mock_record['PCAP Attachment']
+    newattachments = mock_record[field_name]
     assert len(newattachments) == 0
     assert newattachments is not attachments
+
+
+def test_set_attachments_validation(mock_swimlane, mock_record):
+    """Verify type validation when setting an attachments field"""
+    attachment = Attachment(mock_swimlane, {
+        '$type': 'Core.Models.Record.Attachment, Core',
+        'fileId': '1234',
+        'filename': 'filename.txt',
+        'uploadDate': '2017-04-10T16:26:17.017Z'
+    })
+
+    field_name = 'PCAP Attachment'
+    mock_record[field_name] = [attachment]
+    assert list(mock_record[field_name]) == [attachment]
+
+    with pytest.raises(ValidationError):
+        mock_record[field_name] = [1, 2, 3]
+
