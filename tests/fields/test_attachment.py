@@ -43,6 +43,10 @@ def test_attachment_field(mock_swimlane, mock_record):
         assert isinstance(new_attachment, Attachment)
         assert len(attachments) == 2
 
+        # Test adding another attachment
+        attachments.add('next-filename.txt', BytesIO(b'file contents in stream/handle object'))
+        assert len(attachments) == 3
+
 
 def test_attachment_remove(mock_record):
     field_name = 'PCAP Attachment'
