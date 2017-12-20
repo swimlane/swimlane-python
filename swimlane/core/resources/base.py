@@ -34,6 +34,10 @@ class APIResource(six.with_metaclass(APIResourceMetaclass, SwimlaneResolver)):
     def __str__(self):
         return ''
 
+    def __hash__(self):
+        """Added for py2+3 compat"""
+        return int(id(self) / 16)
+
     def __eq__(self, other):
         """Determine if an APIResource is of the same type and has the same hash value"""
         return isinstance(other, self.__class__) and hash(self) == hash(other)
