@@ -34,8 +34,6 @@ class DatetimeField(Field):
         self.supported_types = self._input_type_map.get(self.input_type, [datetime])
 
     def _set(self, value):
-        self.validate_value(value)
-
         # Force to appropriate Pendulum instance for consistency
         if value is not None:
             if self.input_type == self._type_interval:
