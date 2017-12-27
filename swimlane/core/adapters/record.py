@@ -249,6 +249,8 @@ class RecordAdapter(AppResolver):
 
                 app.records.bulk_modify(record1, record2, record3, values={"Field_Name": new_value})
 
+        Returns:
+            :class:`string`: Bulk Modify Job ID
 
 
                 """
@@ -298,12 +300,13 @@ class RecordAdapter(AppResolver):
             })
         data_dict['modifications'] = modifications
 
-        self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=data_dict)
+        job_id = self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=data_dict)
 
         if _type is Record:
             for record in filters_or_records:
                 for field, val in six.iteritems(values):
                     record[field] = val
+        return job_id.text
 
     @requires_swimlane_version('2.17')
     def bulk_delete(self, *filters_or_records):
@@ -321,7 +324,11 @@ class RecordAdapter(AppResolver):
                 record2 = app.records.get(tracking_id='APP-2')
                 record3 = app.records.get(tracking_id='APP-3')
                 app.records.bulk_delete(record1, record2, record3)
+
+        Returns:
+            :class:`string`: Bulk Modify Job ID
             """
+
 
         _type = validate_filters_or_records(filters_or_records)
         data_dict = {}
@@ -346,7 +353,7 @@ class RecordAdapter(AppResolver):
                 })
             data_dict['filters'] = filters
 
-        self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict)
+        return self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict).text
 
 
 def validate_filters_or_records(filters_or_records):
