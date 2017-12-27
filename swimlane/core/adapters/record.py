@@ -306,8 +306,9 @@ class RecordAdapter(AppResolver):
             for record in filters_or_records:
                 for field, val in six.iteritems(values):
                     record[field] = val
-        return job_id.text
-
+        if job_id:
+            return job_id.text
+        return None
     @requires_swimlane_version('2.17')
     def bulk_delete(self, *filters_or_records):
         """Shortcut to bulk delete records
@@ -353,7 +354,10 @@ class RecordAdapter(AppResolver):
                 })
             data_dict['filters'] = filters
 
-        return self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict).text
+        job_id = self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict)
+        if job_id:
+            return job_id.text
+        return None
 
 
 def validate_filters_or_records(filters_or_records):
