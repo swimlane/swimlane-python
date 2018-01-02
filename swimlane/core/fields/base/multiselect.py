@@ -72,9 +72,6 @@ class MultiSelectField(CursorField):
 
         self._set(value)
 
-        if self.multiselect and not self._value:
-            self.record._raw['values'].pop(self.id, None)
-
     def set_swimlane(self, value):
         if self.multiselect:
             value = value or []

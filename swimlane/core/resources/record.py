@@ -169,6 +169,13 @@ class Record(APIResource):
         else:
             method = 'put'
 
+        # Pop off fields with None value to allow for saving empty fields
+        copy_raw = copy.copy(self._raw['values'])
+        for item in copy_raw:
+            if not copy_raw[item]:
+                self._raw['values'].pop(item)
+
+
         self.validate()
 
         response = self._swimlane.request(

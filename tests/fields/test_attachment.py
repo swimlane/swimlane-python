@@ -62,9 +62,6 @@ def test_attachment_remove(mock_record):
 
     mock_record[field_name] = None
 
-    # ensure field id has been removed from record values
-    assert field.id not in mock_record._raw['values']
-
     # assert new cursor
     newattachments = mock_record[field_name]
     assert len(newattachments) == 0
