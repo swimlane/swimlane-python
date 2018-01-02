@@ -343,6 +343,40 @@ Check the status of app.records.bulk_modify() or app.records.bulk_delete() jobs.
     # bulk modify record
     job_id = app.records.bulk_modify(record, values={'number': 2})
     # get status
-    status_dict = swimlane.helpers.check_job_status(job_id)
+    status = swimlane.helpers.check_bulk_job_status(job_id)
     # last index of list is dictionary most recent update to job history
-    status = status_dict[-1]['status']
+    print(status)
+
+    # print(status) will print out the following
+    [{'$type': 'Core.Models.Jobs.JobInfo, Core',
+      'job': 'a4EDVRY7UOHpz5_xV',
+      'status': 'started',
+      'task': 'BatchRecordUpdate'},
+     {'$type': 'Core.Models.Jobs.JobInfo, Core',
+      'job': 'a4EDVRY7UOHpz5_xV',
+      'message': 'Batch update 100% completed.',
+      'status': 'inProgress',
+      'task': 'BatchRecordUpdate'},
+     {'$type': 'Core.Models.Jobs.JobInfo, Core',
+      'details': {'$type': 'Core.Models.Notifications.BulkModifyFinishedNotification, Core',
+       'applicationId': 'aRDyEl8ZRd7gKrEN5',
+       'bulkModificationType': 'update',
+       'dateTime': '2018-01-02T16:46:46.4982709Z',
+       'disabled': False,
+       'errors': [],
+       'id': 'aJxpdAwvKWUSaEPRz',
+       'jobId': 'a4EDVRY7UOHpz5_xV',
+       'notificationType': 'console',
+       'output': 'Task complete',
+       'status': 'Finished',
+       'taskName': 'BatchRecordUpdate',
+       'totalRecordsSkipped': 1,
+       'totalRecordsUpdated': 0,
+       'userName': 'admin',
+       'warnings': [{'$type': 'Core.Models.Notifications.RecordMessage, Core',
+         'message': 'Record is already locked, skipping',
+         'recordId': 'aPieydMqIo6lgwxd9',
+         'trackingId': 'BNAW-15'}]},
+      'job': 'a4EDVRY7UOHpz5_xV',
+      'status': 'completed',
+      'task': 'BatchRecordUpdate'}]

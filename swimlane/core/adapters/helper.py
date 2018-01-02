@@ -56,7 +56,7 @@ class HelperAdapter(SwimlaneResolver):
             }
         )
 
-    def check_job_status(self, job_id):
+    def check_bulk_job_status(self, job_id):
         """Check status of bulk_delete or bulk_modify jobs
         .. versionadded:: 2.17.0
         Args:
