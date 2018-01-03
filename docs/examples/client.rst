@@ -337,17 +337,19 @@ Check the status of app.records.bulk_modify() or app.records.bulk_delete() jobs.
 
 .. code-block:: python
 
-    # Get app and record
-    app = swimlane_instance.apps.list()[0]
-    record = app.records.get('record_id')
-    # bulk modify record
-    job_id = app.records.bulk_modify(record, values={'number': 2})
-    # get status
+    # Get target app
+    app = swimlane.apps.get(name='App')
+
+    # Bulk modify records matching filters
+    job_id = app.records.bulk_modify(
+        ('Numeric', 'equals', 1), 
+        values={'Numeric': 2}
+    )
+    
+    # Check bulk job status
     status = swimlane.helpers.check_bulk_job_status(job_id)
-    # last index of list is dictionary most recent update to job history
     print(status)
 
-    # print(status) will print out the following
     [{'$type': 'Core.Models.Jobs.JobInfo, Core',
       'job': 'a4EDVRY7UOHpz5_xV',
       'status': 'started',
