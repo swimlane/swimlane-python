@@ -216,13 +216,17 @@ class RecordAdapter(AppResolver):
     @requires_swimlane_version('2.17')
     def bulk_modify(self, *filters_or_records, **kwargs):
         """Shortcut to bulk modify records
+        
         .. versionadded:: 2.17.0
+        
         Args:
             *filters_or_records (tuple) or (Record): Either a list of Records, or a list of filters.
 
         Keyword Args:
             values (dict): Dictionary of one or more 'field_name': 'new_value' pairs to update
 
+        Notes:
+            Requires Swimlane 2.17+
 
         Examples:
 
@@ -231,15 +235,17 @@ class RecordAdapter(AppResolver):
                 # Bulk update records by filter
 
                 app.records.bulk_modify(
-                # Query filters
-                ('Field_1', 'equals', value1),
-                ('Field_2', 'equals', value2),
-                # New values for records
-                values={
-                       "Field3": value3,
-                       "Field_4": value4
-                        }
-                 )
+                    # Query filters
+                    ('Field_1', 'equals', value1),
+                    ('Field_2', 'equals', value2),
+                    ...
+                    # New values for records
+                    values={
+                        "Field_3": value3,
+                        "Field_4": value4,
+                        ...
+                    }
+                )
 
                 # Bulk update records
 
@@ -247,13 +253,11 @@ class RecordAdapter(AppResolver):
                 record2 = app.records.get(tracking_id='APP-2')
                 record3 = app.records.get(tracking_id='APP-3')
 
-                app.records.bulk_modify(record1, record2, record3, values={"Field_Name": new_value})
+                app.records.bulk_modify(record1, record2, record3, values={"Field_Name": 'new value'})
 
         Returns:
             :class:`string`: Bulk Modify Job ID
-
-
-                """
+        """
         values = kwargs.pop('values', None)
 
         if kwargs:
@@ -300,27 +304,39 @@ class RecordAdapter(AppResolver):
             })
         data_dict['modifications'] = modifications
 
-        job_id = self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=data_dict)
+        response = self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=data_dict)
 
+        # Update records if instances were used to submit bulk modify request after request was successful
         if _type is Record:
             for record in filters_or_records:
                 for field, val in six.iteritems(values):
                     record[field] = val
-        if job_id:
-            return job_id.text
-        return None
+                    
+        return response.text
+
     @requires_swimlane_version('2.17')
     def bulk_delete(self, *filters_or_records):
         """Shortcut to bulk delete records
+        
         .. versionadded:: 2.17.0
+        
         Args:
             *filters_or_records (tuple) or (Record): Either a list of Records, or a list of filters.
+            
+        Notes:
+            Requires Swimlane 2.17+
+            
         Examples:
+        
             ::
+            
                 # Bulk delete records by filter
-                app.records.bulk_delete(('Field_1', 'equals', value1),
-                                        ('Field_2', 'equals', value2))
-                # Bulk delete records
+                app.records.bulk_delete(
+                    ('Field_1', 'equals', value1),
+                    ('Field_2', 'equals', value2)
+                )
+                
+                # Bulk delete by record instances
                 record1 = app.records.get(tracking_id='APP-1')
                 record2 = app.records.get(tracking_id='APP-2')
                 record3 = app.records.get(tracking_id='APP-3')
@@ -328,8 +344,7 @@ class RecordAdapter(AppResolver):
 
         Returns:
             :class:`string`: Bulk Modify Job ID
-            """
-
+        """
 
         _type = validate_filters_or_records(filters_or_records)
         data_dict = {}
@@ -354,14 +369,10 @@ class RecordAdapter(AppResolver):
                 })
             data_dict['filters'] = filters
 
-        job_id = self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict)
-        if job_id:
-            return job_id.text
-        return None
-
+        return self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict).text
 
 def validate_filters_or_records(filters_or_records):
-    """Validation for filters_or_records variable based into bulk_modify and bulk_delete"""
+    """Validation for filters_or_records variable from bulk_modify and bulk_delete"""
     # If filters_or_records is empty, fail
     if not filters_or_records:
         raise ValueError('Must provide at least one filter tuples or Records')
