@@ -67,5 +67,5 @@ class HelperAdapter(SwimlaneResolver):
 
         """
 
-        return self._swimlane.request('get', "/logging/job/{0}".format(job_id)).json()
+        return self._swimlane.request('get', "logging/job/{0}".format(job_id)).json()
 
