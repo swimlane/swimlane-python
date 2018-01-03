@@ -170,18 +170,19 @@ class Record(APIResource):
             method = 'put'
 
         # Pop off fields with None value to allow for saving empty fields
-        copy_raw = copy.copy(self._raw['values'])
-        for item in copy_raw:
-            if not copy_raw[item]:
-                self._raw['values'].pop(item)
-
+        copy_raw = copy.copy(self._raw)
+        values_dict = {}
+        for key, value in six.iteritems(copy_raw['values']):
+            if value is not None:
+                values_dict[key] = value
+        copy_raw['values'] = values_dict
 
         self.validate()
 
         response = self._swimlane.request(
             method,
             'app/{}/record'.format(self.app.id),
-            json=self._raw
+            json=copy_raw
         )
 
         # Reinitialize record with new raw content returned from server to update any calculated fields
