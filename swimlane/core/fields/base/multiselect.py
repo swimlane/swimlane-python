@@ -48,13 +48,16 @@ class MultiSelectField(CursorField):
         if self.multiselect:
             value = self._get()
             children = []
+            if value:
+                for child in value:
+                    children.append(self.cast_to_swimlane(child))
 
-            for child in value:
-                children.append(self.cast_to_swimlane(child))
-
-            return children
-
+                return children
+            return None
         return super(MultiSelectField, self).get_swimlane()
+
+    def _set(self, value):
+        return super(MultiSelectField, self)._set(value or None)
 
     def set_python(self, value):
         """Override to remove key from raw data when empty to work with server 2.16+ validation"""

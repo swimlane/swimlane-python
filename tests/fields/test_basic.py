@@ -82,15 +82,16 @@ def test_all_fields_empty_value(mock_record, field_class):
     """Test setting fields to empty value works for all field classes"""
     # Get any not readonly field instance of provided field_class
     # Does not guarantee full scope of all field subtypes function as expected
-    field = next((_field for _field in mock_record._fields.values() if isinstance(_field, field_class) and not _field.readonly))
+    for field in mock_record._fields.values():
+        if isinstance(field, field_class) and not field.readonly:
+            del mock_record[field.name]
 
-    del mock_record[field.name]
+            swimlane = field.get_swimlane()
+            python = field.get_python()
+            if getattr(field, 'is_multiselect', False) or isinstance(python, FieldCursor):
+                # Multi select fields use cursors or ordered sets in most cases
+                assert swimlane is None
+                assert len(python) == 0
 
-    swimlane = field.get_swimlane()
-    python = field.get_python()
-
-    if getattr(field, 'is_multiselect', False) or isinstance(python, FieldCursor):
-        # Multi select fields use cursors or ordered sets in most cases
-        assert len(swimlane) == len(python) == 0
-    else:
-        assert swimlane is python is None
+            else:
+                assert swimlane is python is None

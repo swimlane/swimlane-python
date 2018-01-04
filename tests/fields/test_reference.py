@@ -43,6 +43,16 @@ class TestReferenceField(object):
             field.set_swimlane(mock_record.id)
             assert mock_record.id in field._value
 
+    def test_empty_multi_select(self, mock_record):
+        """Test empty multi select reference field"""
+
+        field = mock_record.get_field('Reference')
+        mock_record['Reference'] = None
+        swimlane = field.get_swimlane()
+        python = field.get_python()
+        assert swimlane is None
+        assert len(python) == 0
+
     def test_lazy_retrieval(self, mock_app, mock_record):
         """Test lazy retrieval of referenced records"""
         # Can't patch attribute
