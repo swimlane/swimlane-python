@@ -55,3 +55,17 @@ class HelperAdapter(SwimlaneResolver):
                 'createdDate': pendulum.now().to_rfc3339_string()
             }
         )
+
+    def check_bulk_job_status(self, job_id):
+        """Check status of bulk_delete or bulk_modify jobs
+        .. versionadded:: 2.17.0
+        Args:
+            job_id (str): Job ID
+
+        Returns:
+            :class:`list` of :class:`dict`: List of dictionaries containing job history
+
+        """
+
+        return self._swimlane.request('get', "logging/job/{0}".format(job_id)).json()
+
