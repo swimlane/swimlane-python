@@ -118,6 +118,7 @@ class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
         5010: 'RequiredFieldMissing',
         5011: 'UnableToRetrieveEncryptionKey',
         5012: 'PathNotFound',
+        5013: 'WrongType',
         6000: 'ConnectionDataNotProvided',
         7000: 'RegexNotDefined',
         7001: 'AssetNotFound',
