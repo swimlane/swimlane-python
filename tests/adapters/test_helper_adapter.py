@@ -45,3 +45,10 @@ def test_add_comment(mock_swimlane):
         )
 
         assert mock_request.call_count == 1
+
+def test_check_bulk_job_status(mock_swimlane):
+
+    job_id = 'as03235as'
+    with mock.patch.object(mock_swimlane, 'request') as mock_request:
+        mock_swimlane.helpers.check_bulk_job_status(job_id)
+    mock_request.assert_called_once_with('get', 'logging/job/{0}'.format(job_id))
