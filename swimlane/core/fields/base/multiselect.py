@@ -45,6 +45,7 @@ class MultiSelectField(CursorField):
         return self._get()
 
     def get_swimlane(self):
+        """Handle multi-select and single-select modes"""
         if self.multiselect:
             value = self._get()
             children = []
@@ -57,6 +58,7 @@ class MultiSelectField(CursorField):
         return super(MultiSelectField, self).get_swimlane()
 
     def _set(self, value):
+        """Override to treat empty lists as None"""
         return super(MultiSelectField, self)._set(value or None)
 
     def set_python(self, value):
@@ -76,6 +78,7 @@ class MultiSelectField(CursorField):
         self._set(value)
 
     def set_swimlane(self, value):
+        """Cast all multi-select elements to correct internal type like single-select mode"""
         if self.multiselect:
             value = value or []
             children = []
