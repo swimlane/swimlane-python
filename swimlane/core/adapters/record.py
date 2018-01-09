@@ -299,7 +299,7 @@ class RecordAdapter(AppResolver):
                     "value": mod_field.id,
                     "type": "Id"
                 },
-                "value": mod_field.cast_to_swimlane(update_value),
+                "value": mod_field.get_report(update_value),
                 "type": "Create"
             })
         data_dict['modifications'] = modifications
