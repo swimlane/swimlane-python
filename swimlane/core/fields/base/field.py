@@ -15,6 +15,9 @@ class Field(SwimlaneResolver):
     # List of supported types, leave blank to disable type validation
     supported_types = []
 
+    # Checks if bulk modify is supported for field
+    bulk_modify_support = True
+
     def __init__(self, name, record):
         """Value not included during instantiation to prevent ambiguity between python and swimlane representations"""
         super(Field, self).__init__(record._swimlane)

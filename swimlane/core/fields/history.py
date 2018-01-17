@@ -63,3 +63,4 @@ class HistoryField(ReadOnly, CursorField):
 
     field_type = 'Core.Models.Fields.History.HistoryField, Core'
     cursor_class = RevisionCursor
+    bulk_modify_support = False

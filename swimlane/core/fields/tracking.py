@@ -7,3 +7,4 @@ class TrackingField(ReadOnly, Field):
         'Core.Models.Fields.TrackingField, Core',
         'Core.Models.Fields.Tracking.TrackingField, Core'
     )
+    bulk_modify_support = False

@@ -43,6 +43,7 @@ class AttachmentsField(MultiSelectField):
     )
     cursor_class = AttachmentCursor
     supported_types = [Attachment]
+    bulk_modify_support = False
 
     def __init__(self, *args, **kwargs):
         """Override to force-set multiselect to always True"""
