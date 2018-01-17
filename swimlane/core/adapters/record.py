@@ -3,11 +3,38 @@ import warnings
 import six
 
 from swimlane.core.cache import check_cache
+from swimlane.core.fields.valueslist import ValuesListField
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.core.resources.report import Report
 from swimlane.utils import random_string, one_of_keyword_only
 from swimlane.utils.version import requires_swimlane_version
+
+
+def _cast_to_bulk(field, value):
+    """Method used to temporarily allow Bulk Modify for Value Lists,
+    Not intended for public use Patch will be removed at next release"""
+    if isinstance(field, ValuesListField):
+        if field.multiselect:
+            value = value or []
+            children = []
+            for child in value:
+                field.validate_value(child)
+                children.append(field.cast_to_swimlane(child))
+
+            return children
+        field.validate_value(value)
+        return field.cast_to_swimlane(value)
+
+    else:
+        if field.multiselect:
+            value = value or []
+            children = []
+            for child in value:
+                children.append(field.cast_to_report(child))
+
+            return children
+        return field.cast_to_report(value)
 
 
 class RecordAdapter(AppResolver):
@@ -294,12 +321,14 @@ class RecordAdapter(AppResolver):
         modifications = []
         for field_name, update_value in values.items():
             mod_field = record_stub.get_field(field_name)
+            if not mod_field.bulk_modify_support:
+                raise ValueError("Field '{}' of Type '{}', is not supported for bulk modify".format(field_name, mod_field.field_type[0]))
             modifications.append({
                 "fieldId": {
                     "value": mod_field.id,
                     "type": "Id"
                 },
-                "value": mod_field.get_report(update_value),
+                "value": _cast_to_bulk(mod_field, update_value),
                 "type": "Create"
             })
         data_dict['modifications'] = modifications
@@ -370,6 +399,7 @@ class RecordAdapter(AppResolver):
             data_dict['filters'] = filters
 
         return self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict).text
+
 
 def validate_filters_or_records(filters_or_records):
     """Validation for filters_or_records variable from bulk_modify and bulk_delete"""

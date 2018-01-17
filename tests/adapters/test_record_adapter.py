@@ -6,8 +6,9 @@ import pytest
 import six
 
 from swimlane.exceptions import UnknownField
-from swimlane.core.adapters.record import validate_filters_or_records
-
+from swimlane.core.adapters.record import validate_filters_or_records, _cast_to_bulk
+from swimlane.core.fields.valueslist import ValuesListField
+from swimlane.core.fields.datetime import DatetimeField
 
 def test_get(mock_swimlane, mock_app, mock_record):
     mock_response = mock.MagicMock()
@@ -220,4 +221,36 @@ def test_bulk_modify_errors(mock_app, mock_record):
     # ValueError when additional kwargs beyond values
     with pytest.raises(ValueError):
         mock_app.records.bulk_modify(mock_record, values={}, other_val={})
+    # ValueError when using unsupported fields
+    with pytest.raises(ValueError):
+        mock_app.records.bulk_modify(mock_record, values={'PCAP Attachment': mock_record['PCAP Attachment']})
 
+
+def test_bulk_format_patch(mock_record, mock_group, mock_user):
+
+    # test if case multiselect (Values List)
+    value_field = mock_record.get_field('Values List')
+    value_cursor = mock_record['Values List']
+    assert len(value_cursor) == 2
+    assert _cast_to_bulk(value_field, value_cursor) != value_field.get_report(value_cursor)
+
+    # test if case singleselect (Values List)
+
+    mock_record['Status'] = 'Closed'
+    single_value_field = mock_record.get_field('Status')
+    assert _cast_to_bulk(single_value_field, 'Closed') != single_value_field.get_report('Closed')
+
+    # test else case multiselect (User/Groups)
+
+    group_value = mock_record['User/Groups']
+    group_field = mock_record.get_field('User/Groups')
+    mock_record['User/Groups'] = [mock_group, mock_user]
+    assert len(group_value) == 2
+    assert _cast_to_bulk(group_field, group_value) == group_field.get_report(group_value)
+
+    # test else case singleselect
+
+    single_group_field = mock_record._fields['User/Groups']
+    single_group_field.set_swimlane([{'$type': 'Core.Models.Utilities.UserGroupSelection, Core'}])
+    single_group_value = mock_record['User/Groups']
+    assert _cast_to_bulk(single_group_field, single_group_value) == single_group_field.get_report(single_group_value)

@@ -34,6 +34,7 @@ class CommentsField(ReadOnly, CursorField):
         'Core.Models.Fields.Comments.CommentsField, Core'
     )
     cursor_class = CommentCursor
+    bulk_modify_support = False
 
     def get_initial_elements(self):
         raw_comments = self.record._raw['comments'].get(self.id, [])
