@@ -21,7 +21,6 @@ def _cast_to_bulk(field, value):
             for child in value:
                 field.validate_value(child)
                 children.append(field.cast_to_swimlane(child))
-
             return children
         field.validate_value(value)
         return field.cast_to_swimlane(value)
@@ -32,7 +31,6 @@ def _cast_to_bulk(field, value):
             children = []
             for child in value:
                 children.append(field.cast_to_report(child))
-
             return children
         return field.cast_to_report(value)
 
@@ -322,7 +320,7 @@ class RecordAdapter(AppResolver):
         for field_name, update_value in values.items():
             mod_field = record_stub.get_field(field_name)
             if not mod_field.bulk_modify_support:
-                raise ValueError("Field '{}' of Type '{}', is not supported for bulk modify".format(field_name, mod_field.field_type[0]))
+                raise ValueError("Field '{}' of Type '{}', is not supported for bulk modify".format(field_name, mod_field.__class__.__name__))
             modifications.append({
                 "fieldId": {
                     "value": mod_field.id,
@@ -332,7 +330,6 @@ class RecordAdapter(AppResolver):
                 "type": "Create"
             })
         data_dict['modifications'] = modifications
-
         response = self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=data_dict)
 
         # Update records if instances were used to submit bulk modify request after request was successful
@@ -340,7 +337,7 @@ class RecordAdapter(AppResolver):
             for record in filters_or_records:
                 for field, val in six.iteritems(values):
                     record[field] = val
-                    
+
         return response.text
 
     @requires_swimlane_version('2.17')
