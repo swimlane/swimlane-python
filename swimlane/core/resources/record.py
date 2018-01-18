@@ -316,4 +316,12 @@ def record_factory(app, fields=None):
     for name, value in six.iteritems(fields):
         record[name] = value
 
+    # Pop off fields with None value to allow for saving empty fields
+    copy_raw = copy.copy(record._raw)
+    values_dict = {}
+    for key, value in six.iteritems(copy_raw['values']):
+        if value is not None:
+            values_dict[key] = value
+    record._raw['values'] = values_dict
+
     return record
