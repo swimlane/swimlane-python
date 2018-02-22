@@ -117,14 +117,18 @@ class Swimlane(object):
         Raises:
             swimlane.exceptions.InvalidServerVersion: If server major version is higher than package major version
         """
-        if compare_versions('.'.join([_lib_major_version, _lib_minor_version]), self.version) > 0:
+        if compare_versions('.'.join([_lib_major_version, _lib_minor_version]), self.build_version) > 0:
             logger.warning('Client version {} connecting to server with newer minor release {}.'.format(
                 _lib_full_version,
-                self.version
+                self.build_version
             ))
 
-        if compare_versions(_lib_major_version, self.version) != 0:
-            raise InvalidServerVersion(self, _lib_major_version, str(int(_lib_major_version) + 1))
+        if compare_versions(_lib_major_version, self.build_version) != 0:
+            raise InvalidServerVersion(
+                self,
+                '{}.0.0'.format(_lib_major_version),
+                '{}.0.0'.format(str(int(_lib_major_version) + 1))
+            )
 
     def __repr__(self):
         return '<{cls}: {user} @ {host}>'.format(
@@ -198,8 +202,38 @@ class Swimlane(object):
 
     @property
     def version(self):
-        """Server API version"""
+        """Full Swimlane version"""
         return self.settings['apiVersion']
+
+    @property
+    def product_version(self):
+        """Swimlane product version"""
+        version_separator = '+'
+        if version_separator in self.version:
+            # Post product/build version separation
+            return self.version.split(version_separator)[0]
+        # Pre product/build version separation
+        return self.version
+
+    @property
+    def build_version(self):
+        """Swimlane semantic build version"""
+        version_separator = '+'
+        if version_separator in self.version:
+            # Post product/build version separation
+            return self.version.split(version_separator)[1]
+        # Pre product/build version separation
+        return self.version
+
+    @property
+    def build_number(self):
+        """Swimlane build number"""
+        version_separator = '+'
+        if version_separator in self.version:
+            # Post product/build version separation
+            return self.version.split(version_separator)[2]
+        # Pre product/build version separation
+        return self.version
 
     @property
     def user(self):

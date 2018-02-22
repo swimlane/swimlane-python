@@ -69,7 +69,9 @@ class InvalidServerVersion(SwimlaneException, NotImplementedError):
         else:
             message = '<= {}'.format(self.max_version)
 
-        super(InvalidServerVersion, self).__init__('Server version {}, must be '.format(swimlane.version) + message)
+        super(InvalidServerVersion, self).__init__(
+            'Server build version {}, must be '.format(self.swimlane.build_version) + message
+        )
 
 
 class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
