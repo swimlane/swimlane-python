@@ -95,7 +95,7 @@ def test_server_version_checks():
     with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
         with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
             with mock.patch.object(Swimlane, 'settings', new_callable=mock.PropertyMock) as mock_settings:
-                mock_settings.return_value = {'apiVersion': '2.15.0'}
+                mock_settings.return_value = {'apiVersion': '2.18+4.0.0+123456'}
 
                 with mock.patch('swimlane.core.client.compare_versions', return_value=0):
                     Swimlane('http://host', 'admin', 'password')
@@ -207,3 +207,33 @@ def test_cache_default_disabled(mock_swimlane, mock_record):
     """Test caching is disabled with default Swimlane arguments"""
     mock_swimlane.resources_cache.cache(mock_record)
     assert len(mock_swimlane.resources_cache) == 0
+
+
+def test_old_version_breakdown():
+    """Test that product version, build version, and build number produce expected values in old single value format"""
+    with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
+        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+            with mock.patch.object(Swimlane, 'settings', new_callable=mock.PropertyMock) as mock_settings:
+                version = '2.17.0-123456'
+                mock_settings.return_value = {'apiVersion': version}
+
+                sw = Swimlane('http://host', 'admin', 'password', verify_server_version=False)
+                assert sw.version == version
+                assert sw.product_version == '2.17.0'
+                assert sw.build_version == '2.17.0'
+                assert sw.build_number == '123456'
+
+
+def test_new_version_breakdown():
+    """Test that product version, build version, and build number produce expected values in new multi value format"""
+    with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
+        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+            with mock.patch.object(Swimlane, 'settings', new_callable=mock.PropertyMock) as mock_settings:
+                version = '2.18+4.0.0+123456'
+                mock_settings.return_value = {'apiVersion': version}
+
+                sw = Swimlane('http://host', 'admin', 'password', verify_server_version=False)
+                assert sw.version == version
+                assert sw.product_version == '2.18'
+                assert sw.build_version == '4.0.0'
+                assert sw.build_number == '123456'

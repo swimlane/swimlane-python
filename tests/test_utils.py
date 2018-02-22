@@ -195,7 +195,7 @@ class TestRequiresSwimlaneVersion(object):
     def test_call_invalid_version(self, swimlane_version, min_version, max_version):
         """Test that InvalidServerVersion is raised when calling a method with an out of range Swimlane version"""
         mock_swimlane = mock.MagicMock()
-        mock_swimlane.version = swimlane_version
+        mock_swimlane.build_version = swimlane_version
 
         resolver_class = self._get_resolver(min_version, max_version)
 
@@ -218,7 +218,7 @@ class TestRequiresSwimlaneVersion(object):
     def test_call_valid_version(self, swimlane_version, min_version, max_version):
         """Test that InvalidServerVersion is raised when calling a method with an out of range Swimlane version"""
         mock_swimlane = mock.MagicMock()
-        mock_swimlane.version = swimlane_version
+        mock_swimlane.build_version = swimlane_version
 
         resolver_class = self._get_resolver(min_version, max_version)
 

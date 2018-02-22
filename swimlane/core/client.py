@@ -213,7 +213,7 @@ class Swimlane(object):
             # Post product/build version separation
             return self.version.split(version_separator)[0]
         # Pre product/build version separation
-        return self.version
+        return self.version.split('-')[0]
 
     @property
     def build_version(self):
@@ -223,7 +223,7 @@ class Swimlane(object):
             # Post product/build version separation
             return self.version.split(version_separator)[1]
         # Pre product/build version separation
-        return self.version
+        return self.product_version
 
     @property
     def build_number(self):
@@ -233,7 +233,7 @@ class Swimlane(object):
             # Post product/build version separation
             return self.version.split(version_separator)[2]
         # Pre product/build version separation
-        return self.version
+        return self.version.split('-')[1]
 
     @property
     def user(self):

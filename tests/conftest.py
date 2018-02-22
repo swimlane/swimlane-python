@@ -16,7 +16,7 @@ def mock_swimlane():
         with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
             swimlane = Swimlane('http://host', 'admin', 'password', verify_server_version=False)
             swimlane._Swimlane__settings = {
-                'apiVersion': '2.17.0-123456'
+                'apiVersion': '2.18.0+4.0.0+123456'
             }
             swimlane._session.auth.user = mock_user(swimlane)
 
