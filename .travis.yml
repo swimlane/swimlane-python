@@ -30,3 +30,4 @@ deploy:
   on:
     tags: true
     repo: swimlane/swimlane-python
+    condition: $TRAVIS_PYTHON_VERSION = '2.7'
