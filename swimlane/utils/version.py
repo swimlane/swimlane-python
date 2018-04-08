@@ -57,7 +57,7 @@ def compare_versions(version_a, version_b, zerofill=False):
 
 
 def requires_swimlane_version(min_version=None, max_version=None):
-    """Decorator for SwimlaneResolver methods that verifies Swimlane server is within a given inclusive range
+    """Decorator for SwimlaneResolver methods verifying Swimlane server build version is within a given inclusive range
 
     Raises:
         InvalidVersion: Raised before decorated method call if Swimlane server version is out of provided range

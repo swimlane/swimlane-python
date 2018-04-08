@@ -94,14 +94,9 @@ Manually clone from `Github repository`_, checkout, and install specific branch 
 Versioning
 ^^^^^^^^^^
 
-The Swimlane python driver is versioned along with the **Swimlane platform semantic build version**, and will support
+The Swimlane python driver is versioned along with the **Swimlane product version**, and will support
 all minor versions below installed version. The latest major release should always be installed matching the target
-server major build version. Patch versions can float between server and driver, and may not always match.
-
-.. note::
-
-    The product version is unrelated to the build version, and is ignored by the python driver. Throughout the rest of
-    the documentation, any reference to version should be considered the build version, not the product version.
+server major build version. Patch version is reserved for driver fixes, and is not related to Swimlane server version.
 
 Newer minor server releases will typically work as expected, but could have minor inconsistencies or missing features.
 A warning message will be logged when connecting to a newer minor server release than the current driver release, but
@@ -112,8 +107,8 @@ will otherwise work as expected.
     Major versions of driver and server are incompatible, and will **NOT** work together and will raise
     :class:`swimlane.exceptions.InvalidServerVersion` when attempting to connect.
 
-For example, `swimlane==2.15.0` will fully support build versions 2.0.0 - 2.15.x, will warn and attempt to work when
-connecting to versions 2.16.0 - 2.y.z, and will fail when connecting to versions >= 3.0.0.
+For example, `swimlane==2.15.0` will fully support Swimlane versions 2.0 - 2.15, will warn and attempt to work when
+connecting to versions 2.16 - 2.x, and will fail when connecting to versions 3.0+.
 
 
 
