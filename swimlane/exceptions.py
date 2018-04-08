@@ -48,8 +48,8 @@ class ValidationError(SwimlaneException, ValueError):
         )
 
 
-class InvalidServerVersion(SwimlaneException, NotImplementedError):
-    """Raised when method requiring a specific server version range is called when connected to server outside range
+class _InvalidSwimlaneVersion(SwimlaneException, NotImplementedError):
+    """Base class raised when connecting to unsupported versions of Swimlane
 
     Attributes:
         swimlane (Swimlane): Swimlane client failing the version check
@@ -62,15 +62,42 @@ class InvalidServerVersion(SwimlaneException, NotImplementedError):
         self.min_version = min_version
         self.max_version = max_version
 
-        if self.min_version and self.max_version:
-            message = 'between {} - {}'.format(self.min_version, self.max_version)
-        elif self.min_version:
-            message = '>= {}'.format(self.min_version)
-        else:
-            message = '<= {}'.format(self.max_version)
+        super(_InvalidSwimlaneVersion, self).__init__(self._get_message())
 
-        super(InvalidServerVersion, self).__init__(
-            'Server build version {}, must be '.format(self.swimlane.build_version) + message
+    def _get_range_string(self):
+        if self.min_version and self.max_version:
+            range_string = '>= {}, < {}'.format(self.min_version, self.max_version)
+        elif self.min_version:
+            range_string = '>= {}'.format(self.min_version)
+        else:
+            range_string = '<= {}'.format(self.max_version)
+
+        return range_string
+
+    def _get_message(self):
+        return 'Swimlane version {}, must be {}'.format(
+            self.swimlane.version,
+            self._get_range_string()
+        )
+
+
+class InvalidSwimlaneBuildVersion(_InvalidSwimlaneVersion):
+    """Raised when method connected to Swimlane with build version outside a required range"""
+
+    def _get_message(self):
+        return 'Swimlane build version {}, must be {}'.format(
+            self.swimlane.build_version,
+            self._get_range_string()
+        )
+
+
+class InvalidSwimlaneProductVersion(_InvalidSwimlaneVersion):
+    """Raised when method connected to Swimlane with product version outside a required range"""
+
+    def _get_message(self):
+        return 'Swimlane product version {}, must be {}'.format(
+            self.swimlane.product_version,
+            self._get_range_string()
         )
 
 

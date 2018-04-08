@@ -7,7 +7,7 @@ import pytest
 from pkg_resources import DistributionNotFound
 
 from swimlane.core.resolver import SwimlaneResolver
-from swimlane.exceptions import InvalidServerVersion
+from swimlane.exceptions import InvalidSwimlaneBuildVersion
 from swimlane.utils import (
     random_string,
     get_recursive_subclasses,
@@ -201,7 +201,7 @@ class TestRequiresSwimlaneVersion(object):
 
         resolver = resolver_class(mock_swimlane)
 
-        with pytest.raises(InvalidServerVersion):
+        with pytest.raises(InvalidSwimlaneBuildVersion):
             resolver.func()
 
     @pytest.mark.parametrize('swimlane_version,min_version,max_version', [

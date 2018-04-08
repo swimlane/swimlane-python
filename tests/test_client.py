@@ -4,7 +4,7 @@ import pytest
 from requests import HTTPError
 
 from swimlane.core.client import SwimlaneAuth, Swimlane
-from swimlane.exceptions import SwimlaneHTTP400Error, InvalidServerVersion
+from swimlane.exceptions import SwimlaneHTTP400Error, InvalidSwimlaneProductVersion
 
 
 def test_request_handling(mock_swimlane):
@@ -101,7 +101,7 @@ def test_server_version_checks():
                     Swimlane('http://host', 'admin', 'password')
 
                 with mock.patch('swimlane.core.client.compare_versions', return_value=1):
-                    with pytest.raises(InvalidServerVersion):
+                    with pytest.raises(InvalidSwimlaneProductVersion):
                         Swimlane('http://host', 'admin', 'password')
 
 

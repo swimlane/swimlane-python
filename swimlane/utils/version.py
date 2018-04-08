@@ -3,7 +3,7 @@ import re
 
 from pkg_resources import get_distribution, DistributionNotFound
 
-from swimlane.exceptions import InvalidServerVersion
+from swimlane.exceptions import InvalidSwimlaneBuildVersion
 
 
 def compare_versions(version_a, version_b, zerofill=False):
@@ -77,10 +77,10 @@ def requires_swimlane_version(min_version=None, max_version=None):
             swimlane = self._swimlane
 
             if min_version and compare_versions(min_version, swimlane.build_version, True) < 0:
-                raise InvalidServerVersion(swimlane, min_version, max_version)
+                raise InvalidSwimlaneBuildVersion(swimlane, min_version, max_version)
 
             if max_version and compare_versions(swimlane.build_version, max_version, True) < 0:
-                raise InvalidServerVersion(swimlane, min_version, max_version)
+                raise InvalidSwimlaneBuildVersion(swimlane, min_version, max_version)
 
             return func(self, *args, **kwargs)
 

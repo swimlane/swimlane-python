@@ -13,7 +13,7 @@ from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter, Helper
 from swimlane.core.cache import ResourcesCache
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.usergroup import User
-from swimlane.exceptions import SwimlaneHTTP400Error, InvalidServerVersion
+from swimlane.exceptions import SwimlaneHTTP400Error, InvalidSwimlaneProductVersion
 from swimlane.utils.version import get_package_version, compare_versions
 
 # Disable insecure request warnings
@@ -124,7 +124,7 @@ class Swimlane(object):
             ))
 
         if compare_versions(_lib_major_version, self.product_version) != 0:
-            raise InvalidServerVersion(
+            raise InvalidSwimlaneProductVersion(
                 self,
                 '{}.0'.format(_lib_major_version),
                 '{}.0'.format(str(int(_lib_major_version) + 1))
