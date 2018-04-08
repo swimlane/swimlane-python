@@ -926,7 +926,7 @@ def mock_app(mock_swimlane):
                     'name': 'User/Groups',
                     'selectable': [],
                     'selectionType': 'multi',
-                    'showAllGroups': False,
+                    'showAllGroups': True,
                     'showAllUsers': True,
                     'users': []},
                    {'$type': 'Core.Models.Fields.ValuesListField, Core',
