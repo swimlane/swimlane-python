@@ -200,7 +200,7 @@ def test_auth(mock_swimlane):
 
 
 def test_repr(mock_swimlane):
-    assert repr(mock_swimlane) == '<Swimlane: admin @ http://host>'
+    assert repr(mock_swimlane) == '<Swimlane: admin @ http://host v3.0+5.0.0+123456>'
 
 
 def test_cache_default_disabled(mock_swimlane, mock_record):

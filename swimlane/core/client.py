@@ -109,32 +109,33 @@ class Swimlane(object):
             self.__verify_server_version()
 
     def __verify_server_version(self):
-        """Verify connected to supported server version
+        """Verify connected to supported server product version
 
         Notes:
-            Logs warning if connecting to a newer server version
+            Logs warning if connecting to a newer minor server version
 
         Raises:
             swimlane.exceptions.InvalidServerVersion: If server major version is higher than package major version
         """
-        if compare_versions('.'.join([_lib_major_version, _lib_minor_version]), self.build_version) > 0:
+        if compare_versions('.'.join([_lib_major_version, _lib_minor_version]), self.product_version) > 0:
             logger.warning('Client version {} connecting to server with newer minor release {}.'.format(
                 _lib_full_version,
-                self.build_version
+                self.product_version
             ))
 
-        if compare_versions(_lib_major_version, self.build_version) != 0:
+        if compare_versions(_lib_major_version, self.product_version) != 0:
             raise InvalidServerVersion(
                 self,
-                '{}.0.0'.format(_lib_major_version),
-                '{}.0.0'.format(str(int(_lib_major_version) + 1))
+                '{}.0'.format(_lib_major_version),
+                '{}.0'.format(str(int(_lib_major_version) + 1))
             )
 
     def __repr__(self):
-        return '<{cls}: {user} @ {host}>'.format(
+        return '<{cls}: {user} @ {host} v{version}>'.format(
             cls=self.__class__.__name__,
             user=self.user,
-            host=self.host
+            host=self.host,
+            version=self.version
         )
 
     def request(self, method, api_endpoint, **kwargs):
@@ -202,7 +203,7 @@ class Swimlane(object):
 
     @property
     def version(self):
-        """Full Swimlane version"""
+        """Full Swimlane version, <product_version>+<build_version>+<build_number>"""
         return self.settings['apiVersion']
 
     @property
@@ -217,7 +218,10 @@ class Swimlane(object):
 
     @property
     def build_version(self):
-        """Swimlane semantic build version"""
+        """Swimlane semantic build version
+
+        Falls back to product version in pre-2.18 releases
+        """
         version_separator = '+'
         if version_separator in self.version:
             # Post product/build version separation
