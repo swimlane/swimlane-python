@@ -55,22 +55,3 @@ def test_usergroup_from_report(mock_record):
     field.set_swimlane([{'$type': 'Core.Models.Utilities.UserGroupSelection, Core'}])
 
     assert list(mock_record[field_name]) == []
-
-
-def test_usergroup_allowed_choices(mock_record, mock_swimlane):
-    """Verify choices restrictions for usergroup fields"""
-    field = mock_record.get_field('User/Groups (Multi Restricted)')
-
-    good_id = 'aN99r5xmQ__wW'
-    bad_id = 'aN99r5xmQUGQV'
-
-    with pytest.raises(ValidationError):
-        field.set_python([UserGroup(mock_swimlane, {'id': bad_id, 'name': 'test'})])
-
-    usergroup = UserGroup(mock_swimlane, {'id': good_id, 'name': 'test'})
-
-    field.set_python([usergroup])
-
-    assert list(field.get_python()) == [usergroup]
-
-
