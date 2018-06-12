@@ -1,25 +1,47 @@
-"""Creates dist/swimlane-python-offline-installer-win_amd64-<py_version>.zip offline driver installer for windows"""
+"""Creates dist/swimlane-python-offline-installer-<platform>-<py_version>.pyz offline driver installer archives"""
 import glob
 import os
 import tempfile
 import shutil
+import subprocess
 from zipfile import ZipFile
 
 import sys
-from pip import main as pipmain
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-ALL_DEPS_DIR = tempfile.mkdtemp()
+# Map readable platform name to pip / .whl platform value
+PY_PLATFORMS = {
+    'windows': 'win_amd64',
+    'linux': 'manylinux1_x86_64'
+}
 
 # Python configs
 PY_VERSION = '{}{}'.format(sys.version_info.major, sys.version_info.minor)
-PY_PLATFORM = 'win_amd64'
+PY_PLATFORM = PY_PLATFORMS['windows']
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+
+ALL_DEPS_DIR = tempfile.mkdtemp()
+CACHE_DIR = tempfile.mkdtemp()
 
 # Build local wheel
 print('Building swimlane wheel')
 os.chdir(os.path.join(ROOT_DIR, '..'))
-pipmain(['wheel', '--no-deps', '-w', ALL_DEPS_DIR, '.'])
+subprocess.check_call(
+    r'''
+    pip \
+    --cache-dir="{cache_dir}" \
+    wheel \
+    --no-deps \
+    -w "{deps_dir}" \
+    .
+    '''.format(
+        deps_dir=ALL_DEPS_DIR,
+        cache_dir=CACHE_DIR
+    ),
+    shell=True
+)
 swimlane_whl = glob.glob(os.path.join(ALL_DEPS_DIR, 'swimlane-*'))[0]
 swimlane_version = swimlane_whl.split('/')[-1].split('-')[1]
 print('Built swimlane version ' + swimlane_version)
@@ -31,7 +53,17 @@ print('Downloading all dependencies to {}'.format(ALL_DEPS_DIR))
 os.chdir(ALL_DEPS_DIR)
 
 # Initial pass to recursively grab all deps, regardless of platform support
-pipmain(['download', '-r', os.path.join(ROOT_DIR, '..', 'requirements.txt')])
+subprocess.check_call(
+    r'''
+    pip \
+    --cache-dir="{cache_dir}" \
+    download -r {requirements} \
+    '''.format(
+        cache_dir=CACHE_DIR,
+        requirements=os.path.join(ROOT_DIR, '..', 'requirements.txt')
+    ),
+    shell=True
+)
 
 ZIPAPP_DIR = tempfile.mkdtemp()
 
@@ -51,17 +83,29 @@ for f in os.listdir(ALL_DEPS_DIR):
     name, version = f.rsplit('-', 4)[:2]
     package = '=='.join([name, version])
 
-    # Try to download Windows-platform wheel
-    if pipmain([
-        'download',
-        '--no-deps',
-        '--platform={}'.format(PY_PLATFORM),
-        '--python-version={}'.format(PY_VERSION),
-        '--abi=cp{}m'.format(PY_VERSION),
-        '--only-binary=:all:',
-        package
-    ]):
-        # Non-zero exit code, package not available as a Windows wheel, just copy in tar file as dep
+    # Try to download platform-specific wheel
+    try:
+        abi_extension = 'mu' if PY_PLATFORM == 'manylinux1_x86_64' else 'm'
+        subprocess.check_call(
+            r'''
+            pip --cache-dir="{cache_dir}" download \
+            --no-deps \
+            --platform={platform} \
+            --python-version={version} \
+            --abi=cp{version}{abi_extension} \
+            --only-binary=:all: \
+            {package}
+            '''.format(
+                cache_dir=CACHE_DIR,
+                platform=PY_PLATFORM,
+                abi_extension=abi_extension,
+                version=PY_VERSION,
+                package=package
+            ),
+            shell=True
+        )
+    except Exception:
+        # Non-zero exit code, package not available as a platform-specific wheel, just copy in tar file as dep
         shutil.copy(filename, REAL_DEPS_DIR)
 
 print('Collected dependencies to {}'.format(REAL_DEPS_DIR))
