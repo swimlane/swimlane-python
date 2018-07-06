@@ -28,14 +28,22 @@ sys.path.insert(0, os.path.abspath('..'))
 
 import swimlane
 
-from sphinx.apidoc import main
-
 apidoc_dir = './apidoc'
 if os.path.isdir(apidoc_dir):
     shutil.rmtree(apidoc_dir)
 
-main(['-f', '-T', '-e', '-M', '-o', apidoc_dir, '../swimlane'])
+argv = ['-f', '-T', '-e', '-M', '-o', apidoc_dir, '../swimlane']
+try:
+    # Sphinx 1.7+
+    from sphinx.ext import apidoc
 
+    apidoc.main(argv)
+except ImportError:
+    # Sphinx 1.6 (and earlier)
+    from sphinx import apidoc
+
+    argv.insert(0, apidoc.__file__)
+    apidoc.main(argv)
 
 # -- General configuration ------------------------------------------------
 
