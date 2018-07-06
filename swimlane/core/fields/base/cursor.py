@@ -22,7 +22,7 @@ class FieldCursor(Cursor, SwimlaneResolver):
 
     def __repr__(self):
         # pylint: disable=missing-format-attribute
-        return '<{self.__class__.__name__}: {self._record}["{self._field.name}"] ({length})>'.format(
+        return '<{self.__class__.__name__}: {self._record!r}["{self._field.name}"] ({length})>'.format(
             self=self,
             length=len(self)
         )

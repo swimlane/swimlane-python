@@ -78,7 +78,7 @@ def test_values_list_multi_select_field(mock_record):
 
 
 def test_cursor_repr(mock_record):
-    assert repr(mock_record['Values List']) == '<MultiSelectCursor: RA-7["Values List"] (2)>'
+    assert repr(mock_record['Values List']) == '<MultiSelectCursor: <Record: RA-7>["Values List"] (2)>'
 
 
 def test_get_report(mock_record):
