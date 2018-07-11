@@ -220,7 +220,7 @@ class ListField(CursorField):
 
     def cast_to_swimlane(self, value):
         value = super(ListField, self).cast_to_swimlane(value)
-        return [self._build_list_item(item) for item in value]
+        return [self._build_list_item(item) for item in value] or None
 
     def _build_list_item(self, item_value):
         """Return a dict with random ID and $type for API representation of value"""
