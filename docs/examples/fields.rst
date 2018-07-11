@@ -324,6 +324,53 @@ Field can be set directly to any iterable, overwriting current selection entirel
     assert len(record['Values List']) == 2
 
 
+ListField
+---------
+
+Text and numeric list field. Uses a :class:`TextListFieldCursor` or a :class:`NumericListFieldCursor` depending on the
+field type to enforce min/max item count restrictions, min/max character/word limits, and numeric range restrictions.
+
+Cursor works exactly like a normal primitive Python :class:`list` with added validation around any methods modifying the
+list or its items, and when overriding the field value entirely.
+
+.. code-block:: python
+
+    # Cursor behaving like a list
+    text_list_cursor = record['Text List Field']
+
+    # Iteration
+    for value in text_list_cursor:
+        print(value)
+
+    # Modification
+    text_list_cursor.reverse()
+    text_list_cursor.insert(0, 'new value')
+
+    # Index/slice
+    assert text_list_cursor[0] == 'new value'
+
+    # Contains
+    assert 'new value' in text_list_cursor
+
+    # Type validation
+    # Failing validation will not modify the field value
+    original_values = list(text_list_cursor)
+    try:
+        text_list_cursor.append(123)
+    except ValidationError:
+        assert len(original_values) == len(text_list_cursor)
+
+    # Replacement
+    # Can be set directly to a new list of values
+    record['Text List Field'] = ['new', 'values']
+
+    # Any invalid values will abort the entire operation
+    try:
+        record['Text List Field'] = ['text', 456]
+    except ValidationError:
+        assert list(record['Text List Field']) == ['new', 'values']
+
+
 UserGroupField
 --------------
 
