@@ -17,12 +17,13 @@ class FieldCursor(Cursor, SwimlaneResolver):
 
         self._elements = initial_elements or self._elements
 
+        self.__field_name = field.name
         self.__record_ref = weakref.ref(field.record)
         self.__field_ref = weakref.ref(field)
 
     def __repr__(self):
         # pylint: disable=missing-format-attribute
-        return '<{self.__class__.__name__}: {self._record}["{self._field.name}"] ({length})>'.format(
+        return '<{self.__class__.__name__}: {self._record!r}["{self._field.name}"] ({length})>'.format(
             self=self,
             length=len(self)
         )
@@ -40,7 +41,13 @@ class FieldCursor(Cursor, SwimlaneResolver):
 
     @property
     def _field(self):
-        return self.__field_ref()
+        field = self.__field_ref()
+        # Occurs when a record is saved and reinitialized, creating new Field instances and losing the existing weakref
+        # Update weakref to point to new Field instance of the same name
+        if field is None:
+            field = self._record.get_field(self.__field_name)
+            self.__field_ref = weakref.ref(field)
+        return field
 
 
 class CursorField(Field):

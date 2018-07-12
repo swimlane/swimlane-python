@@ -5,3 +5,4 @@ pyuri>=0.3,<0.4
 requests[security]>=2,<3
 six>=1.10,<1.11
 sortedcontainers>=1.5,<1.6
+shortid==0.1.2
