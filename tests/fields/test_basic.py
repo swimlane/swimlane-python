@@ -6,6 +6,7 @@ import six
 
 from swimlane.core.fields import resolve_field_class, _FIELD_TYPE_MAP, Field, _build_field_type_map
 from swimlane.core.fields.base import ReadOnly, FieldCursor
+from swimlane.core.fields.list import ListField
 from swimlane.exceptions import ValidationError
 from swimlane.utils import get_recursive_subclasses
 
@@ -76,7 +77,7 @@ def test_error_on_invalid_field_type():
 
 @pytest.mark.parametrize(
     'field_class',
-    [cls for cls in _FIELD_TYPE_MAP.values() if not issubclass(cls, ReadOnly)]
+    [cls for cls in _FIELD_TYPE_MAP.values() if not (issubclass(cls, ReadOnly) or cls == ListField)]
 )
 def test_all_fields_empty_value(mock_record, field_class):
     """Test setting fields to empty value works for all field classes"""
