@@ -2,6 +2,8 @@
 
 import logging
 
+import jwt
+import pendulum
 import requests
 from pyuri import URI
 from requests.compat import json
@@ -96,8 +98,7 @@ class Swimlane(object):
         self._session.auth = SwimlaneAuth(
             self,
             username,
-            password,
-            verify_ssl
+            password
         )
 
         self.apps = AppAdapter(self)
@@ -184,6 +185,7 @@ class Swimlane(object):
 
         response = self._session.request(method, urljoin(str(self.host) + self._api_root, api_endpoint), **kwargs)
 
+        # Roll 400 errors up into SwimlaneHTTP400Errors with specific Swimlane error code support
         try:
             response.raise_for_status()
         except requests.HTTPError as error:
@@ -248,52 +250,67 @@ class Swimlane(object):
 class SwimlaneAuth(SwimlaneResolver):
     """Handles authentication for all requests"""
 
+    _token_expiration_buffer = pendulum.Interval(minutes=5)
+
     def __init__(self, swimlane, username, password, verify_ssl=True):
         super(SwimlaneAuth, self).__init__(swimlane)
 
-        self.user, self._login_headers = self.authenticate(username, password, verify_ssl)
+        self._username = username
+        self._password = password
+        self._verify_ssl = verify_ssl
+
+        self.user = None
+        self._login_headers = {}
+        self._token_expiration = pendulum.now()
 
     def __call__(self, request):
+        """Attach necessary headers to all requests
+
+        Automatically reauthenticate before sending request when nearing token expiration
+        """
+
+        # Refresh token if it expires soon
+        if pendulum.now() + self._token_expiration_buffer >= self._token_expiration:
+            self.authenticate()
 
         request.headers.update(self._login_headers)
 
         return request
 
-    def authenticate(self, username, password, verify_ssl=True):
-        """Send login request and return User instance and login headers"""
-        # Explicitly provide verify_ssl argument, appears to not consistently be acknowledged across versions during
-        # initial setup for auth
+    def authenticate(self):
+        """Send login request and update User instance, login headers, and token expiration"""
+
+        # Temporarily remove auth from Swimlane session for auth request to avoid recursive loop during login request
+        self._swimlane._session.auth = None
         resp = self._swimlane.request(
             'post',
             'user/login',
             json={
-                'userName': username,
-                'password': password,
+                'userName': self._username,
+                'password': self._password,
                 'domain': ''
             },
-            verify=verify_ssl
         )
-        json_content = resp.json()
+        self._swimlane._session.auth = self
 
-        # Check for token in response content
+        # Get JWT from response content
+        json_content = resp.json()
         token = json_content.pop('token', None)
 
-        if token is None:
-            # Legacy cookie authentication (2.13-)
-            headers = {'Cookie': ';'.join(
-                ["%s=%s" % cookie for cookie in resp.cookies.items()]
-            )}
-        else:
-            # JWT auth (2.14+)
-            headers = {
-                'Authorization': 'Bearer {}'.format(token)
-            }
+        # Grab token expiration
+        token_data = jwt.decode(token, verify=False)
+        token_expiration = pendulum.from_timestamp(token_data['exp'])
 
-        # User
+        headers = {
+            'Authorization': 'Bearer {}'.format(token)
+        }
 
+        # Create User instance for authenticating user from login response data
         user = User(self._swimlane, _user_raw_from_login_content(json_content))
 
-        return user, headers
+        self._login_headers = headers
+        self.user = user
+        self._token_expiration = token_expiration
 
 
 def _user_raw_from_login_content(login_content):
