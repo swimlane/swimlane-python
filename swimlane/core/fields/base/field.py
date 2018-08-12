@@ -67,6 +67,14 @@ class Field(SwimlaneResolver):
 
         return self.cast_to_report(value)
 
+    def get_bulk_modify(self, value):
+        """Return value in format for bulk modify"""
+        if self.multiselect:
+            value = value or []
+            return [self.cast_to_bulk_modify(child) for child in value]
+
+        return self.cast_to_bulk_modify(value)
+
     def cast_to_python(self, value):
         """Called during set_swimlane, should accept a single raw value as provided from API
 
@@ -84,6 +92,11 @@ class Field(SwimlaneResolver):
     def cast_to_report(self, value):
         """Cast single value to report format, defaults to cast_to_swimlane(value)"""
         return self.cast_to_swimlane(value)
+
+    def cast_to_bulk_modify(self, value):
+        """Cast single value to bulk modify format, defaults to cast_to_report with added validation"""
+        self.validate_value(value)
+        return self.cast_to_report(value)
 
     def validate_value(self, value):
         """Validate value is an acceptable type during set_python operation"""

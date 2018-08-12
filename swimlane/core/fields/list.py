@@ -222,6 +222,11 @@ class ListField(CursorField):
         value = super(ListField, self).cast_to_swimlane(value)
         return [self._build_list_item(item) for item in value] or None
 
+    def cast_to_bulk_modify(self, value):
+        """List fields use raw list values for bulk modify"""
+        self.validate_value(value)
+        return value
+
     def _build_list_item(self, item_value):
         """Return a dict with random ID and $type for API representation of value"""
         return {
@@ -229,3 +234,4 @@ class ListField(CursorField):
             'id': SID.generate(),
             'value': item_value
         }
+

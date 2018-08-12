@@ -51,7 +51,13 @@ class ValuesListField(MultiSelectField):
         }
 
     def cast_to_report(self, value):
+        """Report format uses only the value's id"""
         value = super(ValuesListField, self).cast_to_report(value)
 
         if value:
             return value['id']
+
+    def cast_to_bulk_modify(self, value):
+        """Bulk modify uses the normal Swimlane representation"""
+        self.validate_value(value)
+        return self.cast_to_swimlane(value)
