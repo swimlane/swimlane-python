@@ -287,8 +287,7 @@ class SwimlaneAuth(SwimlaneResolver):
             'user/login',
             json={
                 'userName': self._username,
-                'password': self._password,
-                'domain': ''
+                'password': self._password
             },
         )
         self._swimlane._session.auth = self
