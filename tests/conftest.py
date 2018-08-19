@@ -9,11 +9,13 @@ from swimlane.core.resources.record import Record
 from swimlane.core.resources.usergroup import User, Group
 from swimlane.core.resources.report import Report
 
+
 @pytest.fixture
 def mock_swimlane():
     """Return a mock Swimlane client"""
+    # Patch around SwimlaneAuth.authenticate sending request, and manually assign a User instance
     with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
-        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+        with mock.patch.object(SwimlaneAuth, 'authenticate'):
             swimlane = Swimlane('http://host', 'admin', 'password', verify_server_version=False)
             swimlane._Swimlane__settings = {
                 'apiVersion': '3.0+5.0.0+123456'

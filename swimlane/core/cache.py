@@ -30,7 +30,7 @@ class ResourcesCache(object):
         self.__cache_index_key_map = {}
 
         if self.__cache_max_size == 0:
-            logger.warning('Cache size set to 0, resource caching disabled')
+            logger.debug('Cache size set to 0, resource caching disabled')
 
     def __len__(self):
         """Return sum of all cache sizes"""

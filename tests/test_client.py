@@ -106,54 +106,11 @@ def test_server_version_checks():
 
 
 def test_auth(mock_swimlane):
-    """Test automatic auth request and header injection with automatic version handling"""
+    """Test automatic auth request and header injection"""
     with mock.patch.object(mock_swimlane._session, 'request') as mock_request:
         mock_response = mock.MagicMock()
         mock_request.return_value = mock_response
 
-        # Swimlane v2.13-
-        mock_response.json.return_value = {
-            '$type': 'API.Models.Identity.AuthorizeModel, API',
-            'active': False,
-            'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
-            'createdDate': '2017-03-31T09:10:52.717Z',
-            'disabled': False,
-            'displayName': 'admin',
-            'groups': [{'$type': 'Core.Models.Base.Entity, Core',
-                        'disabled': False,
-                        'id': '58de1d1c07637a0264c0ca71',
-                        'name': 'Everyone'}],
-            'id': '58de1d1c07637a0264c0ca6a',
-            'isAdmin': True,
-            'isMe': True,
-            'lastLogin': '2017-04-27T14:11:38.54Z',
-            'lastPasswordChangedDate': '2017-03-31T09:10:52.536Z',
-            'modifiedByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
-            'modifiedDate': '2017-03-31T09:10:52.76Z',
-            'name': 'admin',
-            'passwordComplexityScore': 3,
-            'passwordResetRequired': False,
-            'permission': {'$type': 'Core.Models.Security.PermissionMatrix, Core'},
-            'roles': [{'$type': 'Core.Models.Base.Entity, Core',
-                       'disabled': False,
-                       'id': '58de1d1c07637a0264c0ca64',
-                       'name': 'Administrator'}],
-            'userName': 'admin',
-            'users': []}
-
-        mock_response.cookies.items.return_value = [('.AspNetCore.Identity.Application',
-                                                     'CfDJ8Eq07zdLE8ZGtPyzBNIkJhIgJB4-EUThghuYsSpPGU6fiO0uXHSfU2LDOmrpxmfa8KAVjMI1JSL1YyXzCXavaTMT7ZBwUO9J6rJG3m2p3B8hHFMd4RGRQypqP-znY6VEJmrvVr6_ZSF8sx-E54FI2N5WQo7gfiqGVIX70WrqyTvbaU1spoGsTRsXs1BJaUeobhSrI8MWjouqXSDuhcTJjjGczq_LGlBkdzYpV1wzPJSiwWXs-ZN2pIJzfMOedAJRs0OzIvVbB8aUn0zKfUu5K3QHhKImdudDqsEadGtTLccygC6t9b6XqIueMGuOYnn7mmOUv6MJBwdzTCfh2Eg4ElYOB8pqZsedWSbXz1GYuTlTpLWihJTwADMKtucIX1myfM4M9DVng_P9yp6K2BHm9_2jEcGJhnJQ2zJBML8TpRpdwhzz3iKBhBohFPqudEJ535zaR4onSO7dFGwbfx-fyZ5E31BNGl70A--y3VcNHeDqzs13ylpR--4DykUTGRnoYjsDFuD4ZHopvNGA8aC0LszaYeVW0M0aUzKw8VbiJdB3xQr9u6wkwscdzG3DqmJGgA')]
-
-        auth = SwimlaneAuth(mock_swimlane, 'admin', 'password')
-
-        assert auth._login_headers == {
-            'Cookie': '.AspNetCore.Identity.Application=CfDJ8Eq07zdLE8ZGtPyzBNIkJhIgJB4-EUThghuYsSpPGU6fiO0uXHSfU2LDOmrpxmfa8KAVjMI1JSL1YyXzCXavaTMT7ZBwUO9J6rJG3m2p3B8hHFMd4RGRQypqP-znY6VEJmrvVr6_ZSF8sx-E54FI2N5WQo7gfiqGVIX70WrqyTvbaU1spoGsTRsXs1BJaUeobhSrI8MWjouqXSDuhcTJjjGczq_LGlBkdzYpV1wzPJSiwWXs-ZN2pIJzfMOedAJRs0OzIvVbB8aUn0zKfUu5K3QHhKImdudDqsEadGtTLccygC6t9b6XqIueMGuOYnn7mmOUv6MJBwdzTCfh2Eg4ElYOB8pqZsedWSbXz1GYuTlTpLWihJTwADMKtucIX1myfM4M9DVng_P9yp6K2BHm9_2jEcGJhnJQ2zJBML8TpRpdwhzz3iKBhBohFPqudEJ535zaR4onSO7dFGwbfx-fyZ5E31BNGl70A--y3VcNHeDqzs13ylpR--4DykUTGRnoYjsDFuD4ZHopvNGA8aC0LszaYeVW0M0aUzKw8VbiJdB3xQr9u6wkwscdzG3DqmJGgA'}
-
-        mock_inflight_request = mock.MagicMock()
-        auth(mock_inflight_request)
-        mock_inflight_request.headers.update.assert_called_once_with(auth._login_headers)
-
-        # Swimlane v2.14+
         JWT_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhTHFfcWlCWVJyVThoIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsIm5iZiI6MTQ5MzMzMTQyNCwiZXhwIjoxNDkzMzM1MDI0LCJpYXQiOjE0OTMzMzE0MjQsImlzcyI6IlN3aW1sYW5lIiwiYXVkIjoiU3dpbWxhbmUifQ.w27D6JgYj6UuoTUivUmwNv8USqeieTTPwmmhJviiDRQ'
 
         mock_response.json.return_value = {
@@ -192,10 +149,12 @@ def test_auth(mock_swimlane):
 
         auth = SwimlaneAuth(mock_swimlane, 'admin', 'password')
 
-        assert auth._login_headers == {'Authorization': 'Bearer {}'.format(JWT_TOKEN)}
-
         mock_inflight_request = mock.MagicMock()
         auth(mock_inflight_request)
+
+        # Assert login headers assigned after first call when automatic authenticate is called due to being past token
+        # expiration window
+        assert auth._login_headers == {'Authorization': 'Bearer {}'.format(JWT_TOKEN)}
         mock_inflight_request.headers.update.assert_called_once_with(auth._login_headers)
 
 
