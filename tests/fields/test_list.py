@@ -88,3 +88,9 @@ def test_min_max_char_validation(mock_record):
 
     with pytest.raises(ValidationError):
         mock_record[key] = ['']
+
+
+def test_list_field_bulk_modify_value(mock_record):
+    """Pass-through bulk_modify value"""
+    value = ['Test', 'Value']
+    assert mock_record.get_field('Text List').get_bulk_modify(value) == value

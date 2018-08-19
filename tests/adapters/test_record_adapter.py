@@ -5,10 +5,10 @@ import mock
 import pytest
 import six
 
+from swimlane.core.bulk import Clear, Replace
 from swimlane.exceptions import UnknownField
-from swimlane.core.adapters.record import validate_filters_or_records, _cast_to_bulk
-from swimlane.core.fields.valueslist import ValuesListField
-from swimlane.core.fields.datetime import DatetimeField
+from swimlane.core.adapters.record import validate_filters_or_records
+
 
 def test_get(mock_swimlane, mock_app, mock_record):
     mock_response = mock.MagicMock()
@@ -41,10 +41,10 @@ def test_create(mock_swimlane, mock_app, mock_record):
     mock_response.json.return_value = mock_record._raw
 
     primitives = six.string_types + (
-         numbers.Number,
-         list,
-         tuple,
-         set
+        numbers.Number,
+        list,
+        tuple,
+        set
     )
 
     fields = {}
@@ -72,17 +72,6 @@ def test_bulk_create(mock_app, records, expected):
 
     else:
         mock_app.records.bulk_create(*records)
-
-
-def test_create_batch_deprecated(mock_app):
-    """Verify DeprecationWarning is emitted for create_batch method"""
-    with warnings.catch_warnings(record=True) as caught_warnings:
-        warnings.simplefilter("always")
-        mock_app.records.create_batch({}, {})
-
-        assert len(caught_warnings) == 1
-        assert issubclass(caught_warnings[-1].category, DeprecationWarning)
-        assert "create_batch" in str(caught_warnings[-1].message)
 
 
 def test_search(mock_swimlane, mock_app, mock_record):
@@ -174,18 +163,18 @@ def test_bulk_modify_by_filter(mock_swimlane, mock_app):
     with mock.patch.object(mock_swimlane, 'request') as mock_func:
         mock_app.records.bulk_modify(('Numeric', 'equals', 1), values={'Numeric': 2})
     mock_func.assert_called_once_with('put', "app/{0}/record/batch".format(mock_app.id), json=
-        {'filters': [{
-                'fieldId': 'aqkg3', 'filterType': 'equals', 'value': 1
-            }],
-            'modifications': [{
-                    'fieldId': {
-                        'type': 'Id',
-                        'value': 'aqkg3'
-                    },
-                    'type': 'Create', 'value': 2
-                }]
-        }
-    )
+    {'filters': [{
+        'fieldId': 'aqkg3', 'filterType': 'equals', 'value': 1
+    }],
+        'modifications': [{
+            'fieldId': {
+                'type': 'id',
+                'value': 'aqkg3'
+            },
+            'type': 'create', 'value': 2
+        }]
+    }
+                                      )
 
 
 def test_bulk_modify_by_record(mock_swimlane, mock_app, mock_record):
@@ -194,15 +183,15 @@ def test_bulk_modify_by_record(mock_swimlane, mock_app, mock_record):
     with mock.patch.object(mock_swimlane, 'request') as mock_func:
         mock_app.records.bulk_modify(mock_record, values={'Numeric': 2})
     mock_func.assert_called_once_with('put', "app/{0}/record/batch".format(mock_app.id), json=
-        {'modifications': [{
-            'fieldId': {
-                'type': 'Id', 'value': 'aqkg3'
-            },
-            'type': 'Create', 'value': 2
-        }],
-            'recordIds': ['58ebb22807637a02d4a14bd6']
-        }
-    )
+    {'modifications': [{
+        'fieldId': {
+            'type': 'id', 'value': 'aqkg3'
+        },
+        'type': 'create', 'value': 2
+    }],
+        'recordIds': ['58ebb22807637a02d4a14bd6']
+    }
+                                      )
     # Ensure record field is being set
     assert mock_record['Numeric'] == 2
 
@@ -227,18 +216,17 @@ def test_bulk_modify_errors(mock_app, mock_record):
 
 
 def test_bulk_format_patch(mock_record, mock_group, mock_user):
-
     # test if case multiselect (Values List)
     value_field = mock_record.get_field('Values List')
     value_cursor = mock_record['Values List']
     assert len(value_cursor) == 2
-    assert _cast_to_bulk(value_field, value_cursor) != value_field.get_report(value_cursor)
+    assert value_field.get_bulk_modify(value_cursor) != value_field.get_report(value_cursor)
 
     # test if case singleselect (Values List)
 
     mock_record['Status'] = 'Closed'
     single_value_field = mock_record.get_field('Status')
-    assert _cast_to_bulk(single_value_field, 'Closed') != single_value_field.get_report('Closed')
+    assert single_value_field.get_bulk_modify('Closed') != single_value_field.get_report('Closed')
 
     # test else case multiselect (User/Groups)
 
@@ -246,11 +234,54 @@ def test_bulk_format_patch(mock_record, mock_group, mock_user):
     group_field = mock_record.get_field('User/Groups')
     mock_record['User/Groups'] = [mock_group, mock_user]
     assert len(group_value) == 2
-    assert _cast_to_bulk(group_field, group_value) == group_field.get_report(group_value)
+    assert group_field.get_bulk_modify(group_value) == group_field.get_report(group_value)
 
     # test else case singleselect
 
     single_group_field = mock_record._fields['User/Groups']
     single_group_field.set_swimlane([{'$type': 'Core.Models.Utilities.UserGroupSelection, Core'}])
     single_group_value = mock_record['User/Groups']
-    assert _cast_to_bulk(single_group_field, single_group_value) == single_group_field.get_report(single_group_value)
+    assert single_group_field.get_bulk_modify(single_group_value) == single_group_field.get_report(single_group_value)
+
+
+def test_bulk_modify_operations(mock_swimlane, mock_app, mock_record):
+    """Test that the various bulk modification operators can be used as bulk_modify values"""
+    with mock.patch.object(mock_swimlane, 'request') as mock_func:
+        mock_app.records.bulk_modify(
+            mock_record,
+            values={
+                'Numeric': Clear()
+            }
+        )
+
+    mock_func.assert_called_once_with('put', "app/{0}/record/batch".format(mock_app.id), json={
+        'modifications': [{
+            'fieldId': {
+                'type': 'id',
+                'value': 'aqkg3'
+            },
+            'type': 'delete',
+            'value': None
+        }],
+        'recordIds': ['58ebb22807637a02d4a14bd6']
+    })
+
+    with mock.patch.object(mock_swimlane, 'request') as mock_func:
+        mock_app.records.bulk_modify(
+            mock_record,
+            values={
+                'Numeric': Replace(3)
+            }
+        )
+
+    mock_func.assert_called_once_with('put', "app/{0}/record/batch".format(mock_app.id), json={
+        'modifications': [{
+            'fieldId': {
+                'type': 'id',
+                'value': 'aqkg3'
+            },
+            'type': 'create',
+            'value': 3
+        }],
+        'recordIds': ['58ebb22807637a02d4a14bd6']
+    })

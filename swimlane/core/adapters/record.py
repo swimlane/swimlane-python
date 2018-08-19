@@ -1,38 +1,12 @@
-import warnings
-
 import six
 
+from swimlane.core.bulk import Replace, _BulkModificationOperation
 from swimlane.core.cache import check_cache
-from swimlane.core.fields.valueslist import ValuesListField
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.core.resources.report import Report
 from swimlane.utils import random_string, one_of_keyword_only
 from swimlane.utils.version import requires_swimlane_version
-
-
-def _cast_to_bulk(field, value):
-    """Method used to temporarily allow Bulk Modify for Value Lists,
-    Not intended for public use Patch will be removed at next release"""
-    if isinstance(field, ValuesListField):
-        if field.multiselect:
-            value = value or []
-            children = []
-            for child in value:
-                field.validate_value(child)
-                children.append(field.cast_to_swimlane(child))
-            return children
-        field.validate_value(value)
-        return field.cast_to_swimlane(value)
-
-    else:
-        if field.multiselect:
-            value = value or []
-            children = []
-            for child in value:
-                children.append(field.cast_to_report(child))
-            return children
-        return field.cast_to_report(value)
 
 
 class RecordAdapter(AppResolver):
@@ -168,21 +142,6 @@ class RecordAdapter(AppResolver):
 
         return new_record
 
-    def create_batch(self, *args, **kwargs):
-        """Old method name before bulk_create, bulk_modify, and bulk_delete were added
-
-        Calls :meth:`bulk_create` with whatever arguments have been passed and emits a DeprecationWarning
-
-        .. deprecated:: 2.17.0
-           Use :meth:`bulk_create` instead
-        """
-        warnings.warn(
-            '"app.records.create_batch(...)" has been deprecated and will be removed in next major release. '
-            'Use "app.records.bulk_create(...)" instead.',
-            DeprecationWarning
-        )
-        return self.bulk_create(*args, **kwargs)
-
     @requires_swimlane_version('2.15')
     def bulk_create(self, *records):
         """Create and validate multiple records in associated app
@@ -238,6 +197,7 @@ class RecordAdapter(AppResolver):
             json=[r._raw for r in new_records]
         )
 
+    # pylint: disable=too-many-branches
     @requires_swimlane_version('2.17')
     def bulk_modify(self, *filters_or_records, **kwargs):
         """Shortcut to bulk modify records
@@ -296,47 +256,59 @@ class RecordAdapter(AppResolver):
 
         _type = validate_filters_or_records(filters_or_records)
 
-        data_dict = {}
+        request_payload = {}
         record_stub = record_factory(self._app)
 
         # build record_id list
         if _type is Record:
-            data_dict['recordIds'] = [record.id for record in filters_or_records]
+            request_payload['recordIds'] = [record.id for record in filters_or_records]
 
         # build filters
         else:
             filters = []
             for filter_tuples in filters_or_records:
-                field = record_stub.get_field(filter_tuples[0])
+                field_name = record_stub.get_field(filter_tuples[0])
                 filters.append({
-                    "fieldId": field.id,
+                    "fieldId": field_name.id,
                     "filterType": filter_tuples[1],
-                    "value": field.get_report(filter_tuples[2])
+                    "value": field_name.get_report(filter_tuples[2])
                 })
-            data_dict['filters'] = filters
+            request_payload['filters'] = filters
+
+        # Ensure all values are wrapped in a bulk modification operation, defaulting to Replace if not provided for
+        # backwards compatibility
+        for field_name in list(values.keys()):
+            modification_operation = values[field_name]
+            if not isinstance(modification_operation, _BulkModificationOperation):
+                values[field_name] = Replace(modification_operation)
 
         # build modifications
         modifications = []
-        for field_name, update_value in values.items():
-            mod_field = record_stub.get_field(field_name)
-            if not mod_field.bulk_modify_support:
-                raise ValueError("Field '{}' of Type '{}', is not supported for bulk modify".format(field_name, mod_field.__class__.__name__))
+        for field_name, modification_operation in values.items():
+            # Lookup target field
+            modification_field = record_stub.get_field(field_name)
+            if not modification_field.bulk_modify_support:
+                raise ValueError("Field '{}' of Type '{}', is not supported for bulk modify".format(
+                    field_name,
+                    modification_field.__class__.__name__
+                ))
+
             modifications.append({
                 "fieldId": {
-                    "value": mod_field.id,
-                    "type": "Id"
+                    "value": modification_field.id,
+                    "type": "id"
                 },
-                "value": _cast_to_bulk(mod_field, update_value),
-                "type": "Create"
+                "value": modification_field.get_bulk_modify(modification_operation.value),
+                "type": modification_operation.type
             })
-        data_dict['modifications'] = modifications
-        response = self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=data_dict)
+        request_payload['modifications'] = modifications
+        response = self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=request_payload)
 
         # Update records if instances were used to submit bulk modify request after request was successful
         if _type is Record:
             for record in filters_or_records:
-                for field, val in six.iteritems(values):
-                    record[field] = val
+                for field_name, modification_operation in six.iteritems(values):
+                    record[field_name] = modification_operation.value
 
         return response.text
 
