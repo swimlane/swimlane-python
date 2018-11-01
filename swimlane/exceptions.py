@@ -155,7 +155,7 @@ class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
         5014: 'ModificationError',
         5015: 'DatabaseError',
         5016: 'NetworkError',
-        5017: 'InvalidOnThisOS'
+        5017: 'InvalidOnThisOS',
         6000: 'ConnectionDataNotProvided',
         7000: 'RegexNotDefined',
         7001: 'AssetNotFound',
