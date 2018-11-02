@@ -174,8 +174,8 @@ class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
         except ValueError:
             error_content = {'Argument': None, 'ErrorCode': '-1'}
 
-        self.code = int(error_content['ErrorCode'])
-        self.argument = error_content['Argument']
+        self.code = int(error_content.get('ErrorCode', -1))
+        self.argument = error_content.get('Argument')
         self.name = self.codes.get(self.code, self.codes[-1])
 
         message = '{}:{}'.format(self.name, self.code)
