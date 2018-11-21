@@ -64,3 +64,4 @@ Session.vim
 .netrwhist
 *~
 /.idea/
+venv/
