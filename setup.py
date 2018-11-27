@@ -11,6 +11,7 @@ with open('./README.rst') as f:
 
 
 setup(
+    version="4.0.0",
     name="swimlane",
     author="Swimlane LLC",
     author_email="info@swimlane.com",
@@ -21,10 +22,8 @@ setup(
     license='AGPLv3',
     install_requires=parse_requirements('./requirements.txt'),
     setup_requires=[
-        'setuptools_scm',
         'pytest-runner'
     ],
-    use_scm_version=True,
     tests_require=parse_requirements('./test-requirements.txt'),
     classifiers=[
         "License :: OSI Approved :: GNU Affero General Public License v3",

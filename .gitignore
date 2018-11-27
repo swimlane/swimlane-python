@@ -63,4 +63,8 @@ target/
 Session.vim
 .netrwhist
 *~
+
+# IDE
 /.idea/
+venv/
+.vscode/
