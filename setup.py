@@ -22,7 +22,6 @@ setup(
     license='AGPLv3',
     install_requires=parse_requirements('./requirements.txt'),
     setup_requires=[
-        'setuptools_scm',
         'pytest-runner'
     ],
     tests_require=parse_requirements('./test-requirements.txt'),
