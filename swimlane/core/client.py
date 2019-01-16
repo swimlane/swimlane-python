@@ -83,7 +83,7 @@ class Swimlane(object):
             resource_cache_size=0
     ):
         self.host = URI(host)
-        self.host.scheme = self.host.scheme.lower() or 'https'
+        self.host.scheme = (self.host.scheme or 'https').lower()
         self.host.path = None
 
         self.resources_cache = ResourcesCache(resource_cache_size)
