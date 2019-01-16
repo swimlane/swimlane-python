@@ -196,3 +196,24 @@ def test_new_version_breakdown():
                 assert sw.product_version == '2.18'
                 assert sw.build_version == '4.0.0'
                 assert sw.build_number == '123456'
+
+
+def test_host_url_scheme_coercion():
+    """Test host URL scheme defaults to 'https' when not provided and is forced to lowercase"""
+    with mock.patch.object(Swimlane, 'request') as mock_request:
+        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+            mock_response = mock.MagicMock()
+            mock_request.return_value = mock_response
+
+            # Only include apiVersion setting for current tests
+            data = {
+                'apiVersion': '2.15.0-1234'
+            }
+            mock_response.json.return_value = data
+
+            mock_swimlane = Swimlane('host', 'user', 'pass', verify_server_version=False)
+            assert mock_swimlane.host.scheme == 'https'
+
+            mock_swimlane = Swimlane('HTTP://host', 'user', 'pass', verify_server_version=False)
+            assert mock_swimlane.host.scheme == 'http'
+
