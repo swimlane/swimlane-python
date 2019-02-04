@@ -85,7 +85,7 @@ class TextListFieldCursor(_ListFieldCursor):
 
     def _validate_item(self, item):
         value = item
-        if isinstance(item, dict):
+        if isinstance(item, dict) and 'value' in item:
             value = item['value']
 
         """Validate char/word count"""
@@ -149,7 +149,7 @@ class NumericListFieldCursor(_ListFieldCursor):
 
     def _validate_item(self, item):
         value = item
-        if isinstance(item, dict):
+        if isinstance(item, dict) and 'value' in item:
             value = item['value']
 
         if not isinstance(value, Number):
