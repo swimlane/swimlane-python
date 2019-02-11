@@ -3,7 +3,7 @@ import mock
 import pytest
 from requests import HTTPError
 
-from swimlane.core.client import SwimlaneAuth, Swimlane
+from swimlane.core.client import SwimlaneJwtAuth, Swimlane
 from swimlane.exceptions import SwimlaneHTTP400Error, InvalidSwimlaneProductVersion
 
 
@@ -70,7 +70,7 @@ def test_request_handling(mock_swimlane):
 def test_lazy_settings():
     """Test accessing settings is evaluated lazily and cached after first retrieval"""
     with mock.patch.object(Swimlane, 'request') as mock_request:
-        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+        with mock.patch.object(SwimlaneJwtAuth, 'authenticate', return_value=(None, {})):
             mock_response = mock.MagicMock()
             mock_request.return_value = mock_response
 
@@ -93,7 +93,7 @@ def test_lazy_settings():
 def test_server_version_checks():
     """Test that server version is checked by default, raising InvalidServerVersion exception when failing"""
     with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
-        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+        with mock.patch.object(SwimlaneJwtAuth, 'authenticate', return_value=(None, {})):
             with mock.patch.object(Swimlane, 'settings', new_callable=mock.PropertyMock) as mock_settings:
                 mock_settings.return_value = {'apiVersion': '2.18+4.0.0+123456'}
 
@@ -147,7 +147,7 @@ def test_auth(mock_swimlane):
             'userName': 'admin',
             'users': []}
 
-        auth = SwimlaneAuth(mock_swimlane, 'admin', 'password')
+        auth = SwimlaneJwtAuth(mock_swimlane, 'admin', 'password')
 
         mock_inflight_request = mock.MagicMock()
         auth(mock_inflight_request)
@@ -171,7 +171,7 @@ def test_cache_default_disabled(mock_swimlane, mock_record):
 def test_old_version_breakdown():
     """Test that product version, build version, and build number produce expected values in old single value format"""
     with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
-        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+        with mock.patch.object(SwimlaneJwtAuth, 'authenticate', return_value=(None, {})):
             with mock.patch.object(Swimlane, 'settings', new_callable=mock.PropertyMock) as mock_settings:
                 version = '2.17.0-123456'
                 mock_settings.return_value = {'apiVersion': version}
@@ -186,7 +186,7 @@ def test_old_version_breakdown():
 def test_new_version_breakdown():
     """Test that product version, build version, and build number produce expected values in new multi value format"""
     with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
-        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+        with mock.patch.object(SwimlaneJwtAuth, 'authenticate', return_value=(None, {})):
             with mock.patch.object(Swimlane, 'settings', new_callable=mock.PropertyMock) as mock_settings:
                 version = '2.18+4.0.0+123456'
                 mock_settings.return_value = {'apiVersion': version}
@@ -201,7 +201,7 @@ def test_new_version_breakdown():
 def test_host_url_scheme_coercion():
     """Test host URL scheme defaults to 'https' when not provided and is forced to lowercase"""
     with mock.patch.object(Swimlane, 'request') as mock_request:
-        with mock.patch.object(SwimlaneAuth, 'authenticate', return_value=(None, {})):
+        with mock.patch.object(SwimlaneJwtAuth, 'authenticate', return_value=(None, {})):
             mock_response = mock.MagicMock()
             mock_request.return_value = mock_response
 

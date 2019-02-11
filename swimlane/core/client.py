@@ -97,7 +97,7 @@ class Swimlane(object):
         self._session.verify = verify_ssl
 
         if username is not None and password is not None:
-            self._session.auth = SwimlaneAuth(
+            self._session.auth = SwimlaneJwtAuth(
                 self,
                 username,
                 password
@@ -258,12 +258,10 @@ class Swimlane(object):
 class SwimlaneTokenAuth(SwimlaneResolver):
     """Handles token authentication for all requests"""
 
-    def __init__(self, swimlane, access_token, verify_ssl=True):
+    def __init__(self, swimlane, access_token):
         super(SwimlaneTokenAuth, self).__init__(swimlane)
 
         self._access_token = access_token
-        self._verify_ssl = verify_ssl
-
         self.user = None
     
     def __call__(self, request):
@@ -275,10 +273,12 @@ class SwimlaneTokenAuth(SwimlaneResolver):
 
         request.headers.update(headers)
 
+        # Only make the call to user/authorize to get the user's profile if we haven't retrieved it
+        # already
         if self.user != None:
             return request
 
-        # Temporarily remove auth from Swimlane session for auth request to avoid recursive loop during login request
+        # Temporarily remove auth from Swimlane session for auth request to avoid recursive loop during the request
         self._swimlane._session.auth = None
         resp = self._swimlane.request(
             'get',
@@ -292,13 +292,13 @@ class SwimlaneTokenAuth(SwimlaneResolver):
         
         return request
 
-class SwimlaneAuth(SwimlaneResolver):
+class SwimlaneJwtAuth(SwimlaneResolver):
     """Handles authentication for all requests"""
 
     _token_expiration_buffer = pendulum.Interval(minutes=5)
 
     def __init__(self, swimlane, username, password, verify_ssl=True):
-        super(SwimlaneAuth, self).__init__(swimlane)
+        super(SwimlaneJwtAuth, self).__init__(swimlane)
 
         self._username = username
         self._password = password
