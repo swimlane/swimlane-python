@@ -74,13 +74,13 @@ class Swimlane(object):
     def __init__(
             self,
             host,
-            username,
-            password,
+            username=None,
+            password=None,
             verify_ssl=True,
             default_timeout=60,
             verify_server_version=True,
             resource_cache_size=0,
-            auth_factory=None
+            access_token=None
     ):
         self.host = URI(host)
         self.host.scheme = (self.host.scheme or 'https').lower()
@@ -96,14 +96,19 @@ class Swimlane(object):
         self._session = requests.Session()
         self._session.verify = verify_ssl
 
-        if auth_factory is None:
+        if username is not None and password is not None:
             self._session.auth = SwimlaneAuth(
                 self,
                 username,
                 password
             )
+        elif access_token is not None:
+            self._session.auth = SwimlaneTokenAuth(
+                self,
+                access_token
+            )
         else:
-            self._session.auth = auth_factory(self)
+            raise ValueError("Must supply a username/password or access token")
 
         self.apps = AppAdapter(self)
         self.users = UserAdapter(self)
@@ -112,31 +117,6 @@ class Swimlane(object):
 
         if verify_server_version:
             self.__verify_server_version()
-
-    @classmethod
-    def token_auth(
-        cls, 
-        host, 
-        access_token,
-        verify_ssl=True,
-        default_timeout=60,
-        verify_server_version=True,
-        resource_cache_size=0
-    ):
-        """Create a new instance of the Swimlane client using access token auth"""
-
-        factory = lambda swimlane: SwimlaneTokenAuth(swimlane, access_token, verify_ssl)
-        instance = Swimlane(
-            host, 
-            None, 
-            None, 
-            verify_ssl, 
-            default_timeout,
-            verify_server_version,
-            resource_cache_size,
-            factory)
-
-        return instance
 
     def __verify_server_version(self):
         """Verify connected to supported server product version
