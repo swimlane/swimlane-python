@@ -11,7 +11,7 @@ with open('./README.rst') as f:
 
 
 setup(
-    version="4.0.1",
+    version="4.0.0",
     name="swimlane",
     author="Swimlane LLC",
     author_email="info@swimlane.com",

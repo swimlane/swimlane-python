@@ -84,18 +84,14 @@ class TextListFieldCursor(_ListFieldCursor):
     """Cursor for Text ListField"""
 
     def _validate_item(self, item):
-        value = item
-        if isinstance(item, dict) and 'value' in item:
-            value = item['value']
-
         """Validate char/word count"""
-        if not isinstance(value, six.string_types):
+        if not isinstance(item, six.string_types):
             raise ValidationError(
                 self._record,
-                "Text list field item values must be strings, not '{}'".format(value.__class__)
+                "Text list field items must be strings, not '{}'".format(item.__class__)
             )
 
-        words =  value.split(' ')
+        words = item.split(' ')
 
         item_length_type = self._field.field_definition.get('itemLengthType')
         item_max_length = self._field.field_definition.get('itemMaxLength')
@@ -125,7 +121,7 @@ class TextListFieldCursor(_ListFieldCursor):
             # Min/max char count of full item
             else:
                 if item_max_length is not None:
-                    if len(value) > item_max_length:
+                    if len(item) > item_max_length:
                         raise ValidationError(
                             self._record,
                             "Field '{}' items cannot contain more than {} characters".format(
@@ -134,7 +130,7 @@ class TextListFieldCursor(_ListFieldCursor):
                             )
                         )
                 if item_min_length is not None:
-                    if len(value) < item_min_length:
+                    if len(item) < item_min_length:
                         raise ValidationError(
                             self._record,
                             "Field '{}' items must contain at least {} characters".format(
@@ -148,14 +144,10 @@ class NumericListFieldCursor(_ListFieldCursor):
     """Cursor for Numeric ListField"""
 
     def _validate_item(self, item):
-        value = item
-        if isinstance(item, dict) and 'value' in item:
-            value = item['value']
-
-        if not isinstance(value, Number):
+        if not isinstance(item, Number):
             raise ValidationError(
                 self._record,
-                "Numeric list field item values must be numbers, not '{}'".format(value.__class__)
+                "Numeric list field items must be numbers, not '{}'".format(item.__class__)
             )
 
         # range restrictions
@@ -163,7 +155,7 @@ class NumericListFieldCursor(_ListFieldCursor):
         item_min = self._field.field_definition.get('itemMin')
 
         if item_max is not None:
-            if value > item_max:
+            if item > item_max:
                 raise ValidationError(
                     self._record,
                     "Field '{}' items cannot be greater than {}".format(
@@ -173,7 +165,7 @@ class NumericListFieldCursor(_ListFieldCursor):
                 )
 
         if item_min is not None:
-            if value < item_min:
+            if item < item_min:
                 raise ValidationError(
                     self._record,
                     "Field '{}' items cannot be less than {}".format(
@@ -206,6 +198,12 @@ class ListField(CursorField):
         super(ListField, self).__init__(*args, **kwargs)
         self.cursor_class = self._type_map[self.input_type]['cursor_class']
 
+    def set_swimlane(self, value):
+        """Convert from list of dicts with values to list of values"""
+        value = [d['value'] for d in value or []]
+
+        return super(ListField, self).set_swimlane(value)
+
     def set_python(self, value):
         """Validate using cursor for consistency between direct set of values vs modification of cursor values"""
         if not isinstance(value, (list, type(None))):
@@ -222,24 +220,18 @@ class ListField(CursorField):
 
     def cast_to_swimlane(self, value):
         value = super(ListField, self).cast_to_swimlane(value)
-        if value is not None:
-            return [self._build_list_item(item) for item in value]
-
-        return value
+        return [self._build_list_item(item) for item in value] or None
 
     def cast_to_bulk_modify(self, value):
         """List fields use raw list values for bulk modify"""
         self.validate_value(value)
         return value
 
-    def _build_list_item(self, item):
-        """Return either the given dict or a new dict with random ID and $type for API representation of value"""
-        if isinstance(item, dict):
-            return item
-
+    def _build_list_item(self, item_value):
+        """Return a dict with random ID and $type for API representation of value"""
         return {
             '$type': self._type_map[self.input_type]['list_item_type'],
             'id': SID.generate(),
-            'value': item
+            'value': item_value
         }
 
