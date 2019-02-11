@@ -267,13 +267,7 @@ class SwimlaneTokenAuth(SwimlaneResolver):
         self.user = None
     
     def __call__(self, request):
-        """Attach necessary headers to all requests
-        
-        We always present the access token as part of a custom header, Swimlane should
-        authenticate each request based off the access token. We just need to retrieve
-        the user's info once and then cache it, the access token can be revoked but it
-        can never expire
-        """
+        """Attach necessary headers to all requests"""
 
         headers = {
             'Private-Token': self._access_token
@@ -297,39 +291,6 @@ class SwimlaneTokenAuth(SwimlaneResolver):
         self.user = User(self._swimlane, _user_raw_from_login_content(json_content))
         
         return request
-
-    def _user_raw_from_login_content(self, login_content):
-        """Returns a User instance with appropriate raw data parsed from login response content"""
-        matching_keys = [
-            'displayName',
-            'lastLogin',
-            'active',
-            'name',
-            'isMe',
-            'lastPasswordChangedDate',
-            'passwordResetRequired',
-            'groups',
-            'roles',
-            'email',
-            'isAdmin',
-            'createdDate',
-            'modifiedDate',
-            'createdByUser',
-            'modifiedByUser',
-            'userName',
-            'id',
-            'disabled'
-        ]
-
-        raw_data = {
-            '$type': User._type,
-        }
-
-        for key in matching_keys:
-            if key in login_content:
-                raw_data[key] = login_content[key]
-
-        return raw_data
 
 class SwimlaneAuth(SwimlaneResolver):
     """Handles authentication for all requests"""
