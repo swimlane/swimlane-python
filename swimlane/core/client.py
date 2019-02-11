@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 _lib_full_version = get_package_version()
 _lib_major_version, _lib_minor_version = _lib_full_version.split('.')[0:2]
 
-
 class Swimlane(object):
     """Swimlane API client
 
@@ -80,7 +79,8 @@ class Swimlane(object):
             verify_ssl=True,
             default_timeout=60,
             verify_server_version=True,
-            resource_cache_size=0
+            resource_cache_size=0,
+            auth_factory=None
     ):
         self.host = URI(host)
         self.host.scheme = (self.host.scheme or 'https').lower()
@@ -95,11 +95,15 @@ class Swimlane(object):
 
         self._session = requests.Session()
         self._session.verify = verify_ssl
-        self._session.auth = SwimlaneAuth(
-            self,
-            username,
-            password
-        )
+
+        if auth_factory is None:
+            self._session.auth = SwimlaneAuth(
+                self,
+                username,
+                password
+            )
+        else:
+            self._session.auth = auth_factory(self)
 
         self.apps = AppAdapter(self)
         self.users = UserAdapter(self)
@@ -108,6 +112,31 @@ class Swimlane(object):
 
         if verify_server_version:
             self.__verify_server_version()
+
+    @classmethod
+    def token_auth(
+        cls, 
+        host, 
+        access_token,
+        verify_ssl=True,
+        default_timeout=60,
+        verify_server_version=True,
+        resource_cache_size=0
+    ):
+        """Create a new instance of the Swimlane client using access token auth"""
+
+        factory = lambda swimlane: SwimlaneTokenAuth(swimlane, access_token, verify_ssl)
+        instance = Swimlane(
+            host, 
+            None, 
+            None, 
+            verify_ssl, 
+            default_timeout,
+            verify_server_version,
+            resource_cache_size,
+            factory)
+
+        return instance
 
     def __verify_server_version(self):
         """Verify connected to supported server product version
@@ -246,6 +275,81 @@ class Swimlane(object):
         """User record instance for authenticated user"""
         return self._session.auth.user
 
+class SwimlaneTokenAuth(SwimlaneResolver):
+    """Handles token authentication for all requests"""
+
+    def __init__(self, swimlane, access_token, verify_ssl=True):
+        super(SwimlaneTokenAuth, self).__init__(swimlane)
+
+        self._access_token = access_token
+        self._verify_ssl = verify_ssl
+
+        self.user = None
+    
+    def __call__(self, request):
+        """Attach necessary headers to all requests
+        
+        We always present the access token as part of a custom header, Swimlane should
+        authenticate each request based off the access token. We just need to retrieve
+        the user's info once and then cache it, the access token can be revoked but it
+        can never expire
+        """
+
+        headers = {
+            'Private-Token': self._access_token
+        }
+
+        request.headers.update(headers)
+
+        if self.user != None:
+            return request
+
+        # Temporarily remove auth from Swimlane session for auth request to avoid recursive loop during login request
+        self._swimlane._session.auth = None
+        resp = self._swimlane.request(
+            'get',
+            'user/authorize',
+            headers=headers
+        )
+        self._swimlane._session.auth = self
+        
+        json_content = resp.json()
+        self.user = User(self._swimlane, _user_raw_from_login_content(json_content))
+        
+        return request
+
+    def _user_raw_from_login_content(self, login_content):
+        """Returns a User instance with appropriate raw data parsed from login response content"""
+        matching_keys = [
+            'displayName',
+            'lastLogin',
+            'active',
+            'name',
+            'isMe',
+            'lastPasswordChangedDate',
+            'passwordResetRequired',
+            'groups',
+            'roles',
+            'email',
+            'isAdmin',
+            'createdDate',
+            'modifiedDate',
+            'createdByUser',
+            'modifiedByUser',
+            'userName',
+            'id',
+            'disabled'
+        ]
+
+        raw_data = {
+            '$type': User._type,
+        }
+
+        for key in matching_keys:
+            if key in login_content:
+                raw_data[key] = login_content[key]
+
+        return raw_data
 
 class SwimlaneAuth(SwimlaneResolver):
     """Handles authentication for all requests"""
