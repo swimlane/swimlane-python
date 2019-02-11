@@ -12,43 +12,42 @@ def test_api_credential_handling(mock_swimlane):
     error_message = "Must supply a username/password or access token"
 
     with mock.patch.object(Swimlane, 'request') as mock_request:
-        with mock.patch.object(SwimlaneJwtAuth, 'authenticate', return_value=(None, {})):
-            mock_request.return_value = mock.MagicMock()
-    
-            # Throws when all credentials are missing
-            try:
-                mock_swimlane = Swimlane('http://host', verify_server_version=False)
-            except ValueError as error:
-                message = error.args[0]
-                assert message == error_message
-            else:
-                raise RuntimeError
+        mock_request.return_value = mock.MagicMock()
 
-            # Throws when username specified but password is not
-            try:
-                mock_swimlane = Swimlane('http://host', 'username', verify_server_version=False)
-            except ValueError as error:
-                message = error.args[0]
-                assert message == error_message
-            else:
-                raise RuntimeError
+        # Throws when all credentials are missing
+        try:
+            mock_swimlane = Swimlane('http://host', verify_server_version=False)
+        except ValueError as error:
+            message = error.args[0]
+            assert message == error_message
+        else:
+            raise RuntimeError
 
-            # Thows when password specified but username is not
-            try:
-                mock_swimlane = Swimlane('http://host', password='password', verify_server_version=False)
-            except ValueError as error:
-                message = error.args[0]
-                assert message == error_message
-            else:
-                raise RuntimeError
+        # Throws when username specified but password is not
+        try:
+            mock_swimlane = Swimlane('http://host', 'username', verify_server_version=False)
+        except ValueError as error:
+            message = error.args[0]
+            assert message == error_message
+        else:
+            raise RuntimeError
 
-            # Does not throw when username and password supplied, correct auth is used
-            mock_swimlane = Swimlane('http://host', 'username', 'password', verify_server_version=False)
-            assert isinstance(mock_swimlane._session.auth, SwimlaneJwtAuth)
+        # Thows when password specified but username is not
+        try:
+            mock_swimlane = Swimlane('http://host', password='password', verify_server_version=False)
+        except ValueError as error:
+            message = error.args[0]
+            assert message == error_message
+        else:
+            raise RuntimeError
 
-            # Does not throw when access token supplied, correct auth is used
-            mock_swimlane = Swimlane('http://host', access_token='abcdefg', verify_server_version=False)
-            assert isinstance(mock_swimlane._session.auth, SwimlaneTokenAuth)
+        # Does not throw when username and password supplied, correct auth is used
+        mock_swimlane = Swimlane('http://host', 'username', 'password', verify_server_version=False)
+        assert isinstance(mock_swimlane._session.auth, SwimlaneJwtAuth)
+
+        # Does not throw when access token supplied, correct auth is used
+        mock_swimlane = Swimlane('http://host', access_token='abcdefg', verify_server_version=False)
+        assert isinstance(mock_swimlane._session.auth, SwimlaneTokenAuth)
 
 def test_request_handling(mock_swimlane):
     """Test error message and code for SwimlaneHTTP400Error class"""
