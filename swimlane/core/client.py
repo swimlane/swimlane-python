@@ -42,6 +42,7 @@ class Swimlane(object):
             additional requests, set False to disable check
         resource_cache_size (int): Maximum number of each resource type to keep in memory cache. Set 0 to disable
             caching. Disabled by default
+        access_token (str): Authentication token, used in lieu of a username and password
 
     Attributes:
         host (pyuri.URI): Full RFC-1738 URL pointing to Swimlane host
@@ -56,11 +57,18 @@ class Swimlane(object):
 
         ::
 
-            # Establish connection
+            # Establish connection using username password
             swimlane = Swimlane(
                 'https://192.168.1.1',
                 'username',
                 'password',
+                verify_ssl=False
+            )
+
+            # Or establish connection using personal access token
+            swimlane = Swimlane(
+                'https://192.168.1.1',
+                access_token='abcdefg',
                 verify_ssl=False
             )
 

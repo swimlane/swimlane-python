@@ -27,6 +27,15 @@ If no scheme is provided, HTTPS is used as the default.
     swimlane = Swimlane('192.168.1.1', 'username', 'password')
 
 
+A personal access token generated can also be used in place of a username and password.
+
+.. code-block:: python
+
+    from swimlane import Swimlane
+
+    swimlane = Swimlane('192.168.1.1', access_token='abcdefg')
+
+
 Clear HTTP Connection
 ^^^^^^^^^^^^^^^^^^^^^
 
