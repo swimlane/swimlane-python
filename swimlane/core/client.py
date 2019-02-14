@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 _lib_full_version = get_package_version()
 _lib_major_version, _lib_minor_version = _lib_full_version.split('.')[0:2]
 
-
 class Swimlane(object):
     """Swimlane API client
 
@@ -43,6 +42,7 @@ class Swimlane(object):
             additional requests, set False to disable check
         resource_cache_size (int): Maximum number of each resource type to keep in memory cache. Set 0 to disable
             caching. Disabled by default
+        access_token (str): Authentication token, used in lieu of a username and password
 
     Attributes:
         host (pyuri.URI): Full RFC-1738 URL pointing to Swimlane host
@@ -57,11 +57,18 @@ class Swimlane(object):
 
         ::
 
-            # Establish connection
+            # Establish connection using username password
             swimlane = Swimlane(
                 'https://192.168.1.1',
                 'username',
                 'password',
+                verify_ssl=False
+            )
+
+            # Or establish connection using personal access token
+            swimlane = Swimlane(
+                'https://192.168.1.1',
+                access_token='abcdefg',
                 verify_ssl=False
             )
 
@@ -75,13 +82,16 @@ class Swimlane(object):
     def __init__(
             self,
             host,
-            username,
-            password,
+            username=None,
+            password=None,
             verify_ssl=True,
             default_timeout=60,
             verify_server_version=True,
-            resource_cache_size=0
+            resource_cache_size=0,
+            access_token=None
     ):
+        self.__verify_auth_params(username, password, access_token)
+
         self.host = URI(host)
         self.host.scheme = (self.host.scheme or 'https').lower()
         self.host.path = None
@@ -95,11 +105,18 @@ class Swimlane(object):
 
         self._session = requests.Session()
         self._session.verify = verify_ssl
-        self._session.auth = SwimlaneAuth(
-            self,
-            username,
-            password
-        )
+
+        if username is not None and password is not None:
+            self._session.auth = SwimlaneJwtAuth(
+                self,
+                username,
+                password
+            )
+        else:
+            self._session.auth = SwimlaneTokenAuth(
+                self,
+                access_token
+            )
 
         self.apps = AppAdapter(self)
         self.users = UserAdapter(self)
@@ -108,6 +125,16 @@ class Swimlane(object):
 
         if verify_server_version:
             self.__verify_server_version()
+
+    @staticmethod
+    def __verify_auth_params(username, password, access_token):
+        """Verify that valid authentication parameters were passed to __init__"""
+
+        if all(v is not None for v in [username, password, access_token]):
+            raise ValueError('Cannot supply a username/password and a access token')
+
+        if (username is None or password is None) and access_token is None:
+            raise ValueError('Must supply a username/password or access token')
 
     def __verify_server_version(self):
         """Verify connected to supported server product version
@@ -246,18 +273,53 @@ class Swimlane(object):
         """User record instance for authenticated user"""
         return self._session.auth.user
 
+class SwimlaneTokenAuth(SwimlaneResolver):
+    """Handles token authentication for all requests"""
 
-class SwimlaneAuth(SwimlaneResolver):
+    def __init__(self, swimlane, access_token):
+        super(SwimlaneTokenAuth, self).__init__(swimlane)
+
+        self._access_token = access_token
+        self.user = None
+    
+    def __call__(self, request):
+        """Attach necessary headers to all requests"""
+
+        headers = {
+            'Private-Token': self._access_token
+        }
+
+        request.headers.update(headers)
+
+        # Only make the call to user/authorize to get the user's profile if we haven't retrieved it
+        # already
+        if self.user is not None:
+            return request
+
+        # Temporarily remove auth from Swimlane session for auth request to avoid recursive loop during the request
+        self._swimlane._session.auth = None
+        resp = self._swimlane.request(
+            'get',
+            'user/authorize',
+            headers=headers
+        )
+        self._swimlane._session.auth = self
+        
+        json_content = resp.json()
+        self.user = User(self._swimlane, _user_raw_from_login_content(json_content))
+        
+        return request
+
+class SwimlaneJwtAuth(SwimlaneResolver):
     """Handles authentication for all requests"""
 
     _token_expiration_buffer = pendulum.Interval(minutes=5)
 
-    def __init__(self, swimlane, username, password, verify_ssl=True):
-        super(SwimlaneAuth, self).__init__(swimlane)
+    def __init__(self, swimlane, username, password):
+        super(SwimlaneJwtAuth, self).__init__(swimlane)
 
         self._username = username
         self._password = password
-        self._verify_ssl = verify_ssl
 
         self.user = None
         self._login_headers = {}

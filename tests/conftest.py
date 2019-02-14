@@ -3,7 +3,7 @@ import random
 import mock
 import pytest
 
-from swimlane.core.client import SwimlaneAuth, Swimlane
+from swimlane.core.client import SwimlaneJwtAuth, Swimlane
 from swimlane.core.resources.app import App
 from swimlane.core.resources.record import Record
 from swimlane.core.resources.usergroup import User, Group
@@ -15,7 +15,7 @@ def mock_swimlane():
     """Return a mock Swimlane client"""
     # Patch around SwimlaneAuth.authenticate sending request, and manually assign a User instance
     with mock.patch('swimlane.core.client.requests.Session', mock.MagicMock()):
-        with mock.patch.object(SwimlaneAuth, 'authenticate'):
+        with mock.patch.object(SwimlaneJwtAuth, 'authenticate'):
             swimlane = Swimlane('http://host', 'admin', 'password', verify_server_version=False)
             swimlane._Swimlane__settings = {
                 'apiVersion': '3.0+5.0.0+123456'
