@@ -41,6 +41,20 @@ def test_api_credential_handling(mock_swimlane):
         else:
             raise RuntimeError
 
+        # Throws when username, password, and access_token specified
+        try:
+            mock_swimlane = Swimlane(
+                'http://host', 
+                'username', 
+                'password', 
+                access_token='abcdefg', 
+                verify_server_version=False)
+        except ValueError as error:
+            message = error.args[0]
+            assert message == 'Cannot supply a username/password and a access token'
+        else:
+            raise RuntimeError
+
         # Does not throw when username and password supplied, correct auth is used
         mock_swimlane = Swimlane('http://host', 'username', 'password', verify_server_version=False)
         assert isinstance(mock_swimlane._session.auth, SwimlaneJwtAuth)

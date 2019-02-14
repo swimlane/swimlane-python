@@ -90,6 +90,8 @@ class Swimlane(object):
             resource_cache_size=0,
             access_token=None
     ):
+        self.__verify_auth_params(username, password, access_token)
+        
         self.host = URI(host)
         self.host.scheme = (self.host.scheme or 'https').lower()
         self.host.path = None
@@ -110,13 +112,11 @@ class Swimlane(object):
                 username,
                 password
             )
-        elif access_token is not None:
+        else:
             self._session.auth = SwimlaneTokenAuth(
                 self,
                 access_token
             )
-        else:
-            raise ValueError("Must supply a username/password or access token")
 
         self.apps = AppAdapter(self)
         self.users = UserAdapter(self)
@@ -125,6 +125,15 @@ class Swimlane(object):
 
         if verify_server_version:
             self.__verify_server_version()
+
+    def __verify_auth_params(self, username, password, access_token):
+        """Verify that valid authentication parameters were passed to __init__"""
+
+        if all(v is not None for v in [username, password, access_token]):
+            raise ValueError('Cannot supply a username/password and a access token')
+
+        if (username is None or password is None) and access_token is None:
+            raise ValueError('Must supply a username/password or access token')
 
     def __verify_server_version(self):
         """Verify connected to supported server product version
@@ -283,7 +292,7 @@ class SwimlaneTokenAuth(SwimlaneResolver):
 
         # Only make the call to user/authorize to get the user's profile if we haven't retrieved it
         # already
-        if self.user != None:
+        if self.user is not None:
             return request
 
         # Temporarily remove auth from Swimlane session for auth request to avoid recursive loop during the request
@@ -305,12 +314,11 @@ class SwimlaneJwtAuth(SwimlaneResolver):
 
     _token_expiration_buffer = pendulum.Interval(minutes=5)
 
-    def __init__(self, swimlane, username, password, verify_ssl=True):
+    def __init__(self, swimlane, username, password):
         super(SwimlaneJwtAuth, self).__init__(swimlane)
 
         self._username = username
         self._password = password
-        self._verify_ssl = verify_ssl
 
         self.user = None
         self._login_headers = {}
