@@ -91,7 +91,7 @@ class Swimlane(object):
             access_token=None
     ):
         self.__verify_auth_params(username, password, access_token)
-        
+
         self.host = URI(host)
         self.host.scheme = (self.host.scheme or 'https').lower()
         self.host.path = None
@@ -126,7 +126,8 @@ class Swimlane(object):
         if verify_server_version:
             self.__verify_server_version()
 
-    def __verify_auth_params(self, username, password, access_token):
+    @staticmethod
+    def __verify_auth_params(username, password, access_token):
         """Verify that valid authentication parameters were passed to __init__"""
 
         if all(v is not None for v in [username, password, access_token]):
