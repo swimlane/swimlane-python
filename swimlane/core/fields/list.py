@@ -1,3 +1,5 @@
+from collections import defaultdict
+from copy import deepcopy
 from numbers import Number
 
 import six
@@ -198,11 +200,23 @@ class ListField(CursorField):
         super(ListField, self).__init__(*args, **kwargs)
         self.cursor_class = self._type_map[self.input_type]['cursor_class']
 
-    def set_swimlane(self, value):
-        """Convert from list of dicts with values to list of values"""
-        value = [d['value'] for d in value or []]
+        # dict of value -> list(ids) for each value from record raw data
+        # Set by set_swimlane during record init from app.records.get() or after record.save()
+        self._initial_value_to_ids_map = defaultdict(list)
 
-        return super(ListField, self).set_swimlane(value)
+    def set_swimlane(self, value):
+        """Convert from list of dicts with values to list of values
+
+        Cache list items with their ID pairs to restore existing IDs to unmodified values to prevent workflow
+        evaluating on each save for any already existing values
+        """
+        value = value or []
+
+        self._initial_value_to_ids_map = defaultdict(list)
+        for item in value:
+            self._initial_value_to_ids_map[item['value']].append(item['id'])
+
+        return super(ListField, self).set_swimlane([d['value'] for d in value])
 
     def set_python(self, value):
         """Validate using cursor for consistency between direct set of values vs modification of cursor values"""
@@ -219,19 +233,31 @@ class ListField(CursorField):
         return super(ListField, self).set_python(value)
 
     def cast_to_swimlane(self, value):
+        """Restore swimlane format, attempting to keep initial IDs for any previously existing values"""
         value = super(ListField, self).cast_to_swimlane(value)
-        return [self._build_list_item(item) for item in value] or None
+
+        if not value:
+            return None
+
+        # Copy initial values to pop IDs out as each value is hydrated back to server format, without modifying initial
+        # cache of value -> list(ids) map
+        value_ids = deepcopy(self._initial_value_to_ids_map)
+
+        return [self._build_list_item(item, value_ids[item].pop(0) if value_ids[item] else None) for item in value]
 
     def cast_to_bulk_modify(self, value):
         """List fields use raw list values for bulk modify"""
         self.validate_value(value)
         return value
 
-    def _build_list_item(self, item_value):
-        """Return a dict with random ID and $type for API representation of value"""
+    def _build_list_item(self, item_value, id_=None):
+        """Return a dict with ID and $type for API representation of value
+
+        Uses id_ param if provided, defaults to new random ID
+        """
         return {
             '$type': self._type_map[self.input_type]['list_item_type'],
-            'id': SID.generate(),
+            'id': id_ or SID.generate(),
             'value': item_value
         }
 
