@@ -65,3 +65,7 @@ class AttachmentsField(MultiSelectField):
 
     def cast_to_swimlane(self, value):
         return value._raw
+
+    def for_json(self):
+        #TODO: Skipping AttachmentField for now
+        return []

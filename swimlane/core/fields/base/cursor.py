@@ -80,3 +80,9 @@ class CursorField(Field):
     def get_python(self):
         """Create, cache, and return the appropriate cursor instance"""
         return self.cursor
+
+    def for_json(self):
+        """Return list of all cursor items .for_json() representations"""
+        cursor = super(CursorField, self).for_json()
+        if cursor is not None:
+            return [item.for_json() for item in cursor]

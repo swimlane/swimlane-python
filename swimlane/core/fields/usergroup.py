@@ -124,3 +124,7 @@ class UserGroupField(MultiSelectField):
             value = value.as_usergroup_selection()
 
         return value
+
+    def for_json(self):
+        #TODO: Skipped
+        pass

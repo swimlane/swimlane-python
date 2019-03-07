@@ -22,3 +22,8 @@ class Comment(APIResource):
 
     def __str__(self):
         return self.message
+
+    def for_json(self):
+        """Called by CommentField.for_json(), returns relevant Comment attributes in JSON-compatible format"""
+        #TODO: Trim $type
+        return self._raw
