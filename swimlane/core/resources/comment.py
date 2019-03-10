@@ -25,5 +25,8 @@ class Comment(APIResource):
 
     def for_json(self):
         """Called by CommentField.for_json(), returns relevant Comment attributes in JSON-compatible format"""
-        #TODO: Trim $type
-        return self._raw
+        return {
+            'message': self.message,
+            'createdDate': self._raw['createdDate'],
+            'createdByUser': self.user.for_json()
+        }

@@ -96,4 +96,8 @@ class MultiSelectField(CursorField):
         if self.multiselect:
             return super(MultiSelectField, self).for_json()
 
-        return self.get_python()
+        value = self.get_python()
+        if hasattr(value, 'for_json'):
+            return value.for_json()
+
+        return value

@@ -82,7 +82,9 @@ class CursorField(Field):
         return self.cursor
 
     def for_json(self):
-        """Return list of all cursor items .for_json() representations"""
+        """Return list of all cursor items, calling .for_json() if available for best representations"""
         cursor = super(CursorField, self).for_json()
         if cursor is not None:
-            return [item.for_json() for item in cursor]
+            # Lambda called immediately, false-positive from pylint on closure scope warning
+            # pylint: disable=cell-var-from-loop
+            return [getattr(item, 'for_json', lambda: item)() for item in cursor]

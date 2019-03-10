@@ -200,6 +200,7 @@ class TestRecord(object):
         }
         assert mock_record.for_json(*expected_result.keys()).keys() == expected_result.keys()
 
-    def test_for_json_dumps(self, mock_record_all_fields):
+    def test_for_json_dumps(self, mock_record):
         """Test .for_json() with all fields passes json.dumps() with no specific assertions beyond no exceptions"""
-        json.dumps(mock_record_all_fields.for_json())
+        result = mock_record.for_json()
+        json.dumps(result)
