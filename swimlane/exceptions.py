@@ -188,6 +188,7 @@ class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
 
 class TwoFactorAuthEnabledException(SwimlaneException):
     """Exception raised when logging in with a username/password and one time passwords are enabled"""
+    
     def __init__(self):
         super(TwoFactorAuthEnabledException, self).__init__(
             'Two factor authentication is enabled for this account, please use a personal access token ' +

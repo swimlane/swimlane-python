@@ -342,6 +342,7 @@ class SwimlaneJwtAuth(SwimlaneResolver):
     def authenticate(self):
         """Send login request and update User instance, login headers, and token expiration"""
 
+        # pylint: disable=unused-argument
         def login_response_hook(r, *args, **kargs):
             if r.status_code == 401 and r.headers.get('X-Swimlane-OTP') == 'required':
                 raise TwoFactorAuthEnabledException()
