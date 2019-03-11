@@ -15,7 +15,7 @@ from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter, Helper
 from swimlane.core.cache import ResourcesCache
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.usergroup import User
-from swimlane.exceptions import SwimlaneHTTP400Error, InvalidSwimlaneProductVersion
+from swimlane.exceptions import SwimlaneHTTP400Error, InvalidSwimlaneProductVersion, TwoFactorAuthEnabledException
 from swimlane.utils.version import get_package_version, compare_versions
 
 # Disable insecure request warnings
@@ -342,6 +342,11 @@ class SwimlaneJwtAuth(SwimlaneResolver):
     def authenticate(self):
         """Send login request and update User instance, login headers, and token expiration"""
 
+        # pylint: disable=unused-argument
+        def login_response_hook(r, *args, **kargs):
+            if r.status_code == 401 and r.headers.get('X-Swimlane-OTP') == 'required':
+                raise TwoFactorAuthEnabledException()
+
         # Temporarily remove auth from Swimlane session for auth request to avoid recursive loop during login request
         self._swimlane._session.auth = None
         resp = self._swimlane.request(
@@ -351,6 +356,7 @@ class SwimlaneJwtAuth(SwimlaneResolver):
                 'userName': self._username,
                 'password': self._password
             },
+            hooks={'response': login_response_hook}
         )
         self._swimlane._session.auth = self
 

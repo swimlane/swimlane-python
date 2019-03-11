@@ -185,3 +185,12 @@ class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
         super(SwimlaneHTTP400Error, self).__init__(
             '{message}: Bad Request for url: {url}'.format(message=message, url=self.http_error.response.url)
         )
+
+class TwoFactorAuthEnabledException(SwimlaneException):
+    """Exception raised when logging in with a username/password and one time passwords are enabled"""
+    
+    def __init__(self):
+        super(TwoFactorAuthEnabledException, self).__init__(
+            'Two factor authentication is enabled for this account, please use a personal access token ' +
+            'instead of a username/password pair for authentication'
+        )
