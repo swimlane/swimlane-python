@@ -48,12 +48,24 @@ class Revision(APIResource):
         self.revision_number = int(self._raw['revisionNumber'])
         self.status = self._raw['status']
 
+        #Get Correct App Revision for History Field
+        from swimlane.core.resources.app import App
+        self.app_revision_number = int(self._raw['version']['applicationRevision'])
+        self._app_revision_raw = self._swimlane.request(
+            'get',
+            '/app/{}/history/{}'.format(
+                self.record.app.id,
+                self.app_revision_number)).json()
+        self.app_revision = App(self._swimlane, self._app_revision_raw['version'])
+
+
+
         # UserGroupSelection, can't set as User without additional lookup
         self.user = UserGroup(self._swimlane, self._raw['userId'])
 
         # Avoid circular imports
         from swimlane.core.resources.record import Record
-        self.version = Record(self.record.app, self._raw['version'])
+        self.version = Record(self.app_revision, self._raw['version'])
 
     def __str__(self):
         return '{} ({})'.format(self.version, self.revision_number)

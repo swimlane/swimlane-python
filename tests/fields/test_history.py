@@ -4,6 +4,7 @@ import mock
 
 from swimlane.core.fields.history import RevisionCursor, Revision
 from swimlane.core.resources.usergroup import UserGroup
+from swimlane.core.resources.app import App
 
 raw_revision_data = [
     {'$type': 'Core.Models.History.Revision, Core',
@@ -481,6 +482,7 @@ def test_history_field(mock_record, mock_swimlane):
         for idx, revision in enumerate(history):
             assert isinstance(revision, Revision)
             assert str(revision) == 'RA-7 ({})'.format(revision.revision_number)
+            assert isinstance(revision.app_revision, App)
             assert isinstance(revision.modified_date, datetime)
             assert isinstance(revision.user, UserGroup)
             assert revision.version.id == mock_record.id
