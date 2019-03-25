@@ -218,6 +218,26 @@ class Record(APIResource):
 
         self.__init__(self.app, raw)
 
+    def for_json(self, *field_names):
+        """Returns json.dump()-compatible dict representation of the record
+
+        .. versionadded:: 4.1
+
+        Useful for resolving any Cursor, datetime/Pendulum, etc. field values to useful formats outside of Python
+
+        Args:
+            *field_names (str): Optional subset of field(s) to include in returned dict. Defaults to all fields
+
+        Raises:
+             UnknownField: Raised if any of `field_names` not found in parent App
+
+        Returns:
+            dict: field names -> JSON compatible field values
+        """
+        field_names = field_names or self._fields.keys()
+
+        return {field_name: self.get_field(field_name).for_json() for field_name in field_names}
+
     @property
     def restrictions(self):
         """Returns cached set of retrieved UserGroups in the record's list of allowed accounts"""

@@ -378,6 +378,44 @@ Records can be iterated over like :meth:`dict.items()`, yielding `(field_name, f
         assert record[field_name] == field_value
 
 
+Pretty Iteration + JSON Serialization
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 4.1.0
+
+Some field types are not cleanly printed or cannot be easily serialized to JSON. A record can be converted to a
+prettier JSON-safe dict using the :meth:`.for_json()` method.
+
+.. code-block:: python
+
+    import json
+
+    # Quick serialize all fields on record to readable JSON-compatible format dict
+    print(json.dumps(
+        record.for_json(),
+        indent=4
+    ))
+
+    # Specify subset of fields to include in output dict
+    print(json.dumps(
+        record.for_json('Target Field 1', 'Target Field 2', ...),
+        indent=4
+    ))
+
+    # Get a single field's JSON-compatible value
+    print(json.dumps(
+        record.get_field('Target Field').for_json()
+    ))
+
+    # Attachments, Comments, UserGroups, and any Cursors can all be converted to JSON-compatible values directly
+    print(json.dumps(
+        record['User Group Field'].for_json()
+    ))
+    print(json.dumps(
+        record['Comments Field'][2].for_json()
+    ))
+
+
 Unknown Fields
 ^^^^^^^^^^^^^^
 

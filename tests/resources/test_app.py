@@ -10,7 +10,7 @@ def test_repr(mock_app):
 
 
 def test_get_field_definitions(mock_app):
-    """Test retrieving field definitions by name or id and UnknownField error with recommendation"""
+    """Test retrieving field definitions by name, key, or id and UnknownField error with recommendation(s)"""
     field_def = mock_app.get_field_definition_by_name('Numeric')
     assert field_def['name'] == 'Numeric'
 
@@ -47,6 +47,11 @@ def test_resolve_field_name(mock_app):
     assert mock_app.resolve_field_name('action-key') == 'Action'
     # Missing
     assert mock_app.resolve_field_name('unknown field name/key') is None
+
+
+def test_get_field_definition_by_name_resolves_keys(mock_app):
+    """Test that field keys are auto-resolved to field names when getting definition by name"""
+    assert mock_app.get_field_definition_by_name('action-key') is mock_app.get_field_definition_by_name('Action')
 
 
 def test_equality(mock_app):

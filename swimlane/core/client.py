@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 _lib_full_version = get_package_version()
 _lib_major_version, _lib_minor_version = _lib_full_version.split('.')[0:2]
 
+
 class Swimlane(object):
     """Swimlane API client
 
@@ -273,8 +274,12 @@ class Swimlane(object):
         """User record instance for authenticated user"""
         return self._session.auth.user
 
+
 class SwimlaneTokenAuth(SwimlaneResolver):
-    """Handles token authentication for all requests"""
+    """Handles token authentication for all requests
+
+    .. versionadded:: 4.1.0
+    """
 
     def __init__(self, swimlane, access_token):
         super(SwimlaneTokenAuth, self).__init__(swimlane)
@@ -309,6 +314,7 @@ class SwimlaneTokenAuth(SwimlaneResolver):
         self.user = User(self._swimlane, _user_raw_from_login_content(json_content))
         
         return request
+
 
 class SwimlaneJwtAuth(SwimlaneResolver):
     """Handles authentication for all requests"""

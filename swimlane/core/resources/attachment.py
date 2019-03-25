@@ -52,3 +52,9 @@ class Attachment(APIResource):
         stream.seek(0)
 
         return stream
+
+    def for_json(self):
+        """Return metadata for JSON-compatible representation"""
+        return_value = self._raw.copy()
+        return_value.pop('$type')
+        return return_value

@@ -123,3 +123,10 @@ class Field(SwimlaneResolver):
     def set_swimlane(self, value):
         """Set field internal value from the swimlane representation of field value"""
         return self._set(self.cast_to_python(value))
+
+    def for_json(self):
+        """Return json.dump()-compatible representation of field value
+
+        .. versionadded:: 4.1.0
+        """
+        return self.get_python()
