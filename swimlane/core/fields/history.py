@@ -58,6 +58,14 @@ class Revision(APIResource):
     def __str__(self):
         return '{} ({})'.format(self.version, self.revision_number)
 
+    def for_json(self):
+        """Return revision metadata"""
+        return {
+            'modifiedDate': self._raw['modifiedDate'],
+            'revisionNumber': self.revision_number,
+            'user': self.user.for_json()
+        }
+
 
 class HistoryField(ReadOnly, CursorField):
 
