@@ -58,8 +58,6 @@ class Revision(APIResource):
                 self.app_revision_number)).json()
         self.app_revision = App(self._swimlane, self._app_revision_raw['version'])
 
-
-
         # UserGroupSelection, can't set as User without additional lookup
         self.user = UserGroup(self._swimlane, self._raw['userId'])
 
