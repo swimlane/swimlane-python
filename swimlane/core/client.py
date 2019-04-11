@@ -17,6 +17,7 @@ from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.usergroup import User
 from swimlane.exceptions import SwimlaneHTTP400Error, InvalidSwimlaneProductVersion
 from swimlane.utils.version import get_package_version, compare_versions
+from swimlane.core.wrappedsession import WrappedSession
 
 # Disable insecure request warnings
 urllib3.disable_warnings()
@@ -93,7 +94,7 @@ class Swimlane(object):
 
         self._default_timeout = default_timeout
 
-        self._session = requests.Session()
+        self._session = WrappedSession()
         self._session.verify = verify_ssl
         self._session.auth = SwimlaneAuth(
             self,
