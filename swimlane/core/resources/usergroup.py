@@ -76,6 +76,13 @@ class UserGroup(APIResource):
             'name': self.name
         }
 
+    def for_json(self):
+        """Get JSON-compatible representation"""
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
 
 class Group(UserGroup):
     """Swimlane group record

@@ -76,10 +76,13 @@ class App(APIResource):
         return self._keys_to_field_names.get(field_key)
 
     def get_field_definition_by_name(self, field_name):
-        """Get JSON field definition for field matching provided name
+        """Get JSON field definition for field matching provided name or key
+
+        .. versionchanged:: 4.1.0
+            Added support for field keys
 
         Args:
-            field_name (str): Target field name to get definition for
+            field_name (str): Target field name or key to get definition for
 
         Raises:
             swimlane.exceptions.UnknownField: Raised when given a field name not found in App
@@ -88,7 +91,7 @@ class App(APIResource):
             dict: Field metadata definition
         """
         try:
-            return self._fields_by_name[field_name]
+            return self._fields_by_name[self.resolve_field_name(field_name)]
         except KeyError:
             raise UnknownField(self, field_name, self._fields_by_name.keys())
 

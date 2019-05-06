@@ -56,6 +56,14 @@ class Revision(APIResource):
     def __str__(self):
         return '{} ({})'.format(self.version, self.revision_number)
 
+    def for_json(self):
+        """Return revision metadata"""
+        return {
+            'modifiedDate': self._raw['modifiedDate'],
+            'revisionNumber': self.revision_number,
+            'user': self.user.for_json()
+        }
+
     @property
     def app_revision(self):
         """Deferring request for app revision until needed"""
@@ -81,7 +89,6 @@ class Revision(APIResource):
 
             self.__version = Record(self.app_revision, self._raw['version'])
         return self.__version
-
 
 class HistoryField(ReadOnly, CursorField):
 

@@ -1,4 +1,5 @@
 import copy
+import json
 
 import mock
 import pytest
@@ -189,3 +190,17 @@ class TestRecord(object):
     def test_record_keys_not_included_in_field_names(self, mock_record):
         """Make sure fields keys don't show up when iterating a record"""
         assert 'action-key' not in dict(mock_record)
+
+    def test_for_json_field_inclusion(self, mock_record):
+        """Test .for_json('field1', ...) method target field inclusions"""
+        expected_result = {
+            'Action': 'authentication failure',
+            'Activity': 'Logon',
+            'Actors': 'MYTHICLEOPARD'
+        }
+        assert mock_record.for_json(*expected_result.keys()).keys() == expected_result.keys()
+
+    def test_for_json_dumps(self, mock_record):
+        """Test .for_json() with all fields passes json.dumps() with no specific assertions beyond no exceptions"""
+        result = mock_record.for_json()
+        json.dumps(result)

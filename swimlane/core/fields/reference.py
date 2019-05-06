@@ -143,10 +143,10 @@ class ReferenceField(CursorField):
 
             if self.multiselect:
                 return ids
-            else:
-                return ids[0]
-        else:
-            return None
+
+            return ids[0]
+
+        return None
 
     def get_python(self):
         """Return cursor if multi-select, direct value if single-select"""
@@ -163,3 +163,6 @@ class ReferenceField(CursorField):
 
     def cast_to_report(self, value):
         return value.id
+
+    def for_json(self):
+        return self.get_swimlane()

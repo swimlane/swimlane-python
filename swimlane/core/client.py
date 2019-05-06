@@ -17,6 +17,7 @@ from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.usergroup import User
 from swimlane.exceptions import SwimlaneHTTP400Error, InvalidSwimlaneProductVersion
 from swimlane.utils.version import get_package_version, compare_versions
+from swimlane.core.wrappedsession import WrappedSession
 
 # Disable insecure request warnings
 urllib3.disable_warnings()
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 # pylint: disable=invalid-name
 _lib_full_version = get_package_version()
 _lib_major_version, _lib_minor_version = _lib_full_version.split('.')[0:2]
+
 
 class Swimlane(object):
     """Swimlane API client
@@ -103,7 +105,7 @@ class Swimlane(object):
 
         self._default_timeout = default_timeout
 
-        self._session = requests.Session()
+        self._session = WrappedSession()
         self._session.verify = verify_ssl
 
         if username is not None and password is not None:
@@ -273,8 +275,12 @@ class Swimlane(object):
         """User record instance for authenticated user"""
         return self._session.auth.user
 
+
 class SwimlaneTokenAuth(SwimlaneResolver):
-    """Handles token authentication for all requests"""
+    """Handles token authentication for all requests
+
+    .. versionadded:: 4.1.0
+    """
 
     def __init__(self, swimlane, access_token):
         super(SwimlaneTokenAuth, self).__init__(swimlane)
@@ -309,6 +315,7 @@ class SwimlaneTokenAuth(SwimlaneResolver):
         self.user = User(self._swimlane, _user_raw_from_login_content(json_content))
         
         return request
+
 
 class SwimlaneJwtAuth(SwimlaneResolver):
     """Handles authentication for all requests"""

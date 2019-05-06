@@ -89,3 +89,15 @@ class MultiSelectField(CursorField):
             return self._set(children)
 
         return super(MultiSelectField, self).set_swimlane(value)
+
+    def for_json(self):
+        """Handle multi-select vs single-select"""
+
+        if self.multiselect:
+            return super(MultiSelectField, self).for_json()
+
+        value = self.get_python()
+        if hasattr(value, 'for_json'):
+            return value.for_json()
+
+        return value
