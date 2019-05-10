@@ -59,6 +59,10 @@ class Record(APIResource):
         self._fields = {}
         self.__premap_fields()
 
+        # avoid circular reference
+        from swimlane.core.adapters import RecordRevisionAdapter
+        self.revisions = RecordRevisionAdapter(app, self)
+
     @property
     def app(self):
         return self.__app

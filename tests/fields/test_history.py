@@ -3,11 +3,13 @@ from datetime import datetime
 import mock
 import pytest
 
-from swimlane.core.fields.history import RevisionCursor, Revision
+from swimlane.core.fields.history import RevisionCursor
+from swimlane.core.resources.record_revision import RecordRevision
 from swimlane.core.resources.usergroup import UserGroup
 from swimlane.core.resources.app import App
 from swimlane.core.resources.record import Record
 
+# an app with two fields: value selection and
 raw_app_data = {
     "$type":"Core.Models.Application.Application, Core",
     "acronym":"PHT",
@@ -687,11 +689,11 @@ raw_app_revision_data = [
 
 def request_mock(method, endpoint, params=None):
     """Mocks swimlane.request function, returns the API responses for the history endpoints"""
-    if 'app' in endpoint:
-        revision = int(endpoint.split('/')[4])
-        return_value = next(x for x in raw_app_revision_data if x['revisionNumber'] == revision)
-    else:
+    if 'record' in endpoint:
         return_value = raw_record_revision_data
+    else:
+        revision = int(endpoint.split('/')[3])
+        return_value = next(x for x in raw_app_revision_data if x['revisionNumber'] == revision)
 
     mock_response = mock.MagicMock()
     mock_response.json.return_value = return_value
@@ -728,9 +730,9 @@ def test_num_revisions(history):
 def test_revisions(history, mock_history_record):
     # Iterate backwards over revisions
     for idx, revision in enumerate(history):
-        assert isinstance(revision, Revision)
+        assert isinstance(revision, RecordRevision)
         assert str(revision) == 'PHT-1 ({})'.format(revision.revision_number)
-        assert isinstance(revision.app_revision, App)
+        assert isinstance(revision.app_version, App)
         assert isinstance(revision.modified_date, datetime)
         assert isinstance(revision.user, UserGroup)
         assert isinstance(revision.version, Record)

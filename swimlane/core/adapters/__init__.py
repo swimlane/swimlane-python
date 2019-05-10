@@ -5,3 +5,5 @@ from .record import RecordAdapter
 from .report import ReportAdapter
 from .usergroup import UserAdapter, GroupAdapter
 from .helper import HelperAdapter
+from .app_revision import AppRevisionAdapter
+from .record_revision import RecordRevisionAdapter
