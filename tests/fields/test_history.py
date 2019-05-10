@@ -698,38 +698,44 @@ def request_mock(method, endpoint, params=None):
     return mock_response
 
 
-def test_revision_cursor(mock_swimlane):
+@pytest.fixture
+def mock_swimlane_history(mock_swimlane):
     with mock.patch.object(mock_swimlane, 'request', side_effect=request_mock):
-        app = App(mock_swimlane, raw_app_data)
-        mock_history_record = Record(app, raw_record_data)
-        history = mock_history_record['History']
-        assert isinstance(history, RevisionCursor)
+        yield mock_swimlane
 
 
-def test_num_revisions(mock_swimlane):
-    with mock.patch.object(mock_swimlane, 'request', side_effect=request_mock):
-        app = App(mock_swimlane, raw_app_data)
-        mock_history_record = Record(app, raw_record_data)
-        history = mock_history_record['History']
-        # Get number of revisions
-        num_revisions = len(history)
-        assert num_revisions == 3
+@pytest.fixture
+def mock_history_record(mock_swimlane_history):
+    app = App(mock_swimlane_history, raw_app_data)
+    return Record(app, raw_record_data)
 
 
-def test_revisions(mock_swimlane):
-    with mock.patch.object(mock_swimlane, 'request', side_effect=request_mock):
-        app = App(mock_swimlane, raw_app_data)
-        mock_history_record = Record(app, raw_record_data)
-        history = mock_history_record['History']
-        # Iterate backwards over revisions
-        for idx, revision in enumerate(history):
-            assert isinstance(revision, Revision)
-            assert str(revision) == 'PHT-1 ({})'.format(revision.revision_number)
-            assert isinstance(revision.app_revision, App)
-            assert isinstance(revision.modified_date, datetime)
-            assert isinstance(revision.user, UserGroup)
-            assert revision.version.id == mock_history_record.id
-            assert len(history) - revision.revision_number == idx
+@pytest.fixture
+def history(mock_history_record):
+    return mock_history_record['History']
+
+
+def test_revision_cursor(history):
+    assert isinstance(history, RevisionCursor)
+
+
+def test_num_revisions(history):
+    # Get number of revisions
+    num_revisions = len(history)
+    assert num_revisions == 3
+
+
+def test_revisions(history, mock_history_record):
+    # Iterate backwards over revisions
+    for idx, revision in enumerate(history):
+        assert isinstance(revision, Revision)
+        assert str(revision) == 'PHT-1 ({})'.format(revision.revision_number)
+        assert isinstance(revision.app_revision, App)
+        assert isinstance(revision.modified_date, datetime)
+        assert isinstance(revision.user, UserGroup)
+        assert isinstance(revision.version, Record)
+        assert revision.version.id == mock_history_record.id
+        assert len(history) - revision.revision_number == idx
 
 
 def test_app_revision_caching(mock_swimlane):

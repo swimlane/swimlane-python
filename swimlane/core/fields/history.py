@@ -90,6 +90,7 @@ class Revision(APIResource):
             self.__version = Record(self.app_revision, self._raw['version'])
         return self.__version
 
+
 class HistoryField(ReadOnly, CursorField):
 
     field_type = 'Core.Models.Fields.History.HistoryField, Core'
