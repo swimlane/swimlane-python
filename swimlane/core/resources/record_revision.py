@@ -17,7 +17,7 @@ class RecordRevision(APIResource):
         self._app = app
 
         self.modified_date = pendulum.parse(self._raw['modifiedDate'])
-        self.revision_number = int(self._raw['revisionNumber'])
+        self.revision_number = self._raw['revisionNumber']
         self.status = self._raw['status']
 
         # UserGroupSelection, can't set as User without additional lookup

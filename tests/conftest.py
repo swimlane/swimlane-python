@@ -3799,3 +3799,6 @@ def random_mock_user(mock_swimlane):
         'passwordResetRequired': False,
         'roles': [],
         'userName': 'admin'})
+
+
+pytest_plugins = ['conftest_revisions']

@@ -692,7 +692,7 @@ def request_mock(method, endpoint, params=None):
     if 'record' in endpoint:
         return_value = raw_record_revision_data
     else:
-        revision = int(endpoint.split('/')[3])
+        revision = float(endpoint.split('/')[3])
         return_value = next(x for x in raw_app_revision_data if x['revisionNumber'] == revision)
 
     mock_response = mock.MagicMock()
@@ -727,11 +727,14 @@ def test_num_revisions(history):
     assert num_revisions == 3
 
 
+def test_revision_str(history):
+    for revision in history:
+        assert str(revision) == 'PHT-1 ({})'.format(revision.revision_number)
+
+
 def test_revisions(history, mock_history_record):
-    # Iterate backwards over revisions
     for idx, revision in enumerate(history):
         assert isinstance(revision, RecordRevision)
-        assert str(revision) == 'PHT-1 ({})'.format(revision.revision_number)
         assert isinstance(revision.app_version, App)
         assert isinstance(revision.modified_date, datetime)
         assert isinstance(revision.user, UserGroup)

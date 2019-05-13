@@ -13,7 +13,7 @@ class AppRevisionAdapter(AppResolver):
         Supports resource cache
 
         Keyword Args:
-            revision_number (int): App revision number
+            revision_number (float): App revision number
 
         Returns:
             AppRevision: The AppRevision for the given revision number.
