@@ -1,6 +1,7 @@
 from swimlane.core.cache import check_cache
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.record_revision import RecordRevision
+from swimlane.utils import one_of_keyword_only
 
 
 class RecordRevisionAdapter(AppResolver):
@@ -10,11 +11,8 @@ class RecordRevisionAdapter(AppResolver):
         super(RecordRevisionAdapter, self).__init__(app)
         self.record = record
 
-    @check_cache(RecordRevision)
     def get(self):
         """Get all revisions for a single record.
-
-        Supports resource cache
 
         Returns:
             RecordRevision[]: All record revisions for the given record ID.

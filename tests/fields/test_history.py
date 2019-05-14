@@ -54,7 +54,7 @@ class TestHistory(object):
 
     def test_revision_str(self, history):
         for revision in history:
-            assert str(revision) == 'PHT-1 ({})'.format(revision.revision_number)
+            assert str(revision) == 'PHT-1 ({0})'.format(revision.revision_number)
 
     def test_revisions(self, history, mock_history_record):
         for idx, revision in enumerate(history):
@@ -65,6 +65,3 @@ class TestHistory(object):
             assert isinstance(revision.version, Record)
             assert revision.version.id == mock_history_record.id
             assert len(history) - revision.revision_number == idx
-
-    def test_app_revision_caching(self, mock_swimlane):
-        assert True is True

@@ -28,3 +28,10 @@ class TestAppRevision(object):
 
         assert isinstance(version, App)
         assert version._raw is mock_ar_app_revision._raw['version']
+
+    def test_get_cache_index(self, mock_ar_app_revision):
+        keys = mock_ar_app_revision.get_cache_index_keys()
+
+        assert len(keys) is 1
+        assert 'app_id_revision' in keys
+        assert keys['app_id_revision'] == 'a34xbNOoo2P3ivyjY --- 3.0'
