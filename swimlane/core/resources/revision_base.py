@@ -10,10 +10,10 @@ class Revision(APIResource):
 
     Attributes:
         Attributes:
-        modified_date: The date this app revision was created.
-        revision_number: The revision number of this app revision.
+        modified_date: The date this revision was created.
+        revision_number: The revision number of this revision.
         status: Indicates whether this revision is the current revision or a historical revision.
-        user: The user that saved this revision of the record.
+        user: The user that saved this revision.
     """
 
     def __init__(self, swimlane, raw):

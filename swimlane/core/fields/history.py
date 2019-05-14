@@ -18,7 +18,7 @@ class RevisionCursor(FieldCursor):
 
     def _retrieve_revisions(self):
         """Populate RecordRevision instances."""
-        return self._record.revisions.get()
+        return self._record.revisions.get_all()
 
 
 class HistoryField(ReadOnly, CursorField):

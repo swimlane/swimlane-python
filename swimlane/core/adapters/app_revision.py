@@ -7,8 +7,19 @@ from swimlane.utils import one_of_keyword_only
 class AppRevisionAdapter(AppResolver):
     """Handles retrieval of Swimlane App Revision resources"""
 
+    def get_all(self):
+        """
+        Gets all app revisions.
+
+        Returns:
+            AppRevision[]: Returns all AppRevisions for this Adapter's app.
+        """
+        raw_revisions = self._swimlane.request('get', 'app/{0}/history'.format(self._app.id)).json()
+        return [AppRevision(self._swimlane, raw) for raw in raw_revisions]
+
     def get(self, revision_number):
-        """Gets a specific app revision.
+        """
+        Gets a specific app revision.
 
         Supports resource cache
 
@@ -18,7 +29,6 @@ class AppRevisionAdapter(AppResolver):
         Returns:
             AppRevision: The AppRevision for the given revision number.
         """
-
         key_value = AppRevision.get_unique_id(self._app.id, revision_number)
         return self.__get(app_id_revision=key_value)
 

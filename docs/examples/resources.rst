@@ -55,6 +55,7 @@ on the report.
         ('Reference (Single-Select)', 'equals', target_record)
     )
 
+
 Keyword-searches can be performed by providing a `keywords` list parameter. All records with fields matching the
 provided keywords will be returned
 
@@ -67,6 +68,7 @@ provided keywords will be returned
         ]
     )
 
+
 Available operators are just strings as shown above, but are made available as constants in the
 :mod:`~swimlane.core.search` module
 
@@ -78,6 +80,7 @@ Available operators are just strings as shown above, but are made available as c
         ('Text Field', EQ, 'equal value'),
         ('Number Field', GTE, 0),
     )
+
 
 .. warning::
 
@@ -98,6 +101,7 @@ Available operators are just strings as shown above, but are made available as c
             ...
             limit=0
         )
+
 
 To operate on large search results as records are returned from API or retrieve only partial results
 :class:`~swimlane.core.resources.report.Report` should be used instead.
@@ -159,6 +163,7 @@ Any records not passing validation will cause the entire operation to fail.
         ...
     )
 
+
 .. note::
 
     .. versionchanged:: 2.17.0
@@ -181,6 +186,7 @@ Delete multiple records at once.
 
     app.records.bulk_delete(record1, record2, record3)
 
+
 Delete multiple records at once by filters using filter format from search.
 
 .. code-block:: python
@@ -190,6 +196,7 @@ Delete multiple records at once by filters using filter format from search.
         ('Field_1', 'equals', value1),
         ('Field_2', 'equals', value2)
     )
+
 
 Bulk Record Modify
 ^^^^^^^^^^^^^^^^^^^
@@ -217,6 +224,7 @@ Invalid field values will cause entire operation to fail.
         }
     )
 
+
 Bulk modify records by filter tuples without record instances.
 
 .. code-block:: python
@@ -234,6 +242,7 @@ Bulk modify records by filter tuples without record instances.
         }
     )
 
+
 Use bulk modify to append, remove, or clear list field values
 
 .. code-block:: python
@@ -249,6 +258,24 @@ Use bulk modify to append, remove, or clear list field values
             'Numeric List': Append(5)
         }
     )
+
+
+Retrieve App Revisions
+^^^^^^^^^^^^^^^^^^^^^^
+
+Retrieve historical revisions of the application.
+
+.. code-block:: python
+
+    # get all revisions
+    app_revisions = app.revisions.get_all()
+
+    # get by revision number
+    app_revision = app.revisions.get(2)
+
+    # get the historical version of the app
+    historical_app_version = app_revision.version
+
 
 Record
 ------
@@ -451,6 +478,24 @@ Record restrictions can be modified using :meth:`~swimlane.core.resources.record
     record.save()
 
 
+Retrieve Record Revisions
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Retrieve historical revisions of the record.
+
+.. code-block:: python
+
+    # get all revisions
+    record_revisions = record.revisions.get_all()
+
+    # get by revision number
+    record_revision = record.revisions.get(2)
+
+    # get the historical version of the app
+    # automatically retrieves the corresponding app revision to create the Record object
+    historical_record_version = record_revision.version
+
+
 UserGroup
 ---------
 
@@ -519,3 +564,38 @@ To iterate over individual users in a group, use group.users property
     group = swimlane.groups.get(name='Everyone')
     for user in group.users:
         assert isinstance(user, User)
+
+
+Revisions
+---------
+
+Revisions represent historical versions of another resource. Currently, App and Record revisions are supported. For more
+details on how to retrieve revisions, see the "Retrieve App Revisions" and "Retrieve Record Revisions" sections above.
+
+Get Information About the Revision
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+    revision = app.revisions.get(1)
+
+    revision.modified_date # The date this revision was created.
+    revision.revision_number # The revision number of this revision.
+    revision.status # Indicates whether this revision is the current revision or a historical revision.
+    revision.user # The user that saved this revision.
+
+    app = revision.version # returns an App or Record object representing the revision depending on revision type.
+
+Record Revisions
+^^^^^^^^^^^^^^^^
+
+Record revisions additionally have attributes containing information about their app.
+
+.. code-block:: python
+
+    revision = record.revisions.get(1)
+
+    revision.app_revision_number # The app revision number this record revision was created using.
+
+    app = revision.app_version # Returns an App corresponding to the app_revision_number of this record revision.
+

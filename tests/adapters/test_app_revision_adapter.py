@@ -3,20 +3,34 @@ import mock
 from swimlane.core.resources.app_revision import AppRevision
 
 
-def test_get(mock_swimlane, mock_revision_app, raw_app_revision_data):
-    mock_response = mock.MagicMock()
-    # return just one revision in response
-    raw_revision = raw_app_revision_data[0]
-    mock_response.json.return_value = raw_revision
-    mock_response.status_code = 200
+class TestAppRevisionAdapter(object):
+    def test_get_all(self, mock_swimlane, mock_revision_app, raw_app_revision_data):
+        mock_response = mock.MagicMock()
+        raw_revision = raw_app_revision_data
+        mock_response.json.return_value = raw_revision
+        mock_response.status_code = 200
 
-    with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
-        revision = mock_revision_app.revisions.get(raw_revision['revisionNumber'])
+        with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
+            revisions = mock_revision_app.revisions.get_all()
 
-        mock_swimlane.request.assert_called_with('get', 'app/{0}/history/{1}'.format(mock_revision_app.id,
-                                                                                     raw_revision['revisionNumber']))
+            mock_swimlane.request.assert_called_with('get', 'app/{0}/history'.format(mock_revision_app.id,))
 
-        assert isinstance(revision, AppRevision)
-        assert revision.revision_number is raw_revision['revisionNumber']
-        assert revision.status is raw_revision['status']
+            for idx, revision in enumerate(revisions):
+                assert isinstance(revision, AppRevision)
+                assert revision.revision_number is raw_app_revision_data[idx]['revisionNumber']
+
+    def test_get(self, mock_swimlane, mock_revision_app, raw_app_revision_data):
+        mock_response = mock.MagicMock()
+        raw_revision = raw_app_revision_data[0]
+        mock_response.json.return_value = raw_revision
+        mock_response.status_code = 200
+
+        with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
+            revision = mock_revision_app.revisions.get(raw_revision['revisionNumber'])
+
+            mock_swimlane.request.assert_called_with('get', 'app/{0}/history/{1}'.format(mock_revision_app.id,
+                                                                                         raw_revision['revisionNumber']))
+
+            assert isinstance(revision, AppRevision)
+            assert revision.revision_number is raw_revision['revisionNumber']
 
