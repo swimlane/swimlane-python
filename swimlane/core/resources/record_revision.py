@@ -16,6 +16,7 @@ class RecordRevision(APIResource):
 
         self._app = app
 
+        self.app_revision_number = self._raw['version']['applicationRevision']
         self.modified_date = pendulum.parse(self._raw['modifiedDate'])
         self.revision_number = self._raw['revisionNumber']
         self.status = self._raw['status']
@@ -38,7 +39,7 @@ class RecordRevision(APIResource):
     def app_version(self):
         """The app revision corresponding to this record revision. Lazy loaded"""
         if not self.__app_version:
-            self.__app_version = self._app.revisions.get(self.revision_number).version
+            self.__app_version = self._app.revisions.get(self.app_revision_number).version
         return self.__app_version
 
     @property

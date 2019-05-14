@@ -717,31 +717,28 @@ def history(mock_history_record):
     return mock_history_record['History']
 
 
-def test_revision_cursor(history):
-    assert isinstance(history, RevisionCursor)
+class TestHistory(object):
+    def test_revision_cursor(self, history):
+        assert isinstance(history, RevisionCursor)
 
+    def test_num_revisions(self, history):
+        # Get number of revisions
+        num_revisions = len(history)
+        assert num_revisions == 3
 
-def test_num_revisions(history):
-    # Get number of revisions
-    num_revisions = len(history)
-    assert num_revisions == 3
+    def test_revision_str(self, history):
+        for revision in history:
+            assert str(revision) == 'PHT-1 ({})'.format(revision.revision_number)
 
+    def test_revisions(self, history, mock_history_record):
+        for idx, revision in enumerate(history):
+            assert isinstance(revision, RecordRevision)
+            assert isinstance(revision.app_version, App)
+            assert isinstance(revision.modified_date, datetime)
+            assert isinstance(revision.user, UserGroup)
+            assert isinstance(revision.version, Record)
+            assert revision.version.id == mock_history_record.id
+            assert len(history) - revision.revision_number == idx
 
-def test_revision_str(history):
-    for revision in history:
-        assert str(revision) == 'PHT-1 ({})'.format(revision.revision_number)
-
-
-def test_revisions(history, mock_history_record):
-    for idx, revision in enumerate(history):
-        assert isinstance(revision, RecordRevision)
-        assert isinstance(revision.app_version, App)
-        assert isinstance(revision.modified_date, datetime)
-        assert isinstance(revision.user, UserGroup)
-        assert isinstance(revision.version, Record)
-        assert revision.version.id == mock_history_record.id
-        assert len(history) - revision.revision_number == idx
-
-
-def test_app_revision_caching(mock_swimlane):
-    assert True is True
+    def test_app_revision_caching(self, mock_swimlane):
+        assert True is True

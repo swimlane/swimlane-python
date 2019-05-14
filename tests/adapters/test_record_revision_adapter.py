@@ -8,11 +8,10 @@ from swimlane.core.resources.usergroup import UserGroup
 
 def test_get(mock_swimlane, mock_revision_record, raw_record_revision_data):
     mock_response = mock.MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = raw_record_revision_data
 
     with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
-        mock_response.status_code = 200
-        mock_response.json.return_value = raw_record_revision_data
-
         revisions = mock_revision_record.revisions.get()
 
         mock_swimlane.request.assert_called_with('get', 'app/{0}/record/{1}/history'.format(mock_revision_record.app.id,
