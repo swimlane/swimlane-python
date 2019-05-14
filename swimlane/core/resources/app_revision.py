@@ -1,4 +1,4 @@
-from pendulum import pendulum
+import pendulum
 
 from swimlane.core.resources.app import App
 from swimlane.core.resources.base import APIResource

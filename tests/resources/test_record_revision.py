@@ -39,8 +39,10 @@ def mock_rr_record_revision(mock_rr_raw_record_revision, mock_rr_app):
 
 class TestRecordRevision(object):
     def test_constructor(self, mock_swimlane, mock_rr_record_revision, mock_rr_raw_record_revision):
-        assert mock_rr_record_revision.app_revision_number is mock_rr_raw_record_revision['version']['applicationRevision']
-        assert str(mock_rr_record_revision.modified_date) == str(pendulum.parse(mock_rr_raw_record_revision['modifiedDate']))
+        assert mock_rr_record_revision.app_revision_number is mock_rr_raw_record_revision['version'][
+            'applicationRevision']
+        assert str(mock_rr_record_revision.modified_date) == str(
+            pendulum.parse(mock_rr_raw_record_revision['modifiedDate']))
         assert mock_rr_record_revision.revision_number is mock_rr_raw_record_revision['revisionNumber']
         assert mock_rr_record_revision.status is mock_rr_raw_record_revision['status']
         assert str(mock_rr_record_revision.user) == str(UserGroup(mock_swimlane, mock_rr_raw_record_revision['userId']))
@@ -51,8 +53,9 @@ class TestRecordRevision(object):
         assert isinstance(app_version, App)
         assert app_version is mock_rr_app_revision.version
 
-    def test_version(self, mock_rr_app_revision, mock_rr_record_revision, mock_rr_raw_record_revision):
+    def test_version(self, mock_rr_app_revision, mock_rr_record_revision):
         version = mock_rr_record_revision.version
 
         assert isinstance(version, Record)
         assert version.app is mock_rr_app_revision.version
+        assert version._raw is mock_rr_record_revision._raw['version']
