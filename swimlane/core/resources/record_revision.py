@@ -1,39 +1,26 @@
-import pendulum
-
-from swimlane.core.resources.base import APIResource
-from swimlane.core.resources.usergroup import UserGroup
+from swimlane.core.resources.revision_base import Revision
 
 
-class RecordRevision(APIResource):
+class RecordRevision(Revision):
     """
     Encapsulates a single revision returned from a History lookup.
+
+    Attributes:
+        app_revision_number: The app revision number this record revision was created using.
+
+    Properties:
+        app_version: Returns an App corresponding to the app_revision_number of this record revision.
+        version: Returns a Record corresponding to the app_version and data contained in this record revision.
     """
 
     def __init__(self, app, raw):
         super(RecordRevision, self).__init__(app._swimlane, raw)
+
         self.__app_version = None
         self.__version = None
-
         self._app = app
 
-        self.app_revision_number = self._raw['version']['applicationRevision']
-        self.modified_date = pendulum.parse(self._raw['modifiedDate'])
-        self.revision_number = self._raw['revisionNumber']
-        self.status = self._raw['status']
-
-        # UserGroupSelection, can't set as User without additional lookup
-        self.user = UserGroup(self._swimlane, self._raw['userId'])
-
-    def __str__(self):
-        return '{} ({})'.format(self.version, self.revision_number)
-
-    def for_json(self):
-        """Return revision metadata"""
-        return {
-            'modifiedDate': self._raw['modifiedDate'],
-            'revisionNumber': self.revision_number,
-            'user': self.user.for_json()
-        }
+        self.app_revision_number = self._version['applicationRevision']
 
     @property
     def app_version(self):
@@ -48,5 +35,5 @@ class RecordRevision(APIResource):
         if not self.__version:
             # avoid circular imports
             from swimlane.core.resources.record import Record
-            self.__version = Record(self.app_version, self._raw['version'])
+            self.__version = Record(self.app_version, self._version)
         return self.__version

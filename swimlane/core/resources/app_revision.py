@@ -1,26 +1,24 @@
-import pendulum
-
 from swimlane.core.resources.app import App
-from swimlane.core.resources.base import APIResource
-from swimlane.core.resources.usergroup import UserGroup
+from swimlane.core.resources.revision_base import Revision
 
 
-class AppRevision(APIResource):
-    """Encapsulates a single revision returned from a History lookup."""
+class AppRevision(Revision):
+    """
+    Encapsulates a single revision returned from a History lookup.
+
+    Attributes:
+        Attributes:
+        modified_date: The date this app revision was created.
+        revision_number: The revision number of this app revision.
+        status: Indicates whether this revision is the current revision or a historical revision.
+        user: The user that saved this revision of the record.
+        version: The App corresponding to the data contained in this app revision.
+    """
 
     def __init__(self, swimlane, raw):
         super(AppRevision, self).__init__(swimlane, raw)
-        self.version = App(swimlane, raw['version'])
 
-        self.modified_date = pendulum.parse(self._raw['modifiedDate'])
-        self.revision_number = self._raw['revisionNumber']
-        self.status = self._raw['status']
-
-        # UserGroupSelection, can't set as User without additional lookup
-        self.user = UserGroup(self._swimlane, self._raw['userId'])
-
-    def __str__(self):
-        return '{} ({})'.format(self.version, self.revision_number)
+        self.version = App(swimlane, self._version)
 
     @staticmethod
     def __separator():
