@@ -1,11 +1,9 @@
-from swimlane.core.cache import check_cache
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.record_revision import RecordRevision
-from swimlane.utils import one_of_keyword_only
 
 
 class RecordRevisionAdapter(AppResolver):
-    """Handles retrieval and creation of Swimlane Record Revision resources"""
+    """Handles retrieval of Swimlane Record Revision resources"""
 
     def __init__(self, app, record):
         super(RecordRevisionAdapter, self).__init__(app)
