@@ -1,7 +1,7 @@
-from swimlane.core.resources.revision_base import Revision
+from swimlane.core.resources.revision_base import RevisionBase
 
 
-class RecordRevision(Revision):
+class RecordRevision(RevisionBase):
     """
     Encapsulates a single revision returned from a History lookup.
 
@@ -12,15 +12,13 @@ class RecordRevision(Revision):
         app_version: Returns an App corresponding to the app_revision_number of this record revision.
         version: Returns a Record corresponding to the app_version and data contained in this record revision.
     """
-
     def __init__(self, app, raw):
         super(RecordRevision, self).__init__(app._swimlane, raw)
 
         self.__app_version = None
-        self.__version = None
         self._app = app
 
-        self.app_revision_number = self._version['applicationRevision']
+        self.app_revision_number = self._raw_version['applicationRevision']
 
     @property
     def app_version(self):
@@ -31,9 +29,9 @@ class RecordRevision(Revision):
 
     @property
     def version(self):
-        """The record contained in this record revision. Lazy loaded"""
-        if not self.__version:
+        """The record contained in this record revision. Lazy loaded. Overridden from base class."""
+        if not self._version:
             # avoid circular imports
             from swimlane.core.resources.record import Record
-            self.__version = Record(self.app_version, self._version)
-        return self.__version
+            self._version = Record(self.app_version, self._raw_version)
+        return self._version

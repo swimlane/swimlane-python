@@ -586,6 +586,11 @@ Get Information About the Revision
 
     app = revision.version # returns an App or Record object representing the revision depending on revision type.
 
+    # additional functions
+    text = str(revision) # returns name of the revision and the revision number as a string
+    json = revision.for_json # returns a dict containing modifiedDate, revisionNumber, and user keys/attribute values
+
+
 Record Revisions
 ^^^^^^^^^^^^^^^^
 
@@ -598,4 +603,5 @@ Record revisions additionally have attributes containing information about their
     revision.app_revision_number # The app revision number this record revision was created using.
 
     app = revision.app_version # Returns an App corresponding to the app_revision_number of this record revision.
+
 

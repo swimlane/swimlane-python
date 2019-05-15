@@ -1,8 +1,8 @@
 from swimlane.core.resources.app import App
-from swimlane.core.resources.revision_base import Revision
+from swimlane.core.resources.revision_base import RevisionBase
 
 
-class AppRevision(Revision):
+class AppRevision(RevisionBase):
     """
     Encapsulates a single revision returned from a History lookup.
 
@@ -14,11 +14,8 @@ class AppRevision(Revision):
         user: The user that saved this revision of the record.
         version: The App corresponding to the data contained in this app revision.
     """
-
     def __init__(self, swimlane, raw):
         super(AppRevision, self).__init__(swimlane, raw)
-
-        self.version = App(swimlane, self._version)
 
     @staticmethod
     def __separator():
@@ -30,12 +27,20 @@ class AppRevision(Revision):
 
     @staticmethod
     def get_unique_id(app_id, revision_number):
-        """Return the unique identifier for the given AppRevision."""
+        """Returns the unique identifier for the given AppRevision."""
         return '{0}{1}{2}'.format(app_id, AppRevision.__separator(), revision_number)
 
     @staticmethod
     def parse_unique_id(unique_id):
+        """Returns an array containing two items: the app_id and revision number parsed from the given unique_id."""
         return unique_id.split(AppRevision.__separator())
+
+    @property
+    def version(self):
+        """Returns an App from the _raw_version info in this app revision. Lazy loaded. Overridden from base class."""
+        if not self._version:
+            self._version = App(self._swimlane, self._raw_version)
+        return self._version
 
     def get_cache_index_keys(self):
         """Returns cache index keys for this AppRevision."""

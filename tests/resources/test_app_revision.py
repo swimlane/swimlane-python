@@ -35,3 +35,15 @@ class TestAppRevision(object):
         assert len(keys) is 1
         assert 'app_id_revision' in keys
         assert keys['app_id_revision'] == 'a34xbNOoo2P3ivyjY --- 3.0'
+
+    def test_for_json(self, mock_ar_app_revision):
+        json = mock_ar_app_revision.for_json()
+
+        assert 'modifiedDate' in json
+        assert 'revisionNumber' in json
+        assert 'user' in json
+
+    def test_str(self, mock_ar_app_revision):
+        text = str(mock_ar_app_revision)
+
+        assert text == 'Pydriver History Test (PHT) (3.0)'

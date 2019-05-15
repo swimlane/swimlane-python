@@ -1,7 +1,6 @@
-from datetime import datetime
-
 import mock
 import pytest
+import pendulum
 
 from swimlane.core.fields.history import RevisionCursor
 from swimlane.core.resources.record_revision import RecordRevision
@@ -9,25 +8,21 @@ from swimlane.core.resources.usergroup import UserGroup
 from swimlane.core.resources.app import App
 from swimlane.core.resources.record import Record
 
-# slight hack, these are pytest fixtures but need to be used outside a test in the request_mock function below
-from tests.conftest_revisions import raw_app_revision_data, raw_record_revision_data
-
-
-def request_mock(method, endpoint, params=None):
-    """Mocks swimlane.request function, returns the API responses for the history endpoints."""
-    if 'record' in endpoint:
-        return_value = raw_record_revision_data()
-    else:
-        revision = float(endpoint.split('/')[3])
-        return_value = next(x for x in raw_app_revision_data() if x['revisionNumber'] == revision)
-
-    mock_response = mock.MagicMock()
-    mock_response.json.return_value = return_value
-    return mock_response
-
 
 @pytest.fixture
-def mock_history_swimlane(mock_swimlane):
+def mock_history_swimlane(mock_swimlane, raw_app_revision_data, raw_record_revision_data):
+    def request_mock(method, endpoint, params=None):
+        """Mocks swimlane.request function, returns the API responses for the history endpoints."""
+        if 'record' in endpoint:
+            return_value = raw_record_revision_data
+        else:
+            revision = float(endpoint.split('/')[3])
+            return_value = next(x for x in raw_app_revision_data if x['revisionNumber'] == revision)
+
+        mock_response = mock.MagicMock()
+        mock_response.json.return_value = return_value
+        return mock_response
+
     with mock.patch.object(mock_swimlane, 'request', side_effect=request_mock):
         yield mock_swimlane
 
@@ -60,7 +55,7 @@ class TestHistory(object):
         for idx, revision in enumerate(history):
             assert isinstance(revision, RecordRevision)
             assert isinstance(revision.app_version, App)
-            assert isinstance(revision.modified_date, datetime)
+            assert isinstance(revision.modified_date, pendulum.datetime)
             assert isinstance(revision.user, UserGroup)
             assert isinstance(revision.version, Record)
             assert revision.version.id == mock_history_record.id

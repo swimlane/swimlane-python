@@ -4,7 +4,7 @@ from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.usergroup import UserGroup
 
 
-class Revision(APIResource):
+class RevisionBase(APIResource):
     """
     The base class representing a single revision returned from a History lookup.
 
@@ -17,7 +17,7 @@ class Revision(APIResource):
     """
 
     def __init__(self, swimlane, raw):
-        super(Revision, self).__init__(swimlane, raw)
+        super(RevisionBase, self).__init__(swimlane, raw)
 
         self.modified_date = pendulum.parse(self._raw['modifiedDate'])
         self.revision_number = self._raw['revisionNumber']
@@ -26,10 +26,15 @@ class Revision(APIResource):
         # UserGroupSelection, can't set as User without additional lookup
         self.user = UserGroup(self._swimlane, self._raw['userId'])
 
-        self._version = self._raw['version']
+        self._raw_version = self._raw['version']
+        self._version = None
 
     def __str__(self):
         return '{} ({})'.format(self.version, self.revision_number)
+
+    @property
+    def version(self):
+        raise NotImplementedError
 
     def for_json(self):
         """Return revision metadata"""

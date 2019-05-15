@@ -59,3 +59,15 @@ class TestRecordRevision(object):
         assert isinstance(version, Record)
         assert version.app is mock_rr_app_revision.version
         assert version._raw is mock_rr_record_revision._raw['version']
+
+    def test_for_json(self, mock_rr_record_revision):
+        json = mock_rr_record_revision.for_json()
+
+        assert 'modifiedDate' in json
+        assert 'revisionNumber' in json
+        assert 'user' in json
+
+    def test_str(self, mock_rr_record_revision):
+        text = str(mock_rr_record_revision)
+
+        assert text == 'PHT-1 (3.0)'
