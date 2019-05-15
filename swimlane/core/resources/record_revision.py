@@ -1,3 +1,4 @@
+from swimlane.core.resources.record import Record
 from swimlane.core.resources.revision_base import RevisionBase
 
 
@@ -31,7 +32,5 @@ class RecordRevision(RevisionBase):
     def version(self):
         """The record contained in this record revision. Lazy loaded. Overridden from base class."""
         if not self._version:
-            # avoid circular imports
-            from swimlane.core.resources.record import Record
             self._version = Record(self.app_version, self._raw_version)
         return self._version
