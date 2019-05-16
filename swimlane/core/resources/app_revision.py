@@ -14,26 +14,20 @@ class AppRevision(RevisionBase):
         user: The user that saved this revision of the record.
         version: The App corresponding to the data contained in this app revision.
     """
-    def __init__(self, swimlane, raw):
-        super(AppRevision, self).__init__(swimlane, raw)
 
-    @staticmethod
-    def __separator():
-        """
-        Separator for unique ids. Unlikely to be found in application ids. Although technically we do not currently
-        validate app ids in the backend for specific characters so this sequence could be found.
-        """
-        return ' --- '
+    # Separator for unique ids. Unlikely to be found in application ids. Although technically we do not currently
+    # validate app ids in the backend for specific characters so this sequence could be found.
+    SEPARATOR = ' --- '
 
     @staticmethod
     def get_unique_id(app_id, revision_number):
         """Returns the unique identifier for the given AppRevision."""
-        return '{0}{1}{2}'.format(app_id, AppRevision.__separator(), revision_number)
+        return '{0}{1}{2}'.format(app_id, AppRevision.SEPARATOR, revision_number)
 
     @staticmethod
     def parse_unique_id(unique_id):
         """Returns an array containing two items: the app_id and revision number parsed from the given unique_id."""
-        return unique_id.split(AppRevision.__separator())
+        return unique_id.split(AppRevision.SEPARATOR)
 
     @property
     def version(self):
