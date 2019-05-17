@@ -1,7 +1,3 @@
-import pendulum
-
-from swimlane.core.resources.base import APIResource
-from swimlane.core.resources.usergroup import UserGroup
 from .base import CursorField, FieldCursor, ReadOnly
 
 
@@ -21,50 +17,8 @@ class RevisionCursor(FieldCursor):
         return super(RevisionCursor, self)._evaluate()
 
     def _retrieve_revisions(self):
-        """Retrieve and populate Revision instances from history API endpoint"""
-        response = self._swimlane.request(
-            'get',
-            'history',
-            params={
-                'type': 'Records',
-                'id': self._record.id
-            }
-        )
-
-        raw_revisions = response.json()
-
-        return [Revision(self._record, raw) for raw in raw_revisions]
-
-
-class Revision(APIResource):
-    """Encapsulates a single revision returned from a History lookup"""
-
-    def __init__(self, record, raw):
-        super(Revision, self).__init__(record._swimlane, raw)
-
-        self.record = record
-
-        self.modified_date = pendulum.parse(self._raw['modifiedDate'])
-        self.revision_number = int(self._raw['revisionNumber'])
-        self.status = self._raw['status']
-
-        # UserGroupSelection, can't set as User without additional lookup
-        self.user = UserGroup(self._swimlane, self._raw['userId'])
-
-        # Avoid circular imports
-        from swimlane.core.resources.record import Record
-        self.version = Record(self.record.app, self._raw['version'])
-
-    def __str__(self):
-        return '{} ({})'.format(self.version, self.revision_number)
-
-    def for_json(self):
-        """Return revision metadata"""
-        return {
-            'modifiedDate': self._raw['modifiedDate'],
-            'revisionNumber': self.revision_number,
-            'user': self.user.for_json()
-        }
+        """Populate RecordRevision instances."""
+        return self._record.revisions.get_all()
 
 
 class HistoryField(ReadOnly, CursorField):

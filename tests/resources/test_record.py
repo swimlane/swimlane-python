@@ -4,6 +4,7 @@ import json
 import mock
 import pytest
 
+from swimlane.core.adapters import RecordRevisionAdapter
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.exceptions import UnknownField, ValidationError
 
@@ -204,3 +205,6 @@ class TestRecord(object):
         """Test .for_json() with all fields passes json.dumps() with no specific assertions beyond no exceptions"""
         result = mock_record.for_json()
         json.dumps(result)
+
+    def test_revisions(self, mock_record):
+        assert isinstance(mock_record.revisions, RecordRevisionAdapter)

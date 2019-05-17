@@ -575,9 +575,10 @@ Cursor managing iteration and addition of comments
 HistoryField
 ------------
 
-Returns a readonly RevisionCursor object that abstracts out retrieval and pagination of record history
+Returns a readonly RevisionCursor object that abstracts out retrieval of record history.
 
-Performs additional request(s) to history API endpoint as accessed
+Each item in the RevisionCursor is a RecordRevision object, which performs additional requests to history API endpoints
+as accessed. See the "Resources" section of the documentation for more information about the RecordRevision object.
 
 .. code-block:: python
 

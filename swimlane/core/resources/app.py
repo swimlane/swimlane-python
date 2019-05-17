@@ -44,9 +44,10 @@ class App(APIResource):
                 self._keys_to_field_names[key] = name
 
         # Avoid circular import
-        from swimlane.core.adapters import RecordAdapter, ReportAdapter
+        from swimlane.core.adapters import RecordAdapter, ReportAdapter, AppRevisionAdapter
         self.records = RecordAdapter(self)
         self.reports = ReportAdapter(self)
+        self.revisions = AppRevisionAdapter(self)
 
     def __str__(self):
         return '{self.name} ({self.acronym})'.format(self=self)
