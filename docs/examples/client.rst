@@ -115,7 +115,7 @@ following supported resource types at a time:
 - User
 - Group
 
-Once a cache is full, items are removed using "Least Frequently Used (LFU)" priority, meaning the resource_cache_sizes that are
+Once a cache is full, items are removed using "Least Frequently Used (LFU)" priority, meaning the resource that are
 most often accessed will be kept in the cache longer than less-frequently accessed resources.
 
 .. code-block:: python
