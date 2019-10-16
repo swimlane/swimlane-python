@@ -115,7 +115,7 @@ following supported resource types at a time:
 - User
 - Group
 
-Once a cache is full, items are removed using "Least Frequently Used (LFU)" priority, meaning the resources that are
+Once a cache is full, items are removed using "Least Frequently Used (LFU)" priority, meaning the resource_cache_sizes that are
 most often accessed will be kept in the cache longer than less-frequently accessed resources.
 
 .. code-block:: python
@@ -333,6 +333,7 @@ requests.
     swimlane.helpers.add_record_references(
         app_id='123...456',
         record_id='789...0ab',
+        field_id='abc...def',
         target_record_ids=[
             '123...456',
             '789...0ab',

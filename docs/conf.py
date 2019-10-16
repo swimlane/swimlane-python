@@ -75,7 +75,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Swimlane Python'
-author = 'Swimlane LLC'
+author = 'Swimlane'
 copyright = '{}, {}'.format(datetime.now().year, author)
 
 # The version info for the project you're documenting, acts as replacement for
