@@ -45,6 +45,7 @@ class Swimlane(object):
         resource_cache_size (int): Maximum number of each resource type to keep in memory cache. Set 0 to disable
             caching. Disabled by default
         access_token (str): Authentication token, used in lieu of a username and password
+        write_to_read_only (bool): Enable the ability to write to Read-only fields
 
     Attributes:
         host (pyuri.URI): Full RFC-1738 URL pointing to Swimlane host
