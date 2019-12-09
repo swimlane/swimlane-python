@@ -1,4 +1,5 @@
 import six
+import json
 
 from .base import Field
 
@@ -14,6 +15,12 @@ class TextField(Field):
 
     def set_python(self, value):
         """Set field internal value from the python representation of field value"""
+
+        # json field handling
+        if self.input_type == "json":
+            if value is not None and not isinstance(value, self.supported_types):
+                value = json.dumps(value, indent=4)
+            self.readonly = False
         
         # hook exists to stringify before validation
 
