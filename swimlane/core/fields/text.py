@@ -20,7 +20,6 @@ class TextField(Field):
         if self.input_type == "json":
             if value is not None and not isinstance(value, self.supported_types):
                 value = json.dumps(value, indent=4)
-            self.readonly = False
         
         # hook exists to stringify before validation
 
