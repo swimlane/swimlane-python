@@ -105,7 +105,7 @@ class Swimlane(object):
         self.__settings = None
         self.__user = None
 
-        self._read_only = write_to_read_only
+        self._write_to_read_only = write_to_read_only
 
         self._default_timeout = default_timeout
 
