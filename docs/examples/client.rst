@@ -333,6 +333,7 @@ requests.
     swimlane.helpers.add_record_references(
         app_id='123...456',
         record_id='789...0ab',
+        field_id='abc...def',
         target_record_ids=[
             '123...456',
             '789...0ab',
