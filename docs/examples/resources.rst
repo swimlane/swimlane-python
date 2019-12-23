@@ -103,12 +103,16 @@ Available operators are just strings as shown above, but are made available as c
         )
 
 
+Reports
+^^^^^^^
+
 To operate on large search results as records are returned from API or retrieve only partial results
 :class:`~swimlane.core.resources.report.Report` should be used instead.
 
 .. code-block:: python
 
-    report = app.reports.build('report-name', limit=0)
+    # Create initial report, with optional limit and keywords filter
+    report = app.reports.build('report-name', limit=0, keywords=['target', 'keywords'])
 
     # Apply report filters
     # These work like search filters, but must be applied one-by-one and are NOT tuples like in app.records.search()

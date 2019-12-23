@@ -13,7 +13,7 @@ with open('./README.rst') as f:
 setup(
     version="10.0.0",
     name="swimlane",
-    author="Swimlane LLC",
+    author="Swimlane",
     author_email="info@swimlane.com",
     url="https://github.com/swimlane/swimlane-python",
     packages=find_packages(exclude=('tests', 'tests.*')),
@@ -27,7 +27,7 @@ setup(
     tests_require=parse_requirements('./test-requirements.txt'),
     classifiers=[
         "License :: OSI Approved :: GNU Affero General Public License v3",
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.4",
