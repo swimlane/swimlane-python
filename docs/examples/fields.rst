@@ -443,16 +443,34 @@ Returns a cursor managing iteration existing attachments.
         content = stream.read()
         assert len(content) > 0
 
-Upload new attachment with filename and stream or file handle
+Upload new attachment with a given filename and a file-like object
 
 .. code-block:: python
 
-    attachments = record['Attachment']
-    assert len(attachments) == 1
+    # Read file from disk and add as new attachment
+    with open('/path/to/file', 'rb') as file_handle:
+        record['Attachment'].add('filename.txt', file_handle)
 
-    new_attachment = attachments.add('filename.txt', BytesIO(b'file contents in stream/handle object'))
-    assert isinstance(new_attachment, Attachment)
-    assert len(attachments) == 2
+    # Create new attachment from data already loaded into a file-like object
+    # Useful when attaching data already read from disk or when that file data is used multiple times
+    from io import BytesIO
+
+    with open('/path/to/file', 'rb') as file_handle:
+        data = file_handle.read()
+
+    record['Attachment'].add('filename.txt', BytesIO(data))
+
+Example showing adding a request response body as an attachment
+
+.. code-block:: python
+
+    from io import BytesIO
+    import requests
+
+    response = requests.get('http://httpbin.org/json')
+
+    record['Attachment'].add('example.json', BytesIO(response.content))
+    record.save()
 
 .. note::
 
