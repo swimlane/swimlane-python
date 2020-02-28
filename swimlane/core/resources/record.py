@@ -76,8 +76,9 @@ class Record(APIResource):
         return str(self.tracking_id)
 
     def __setitem__(self, field_name, value):
-        field_id, swimlane_value = self.get_field(field_name).set_python(value)
-        self.__pending[field_id] = swimlane_value
+        field = self.get_field(field_name)
+        field.set_python(value)
+        self.__pending[field.id] = field.get_swimlane()
 
     def __getitem__(self, field_name):
         return self.get_field(field_name).get_python()
