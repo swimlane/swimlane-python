@@ -29,6 +29,8 @@ class Record(APIResource):
 
         self.__app = app
 
+        self.__pending = {}
+
         self.is_new = self._raw.get('isNew', False)
 
         # Protect against creation from generic raw data not yet containing server-generated values
@@ -74,7 +76,8 @@ class Record(APIResource):
         return str(self.tracking_id)
 
     def __setitem__(self, field_name, value):
-        self.get_field(field_name).set_python(value)
+        field_id, swimlane_value = self.get_field(field_name).set_python(value)
+        self.__pending[field_id] = swimlane_value
 
     def __getitem__(self, field_name):
         return self.get_field(field_name).get_python()
@@ -158,12 +161,25 @@ class Record(APIResource):
             if field.get_swimlane() is None:
                 raise ValidationError(self, 'Required field "{}" is not set'.format(field.name))
 
+    def __request_and_reinitialize(self, method, endpoint, data):
+        response = self._swimlane.request(
+            method,
+            endpoint,
+            json=data
+        )
+
+        # Reinitialize record with new raw content returned from server to update any calculated fields
+        self.__init__(self.app, response.json())
+
+        # Manually cache self after save to keep cache updated with latest data
+        self._swimlane.resources_cache.cache(self)
+
     def save(self):
         """Persist record changes on Swimlane server
-        
+
         Updates internal raw data with response content from server to guarantee calculated field values match values on
         server
-        
+
         Raises:
             ValidationError: If any fields fail validation
         """
@@ -183,17 +199,33 @@ class Record(APIResource):
 
         self.validate()
 
-        response = self._swimlane.request(
+        self.__request_and_reinitialize(
             method,
             'app/{}/record'.format(self.app.id),
-            json=copy_raw
+            copy_raw
         )
 
-        # Reinitialize record with new raw content returned from server to update any calculated fields
-        self.__init__(self.app, response.json())
+    def patch(self):
+        """Patch record on Swimlane server
 
-        # Manually cache self after save to keep cache updated with latest data
-        self._swimlane.resources_cache.cache(self)
+        Raises
+            ValueError: If record.is_new
+        """
+        if self.is_new:
+            raise ValueError('Cannot patch a new Record')
+
+        copy_raw = copy.copy(self._raw)
+        copy_raw['values'] = self.__pending
+
+        self.validate()
+
+        self.__request_and_reinitialize(
+            'patch',
+            'app/{}/record/{}'.format(self.app.id, self.id),
+            copy_raw
+        )
+
+        self.__pending = {}
 
     def delete(self):
         """Delete record from Swimlane server
