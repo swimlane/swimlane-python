@@ -206,6 +206,8 @@ class Record(APIResource):
             copy_raw
         )
 
+        self.__pending = {}
+
     def patch(self):
         """Patch record on Swimlane server
 
