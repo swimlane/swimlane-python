@@ -29,7 +29,7 @@ class Record(APIResource):
 
         self.__app = app
 
-        self.__pending = {}
+        self.__altered_fields = {}
 
         self.is_new = self._raw.get('isNew', False)
 
@@ -78,7 +78,7 @@ class Record(APIResource):
     def __setitem__(self, field_name, value):
         field = self.get_field(field_name)
         field.set_python(value)
-        self.__pending[field.id] = field.get_swimlane()
+        self.__altered_fields[field.id] = 1
 
     def __getitem__(self, field_name):
         return self.get_field(field_name).get_python()
@@ -206,7 +206,7 @@ class Record(APIResource):
             copy_raw
         )
 
-        self.__pending = {}
+        self.__altered_fields = {}
 
     def patch(self):
         """Patch record on Swimlane server
@@ -218,7 +218,8 @@ class Record(APIResource):
             raise ValueError('Cannot patch a new Record')
 
         copy_raw = copy.copy(self._raw)
-        copy_raw['values'] = self.__pending
+
+        copy_raw['values'] = {k:v for (k,v) in copy_raw['values'].items() if k in self.__altered_fields}
 
         self.validate()
 
@@ -228,7 +229,7 @@ class Record(APIResource):
             copy_raw
         )
 
-        self.__pending = {}
+        self.__altered_fields = {}
 
     def delete(self):
         """Delete record from Swimlane server
