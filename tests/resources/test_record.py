@@ -1,5 +1,6 @@
 import copy
 import json
+import pendulum
 
 import mock
 import pytest
@@ -147,6 +148,20 @@ class TestRecord(object):
             assert error.app is mock_record.app
         else:
             raise RuntimeError
+
+    def test_read_only(self, mock_swimlane, mock_record):
+        """Testing writing to a read only field"""
+
+        now = pendulum.now()
+        try:
+            mock_record['Datetime (Read-only)'] = now
+        except ValidationError as error:
+            assert mock_record['Datetime (Read-only)'] == None
+
+        mock_swimlane._write_to_read_only = True
+        mock_record['Datetime (Read-only)'] = now
+        assert mock_record['Datetime (Read-only)'] == now
+
 
     def test_iteration(self, mock_record):
         """Test that iterating over a record yields field names and their values like dict.items()"""
