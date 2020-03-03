@@ -149,6 +149,27 @@ most often accessed will be kept in the cache longer than less-frequently access
 Resource caching can provide a big performance boost when requesting the same resources multiple times, especially when
 performing multiple searches or accessing references fields pointing to the same set of records.
 
+Write to Read Only Fields
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To enable the ability to set fields that have been marked Read-Only in the application builder, you can set the
+`write_to_read_only` parameter when initializing the Swimlane client.
+
+.. code-block:: python
+
+    from swimlane import Swimlane
+
+    swimlane = Swimlane(
+        '192.168.1.1',
+        'username',
+        'password',
+        write_to_read_only=True)
+
+    app = swimlane.apps.get(id='abc...123')
+    record = app.records.get(id='def...456')
+
+    record['Read-Only Field'] = "New Value"
+    record.save()
 
 Custom Direct Requests
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -333,6 +354,7 @@ requests.
     swimlane.helpers.add_record_references(
         app_id='123...456',
         record_id='789...0ab',
+        field_id='abc...def',
         target_record_ids=[
             '123...456',
             '789...0ab',

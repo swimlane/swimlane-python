@@ -25,9 +25,9 @@ deploy:
 - provider: pypi
   user: swimlane
   distributions: sdist bdist_wheel
-  password:
-    secure: "GUQY7wd//rXctjh2GnUQ5r0hHQJnPzwCnH8ZvXL402p9KJP03SzSzrvkYhhTezEPIU+iqvwyL2X1bcwwH4kU94Oy7n81hnJriXWvFMQt819atrHe53J4tBZGA1ye3BiNAgv/pWfXcqctm2KI4h8UQhQvTRa1AZT6w86q0RC+qWsOfdITqroAXDXXVkfRrqzCqyylhWYDj+G4q86gBaJQWHzYdE98PS19LXFLtONbe0PtkHEpLT2SMwrccGTnOt0hRz9ZSCj03kTUp3LO44S1UTkBqNJ81hnVXNbPXZ2mUz2cZcxfKb97vtlOJhepJtSDzgaN3L882XKwWyUezFxKgWnXaz3vRd4ctrTBtaEfRIScOd/QnNHDjGDLaLZNyBYSlSX1NK4c1HuLfGQAi43gb6Vcckreb2ZUOoEzz4Q4dzOSWQADvX0ktA41NPu3Bj55D/Rn4EWXlwDoh4XRHuOPErFDe73cHF5ITz+8nYns7Uk97Wm30+U8UJxakqmgHM6fpm8ZoqScz6oqvIQDjMZSeeI4BAc+/dEcSHwLhXLsXJYBzcsJVLm7+xj/rubte0kTAt8dHdxgbOvKlAwjoeYOdRj1bDJTXstVYAbR3z8pqrbl4I4YufHjpA0Ao2nq5xzlN28bnS54uxYoW0JNN3jeeaq5HOsXgx3k6V6Zf08VFTY="
+  password: $PIP_PASSWORD
   on:
     tags: true
     repo: swimlane/swimlane-python
+    # Package uploaded is universal for Python 2 and 3, just only push to pip during one version build cycle
     condition: $TRAVIS_PYTHON_VERSION = '2.7'
