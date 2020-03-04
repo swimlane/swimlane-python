@@ -33,8 +33,22 @@ class App(APIResource):
         self.id = self._raw['id']
         self.tracking_id = self._raw.get('trackingFieldId')
 
-        self._fields_by_id = {f['id']: f for f in self._raw['fields']}
-        self._fields_by_name = {f['name']: f for f in self._raw['fields']}
+        self._fields_by_id = dict()
+        self._fields_by_name = dict()
+        self._defaults = dict()
+
+        for f in self._raw['fields']:
+            self._fields_by_id[f['id']] = f
+            self._fields_by_name[f['name']] = f
+            if f['fieldType'] == "valuesList":
+                t = f['selectionType']
+                for v in f['values']:
+                    if v['selected']:
+                        if t == 'single':
+                            self._defaults[f['name']] = v['name']
+                        elif t == 'multi':
+                            self._defaults[f['name']] = [v['name']]
+
         self._keys_to_field_names = {}
         for name, field_def in six.iteritems(self._fields_by_name):
             # Include original name to simplify name resolution
