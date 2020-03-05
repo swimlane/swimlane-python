@@ -29,8 +29,6 @@ class Record(APIResource):
 
         self.__app = app
 
-        self.__altered_fields = {}
-
         self.is_new = self._raw.get('isNew', False)
 
         # Protect against creation from generic raw data not yet containing server-generated values
@@ -61,6 +59,8 @@ class Record(APIResource):
         self._fields = {}
         self.__premap_fields()
 
+        self.__existing_values = {k:self.get_field(k).get_batch_representation() for (k,v) in self}
+
         # avoid circular reference
         from swimlane.core.adapters import RecordRevisionAdapter
         self.revisions = RecordRevisionAdapter(app, self)
@@ -76,9 +76,7 @@ class Record(APIResource):
         return str(self.tracking_id)
 
     def __setitem__(self, field_name, value):
-        field = self.get_field(field_name)
-        field.set_python(value)
-        self.__altered_fields[field.id] = 1
+        self.get_field(field_name).set_python(value)
 
     def __getitem__(self, field_name):
         return self.get_field(field_name).get_python()
@@ -206,8 +204,6 @@ class Record(APIResource):
             copy_raw
         )
 
-        self.__altered_fields = {}
-
     def patch(self):
         """Patch record on Swimlane server
 
@@ -219,7 +215,19 @@ class Record(APIResource):
 
         copy_raw = copy.copy(self._raw)
 
-        copy_raw['values'] = {k:v for (k,v) in copy_raw['values'].items() if k in self.__altered_fields}
+        pending_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
+        patch_values = {
+            self.get_field(k).id: pending_values[k] for k in pending_values.keys() & self.__existing_values
+            if pending_values[k] != self.__existing_values[k]
+        }
+
+        # Use None for empty arrays to ensure field is removed from Record on PATCH
+        for field_id, value in six.iteritems(patch_values):
+            if not value:
+                patch_values[field_id] = None
+
+        copy_raw['values'] = patch_values
+        print(copy_raw['values'])
 
         self.validate()
 
@@ -229,7 +237,6 @@ class Record(APIResource):
             copy_raw
         )
 
-        self.__altered_fields = {}
 
     def delete(self):
         """Delete record from Swimlane server

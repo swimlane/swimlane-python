@@ -102,6 +102,10 @@ class UserGroupField(MultiSelectField):
             )
         )
 
+    def get_batch_representation(self):
+        """Return best batch process representation of field value"""
+        return self.get_swimlane()
+
     def set_swimlane(self, value):
         """Workaround for reports returning an empty usergroup field as a single element list with no id/name"""
         if value == [{"$type": "Core.Models.Utilities.UserGroupSelection, Core"}]:
