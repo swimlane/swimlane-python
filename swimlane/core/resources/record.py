@@ -59,6 +59,8 @@ class Record(APIResource):
         self._fields = {}
         self.__premap_fields()
 
+        self.__existing_values = {k:self.get_field(k).get_batch_representation() for (k,v) in self}
+
         # avoid circular reference
         from swimlane.core.adapters import RecordRevisionAdapter
         self.revisions = RecordRevisionAdapter(app, self)
@@ -158,12 +160,25 @@ class Record(APIResource):
             if field.get_swimlane() is None:
                 raise ValidationError(self, 'Required field "{}" is not set'.format(field.name))
 
+    def __request_and_reinitialize(self, method, endpoint, data):
+        response = self._swimlane.request(
+            method,
+            endpoint,
+            json=data
+        )
+
+        # Reinitialize record with new raw content returned from server to update any calculated fields
+        self.__init__(self.app, response.json())
+
+        # Manually cache self after save to keep cache updated with latest data
+        self._swimlane.resources_cache.cache(self)
+
     def save(self):
         """Persist record changes on Swimlane server
-        
+
         Updates internal raw data with response content from server to guarantee calculated field values match values on
         server
-        
+
         Raises:
             ValidationError: If any fields fail validation
         """
@@ -183,17 +198,45 @@ class Record(APIResource):
 
         self.validate()
 
-        response = self._swimlane.request(
+        self.__request_and_reinitialize(
             method,
             'app/{}/record'.format(self.app.id),
-            json=copy_raw
+            copy_raw
         )
 
-        # Reinitialize record with new raw content returned from server to update any calculated fields
-        self.__init__(self.app, response.json())
+    def patch(self):
+        """Patch record on Swimlane server
 
-        # Manually cache self after save to keep cache updated with latest data
-        self._swimlane.resources_cache.cache(self)
+        Raises
+            ValueError: If record.is_new
+        """
+        if self.is_new:
+            raise ValueError('Cannot patch a new Record')
+
+        copy_raw = copy.copy(self._raw)
+
+        pending_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
+        patch_values = {
+            self.get_field(k).id: pending_values[k] for k in set(pending_values) & set(self.__existing_values)
+            if pending_values[k] != self.__existing_values[k]
+        }
+
+        # Use None for empty arrays to ensure field is removed from Record on PATCH
+        for field_id, value in six.iteritems(patch_values):
+            if not value:
+                patch_values[field_id] = None
+
+        copy_raw['values'] = patch_values
+        print(copy_raw['values'])
+
+        self.validate()
+
+        self.__request_and_reinitialize(
+            'patch',
+            'app/{}/record/{}'.format(self.app.id, self.id),
+            copy_raw
+        )
+
 
     def delete(self):
         """Delete record from Swimlane server

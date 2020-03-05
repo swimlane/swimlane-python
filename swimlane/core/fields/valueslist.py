@@ -32,6 +32,10 @@ class ValuesListField(MultiSelectField):
                     )
                 )
 
+    def get_batch_representation(self):
+        """Return best batch process representation of field value"""
+        return self.get_swimlane()
+
     def cast_to_python(self, value):
         """Store actual value as internal representation"""
         if value is not None:
