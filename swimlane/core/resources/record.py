@@ -217,7 +217,7 @@ class Record(APIResource):
 
         pending_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
         patch_values = {
-            self.get_field(k).id: pending_values[k] for k in pending_values.keys() & self.__existing_values
+            self.get_field(k).id: pending_values[k] for k in set(pending_values) & set(self.__existing_values)
             if pending_values[k] != self.__existing_values[k]
         }
 
