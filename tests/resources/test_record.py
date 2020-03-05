@@ -41,6 +41,85 @@ class TestRecord(object):
                 assert mock_validate.call_count == 2
                 assert mock_request.call_count == 1
 
+    def test_patch(self, mock_swimlane, mock_record):
+        """Test patch endpoint called with correct args"""
+
+        with mock.patch.object(mock_swimlane, 'request') as mock_request:
+
+            mock_request.return_value.json.return_value = mock_record._raw
+
+            mock_record['Action'] = 'test'
+            mock_record.patch()
+            mock_request.assert_called_with(
+                'patch',
+                'app/{}/record/{}'.format(mock_record.app.id, mock_record.id),
+                json={'$type': 'Core.Models.Record.Record, Core','actionsExecuted': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'allowed': [],'applicationId': '58e4bb4407637a0e4c4f9873','applicationRevision': 0.0,'comments': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib', 'a3uau': [{'$type': 'Core.Models.Record.Comments, Core', 'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core', 'id': '58de1d1c07637a0264c0ca6a', 'name': 'admin'}, 'createdDate': '2017-04-19T18:40:25.529Z', 'message': 'Example comment'}]},'createdDate': '0001-01-01T00:00:00','disabled': False,'id': '58ebb22807637a02d4a14bd6','isNew': False,'linkedData': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'modifiedDate': '0001-01-01T00:00:00','referencedByIds': [],'referencedRecordIds': [],'sessionTimeSpent': 0,'timeTrackingEnabled': True,'totalTimeSpent': 0,'trackingId': 7.0,
+                      'values': {
+                          'arnd6': 'test'
+                      }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
+
+            mock_record['Numeric List'] = [1, 2.3]
+            mock_record.patch()
+            mock_request.assert_called_with(
+                'patch',
+                'app/{}/record/{}'.format(mock_record.app.id, mock_record.id),
+                json={'$type': 'Core.Models.Record.Record, Core','actionsExecuted': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'allowed': [],'applicationId': '58e4bb4407637a0e4c4f9873','applicationRevision': 0.0,'comments': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib', 'a3uau': [{'$type': 'Core.Models.Record.Comments, Core', 'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core', 'id': '58de1d1c07637a0264c0ca6a', 'name': 'admin'}, 'createdDate': '2017-04-19T18:40:25.529Z', 'message': 'Example comment'}]},'createdDate': '0001-01-01T00:00:00','disabled': False,'id': '58ebb22807637a02d4a14bd6','isNew': False,'linkedData': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'modifiedDate': '0001-01-01T00:00:00','referencedByIds': [],'referencedRecordIds': [],'sessionTimeSpent': 0,'timeTrackingEnabled': True,'totalTimeSpent': 0,'trackingId': 7.0,
+                      'values': {
+                          'azvbz': [1, 2.3]
+                      }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
+
+            mock_record['Text List'] = ['a', 'b']
+            mock_record.patch()
+            mock_request.assert_called_with(
+                'patch',
+                'app/{}/record/{}'.format(mock_record.app.id, mock_record.id),
+                json={'$type': 'Core.Models.Record.Record, Core','actionsExecuted': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'allowed': [],'applicationId': '58e4bb4407637a0e4c4f9873','applicationRevision': 0.0,'comments': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib', 'a3uau': [{'$type': 'Core.Models.Record.Comments, Core', 'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core', 'id': '58de1d1c07637a0264c0ca6a', 'name': 'admin'}, 'createdDate': '2017-04-19T18:40:25.529Z', 'message': 'Example comment'}]},'createdDate': '0001-01-01T00:00:00','disabled': False,'id': '58ebb22807637a02d4a14bd6','isNew': False,'linkedData': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'modifiedDate': '0001-01-01T00:00:00','referencedByIds': [],'referencedRecordIds': [],'sessionTimeSpent': 0,'timeTrackingEnabled': True,'totalTimeSpent': 0,'trackingId': 7.0,
+                      'values': {
+                          'ajvrh': ['a', 'b'],
+                      }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
+
+            mock_record['Last Updated By'].id = 'u2'
+            mock_record['Last Updated By'].name = 'other'
+            mock_record.patch()
+            mock_request.assert_called_with(
+                'patch',
+                'app/{}/record/{}'.format(mock_record.app.id, mock_record.id),
+                json={'$type': 'Core.Models.Record.Record, Core','actionsExecuted': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'allowed': [],'applicationId': '58e4bb4407637a0e4c4f9873','applicationRevision': 0.0,'comments': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib', 'a3uau': [{'$type': 'Core.Models.Record.Comments, Core', 'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core', 'id': '58de1d1c07637a0264c0ca6a', 'name': 'admin'}, 'createdDate': '2017-04-19T18:40:25.529Z', 'message': 'Example comment'}]},'createdDate': '0001-01-01T00:00:00','disabled': False,'id': '58ebb22807637a02d4a14bd6','isNew': False,'linkedData': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'modifiedDate': '0001-01-01T00:00:00','referencedByIds': [],'referencedRecordIds': [],'sessionTimeSpent': 0,'timeTrackingEnabled': True,'totalTimeSpent': 0,'trackingId': 7.0,
+                      'values': {
+                          'a11mn': {
+                              '$type': 'Core.Models.Utilities.UserGroupSelection, Core',
+                              'id': 'u2',
+                              'name': 'other'
+                          }
+                      }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
+
+            mock_record['Values List'].deselect('Option 1')
+            mock_record['Values List'].select('Option 2')
+            mock_record.patch()
+            mock_request.assert_called_with(
+                'patch',
+                'app/{}/record/{}'.format(mock_record.app.id, mock_record.id),
+                json={'$type': 'Core.Models.Record.Record, Core','actionsExecuted': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'allowed': [],'applicationId': '58e4bb4407637a0e4c4f9873','applicationRevision': 0.0,'comments': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib', 'a3uau': [{'$type': 'Core.Models.Record.Comments, Core', 'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core', 'id': '58de1d1c07637a0264c0ca6a', 'name': 'admin'}, 'createdDate': '2017-04-19T18:40:25.529Z', 'message': 'Example comment'}]},'createdDate': '0001-01-01T00:00:00','disabled': False,'id': '58ebb22807637a02d4a14bd6','isNew': False,'linkedData': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'modifiedDate': '0001-01-01T00:00:00','referencedByIds': [],'referencedRecordIds': [],'sessionTimeSpent': 0,'timeTrackingEnabled': True,'totalTimeSpent': 0,'trackingId': 7.0,
+                      'values': {
+                          'arlrt': [{
+                              '$type': 'Core.Models.Record.ValueSelection, Core',
+                              'id': '58fae4eafef0eead26dee65c',
+                              'value': 'Option 2'
+                          }]
+                      }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
+
+            mock_record['Incident Closed'] = None
+            mock_record.patch()
+            mock_request.assert_called_with(
+                'patch',
+                'app/{}/record/{}'.format(mock_record.app.id, mock_record.id),
+                json={'$type': 'Core.Models.Record.Record, Core','actionsExecuted': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'allowed': [],'applicationId': '58e4bb4407637a0e4c4f9873','applicationRevision': 0.0,'comments': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib', 'a3uau': [{'$type': 'Core.Models.Record.Comments, Core', 'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core', 'id': '58de1d1c07637a0264c0ca6a', 'name': 'admin'}, 'createdDate': '2017-04-19T18:40:25.529Z', 'message': 'Example comment'}]},'createdDate': '0001-01-01T00:00:00','disabled': False,'id': '58ebb22807637a02d4a14bd6','isNew': False,'linkedData': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'modifiedDate': '0001-01-01T00:00:00','referencedByIds': [],'referencedRecordIds': [],'sessionTimeSpent': 0,'timeTrackingEnabled': True,'totalTimeSpent': 0,'trackingId': 7.0,
+                      'values': {
+                          'a365t': None,
+                      }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
+
+            assert mock_request.call_count == 6
+
     def test_delete(self, mock_swimlane, mock_record):
         """Test record can be deleted when not new and that deleted records lose their ID but maintain their fields"""
         with mock.patch.object(mock_swimlane, 'request') as mock_request:
