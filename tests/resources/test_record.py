@@ -55,7 +55,8 @@ class TestRecord(object):
                 'app/{}/record/{}'.format(mock_record.app.id, mock_record.id),
                 json={'$type': 'Core.Models.Record.Record, Core','actionsExecuted': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'allowed': [],'applicationId': '58e4bb4407637a0e4c4f9873','applicationRevision': 0.0,'comments': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib', 'a3uau': [{'$type': 'Core.Models.Record.Comments, Core', 'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core', 'id': '58de1d1c07637a0264c0ca6a', 'name': 'admin'}, 'createdDate': '2017-04-19T18:40:25.529Z', 'message': 'Example comment'}]},'createdDate': '0001-01-01T00:00:00','disabled': False,'id': '58ebb22807637a02d4a14bd6','isNew': False,'linkedData': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'modifiedDate': '0001-01-01T00:00:00','referencedByIds': [],'referencedRecordIds': [],'sessionTimeSpent': 0,'timeTrackingEnabled': True,'totalTimeSpent': 0,'trackingId': 7.0,
                       'values': {
-                          'arnd6': 'test'
+                          'arnd6': 'test',
+                          '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
                       }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
 
             mock_record['Numeric List'] = [1, 2.3]
@@ -65,7 +66,8 @@ class TestRecord(object):
                 'app/{}/record/{}'.format(mock_record.app.id, mock_record.id),
                 json={'$type': 'Core.Models.Record.Record, Core','actionsExecuted': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'allowed': [],'applicationId': '58e4bb4407637a0e4c4f9873','applicationRevision': 0.0,'comments': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib', 'a3uau': [{'$type': 'Core.Models.Record.Comments, Core', 'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core', 'id': '58de1d1c07637a0264c0ca6a', 'name': 'admin'}, 'createdDate': '2017-04-19T18:40:25.529Z', 'message': 'Example comment'}]},'createdDate': '0001-01-01T00:00:00','disabled': False,'id': '58ebb22807637a02d4a14bd6','isNew': False,'linkedData': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'modifiedDate': '0001-01-01T00:00:00','referencedByIds': [],'referencedRecordIds': [],'sessionTimeSpent': 0,'timeTrackingEnabled': True,'totalTimeSpent': 0,'trackingId': 7.0,
                       'values': {
-                          'azvbz': [1, 2.3]
+                          'azvbz': [1, 2.3],
+                          '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
                       }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
 
             mock_record['Text List'] = ['a', 'b']
@@ -76,6 +78,7 @@ class TestRecord(object):
                 json={'$type': 'Core.Models.Record.Record, Core','actionsExecuted': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'allowed': [],'applicationId': '58e4bb4407637a0e4c4f9873','applicationRevision': 0.0,'comments': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib', 'a3uau': [{'$type': 'Core.Models.Record.Comments, Core', 'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core', 'id': '58de1d1c07637a0264c0ca6a', 'name': 'admin'}, 'createdDate': '2017-04-19T18:40:25.529Z', 'message': 'Example comment'}]},'createdDate': '0001-01-01T00:00:00','disabled': False,'id': '58ebb22807637a02d4a14bd6','isNew': False,'linkedData': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'modifiedDate': '0001-01-01T00:00:00','referencedByIds': [],'referencedRecordIds': [],'sessionTimeSpent': 0,'timeTrackingEnabled': True,'totalTimeSpent': 0,'trackingId': 7.0,
                       'values': {
                           'ajvrh': ['a', 'b'],
+                          '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
                       }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
 
             mock_record['Last Updated By'].id = 'u2'
@@ -90,7 +93,8 @@ class TestRecord(object):
                               '$type': 'Core.Models.Utilities.UserGroupSelection, Core',
                               'id': 'u2',
                               'name': 'other'
-                          }
+                          },
+                          '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
                       }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
 
             mock_record['Values List'].deselect('Option 1')
@@ -105,7 +109,8 @@ class TestRecord(object):
                               '$type': 'Core.Models.Record.ValueSelection, Core',
                               'id': '58fae4eafef0eead26dee65c',
                               'value': 'Option 2'
-                          }]
+                          }],
+                          '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
                       }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
 
             mock_record['Incident Closed'] = None
@@ -116,6 +121,7 @@ class TestRecord(object):
                 json={'$type': 'Core.Models.Record.Record, Core','actionsExecuted': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'allowed': [],'applicationId': '58e4bb4407637a0e4c4f9873','applicationRevision': 0.0,'comments': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.Comments, Core]], mscorlib]], mscorlib', 'a3uau': [{'$type': 'Core.Models.Record.Comments, Core', 'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core', 'id': '58de1d1c07637a0264c0ca6a', 'name': 'admin'}, 'createdDate': '2017-04-19T18:40:25.529Z', 'message': 'Example comment'}]},'createdDate': '0001-01-01T00:00:00','disabled': False,'id': '58ebb22807637a02d4a14bd6','isNew': False,'linkedData': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'},'modifiedDate': '0001-01-01T00:00:00','referencedByIds': [],'referencedRecordIds': [],'sessionTimeSpent': 0,'timeTrackingEnabled': True,'totalTimeSpent': 0,'trackingId': 7.0,
                       'values': {
                           'a365t': None,
+                          '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Object, mscorlib]], mscorlib'
                       }, 'visualizations': {'$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
 
             assert mock_request.call_count == 6
