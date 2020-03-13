@@ -226,8 +226,9 @@ class Record(APIResource):
             if not value:
                 patch_values[field_id] = None
 
+        # $type needed here for dotnet to deserialize correctly
+        patch_values['$type'] = self._raw['values']['$type']
         copy_raw['values'] = patch_values
-        print(copy_raw['values'])
 
         self.validate()
 
