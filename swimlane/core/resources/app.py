@@ -37,17 +37,18 @@ class App(APIResource):
         self._fields_by_name = dict()
         self._defaults = dict()
 
-        for f in self._raw['fields']:
-            self._fields_by_id[f['id']] = f
-            self._fields_by_name[f['name']] = f
-            if f['fieldType'] == "valuesList":
-                t = f['selectionType']
-                for v in f['values']:
-                    if v['selected']:
-                        if t == 'single':
-                            self._defaults[f['name']] = v['name']
-                        elif t == 'multi':
-                            self._defaults[f['name']] = [v['name']]
+        for field in self._raw['fields']:
+            self._fields_by_id[field['id']] = field
+            self._fields_by_name[field['name']] = field
+            if field['fieldType'] == "valuesList":
+                selection_type = field['selectionType']
+                for value in field['values']:
+                    if value['selected']:
+                        if selection_type == 'single':
+                            self._defaults[field['name']] = value['name']
+                            break
+                        elif selection_type == 'multi':
+                            self._defaults.get(field['name'], list()).append([value['name']])
 
         self._keys_to_field_names = {}
         for name, field_def in six.iteritems(self._fields_by_name):
