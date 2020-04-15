@@ -50,6 +50,10 @@ class Field(SwimlaneResolver):
         """Return best python representation of field value"""
         return self._get()
 
+    def get_batch_representation(self):
+        """Return best batch process representation of field value"""
+        return self._get()
+
     def get_swimlane(self):
         """Return best swimlane representation of field value"""
         return self.cast_to_swimlane(self._get())
