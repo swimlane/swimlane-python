@@ -47,7 +47,7 @@ class App(APIResource):
                         if selection_type == 'single':
                             self._defaults[field['name']] = value['name']
                             break
-                        elif selection_type == 'multi':
+                        else:
                             self._defaults.get(field['name'], list()).append([value['name']])
 
         self._keys_to_field_names = {}
