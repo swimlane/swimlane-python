@@ -48,7 +48,9 @@ class App(APIResource):
                             self._defaults[field['name']] = value['name']
                             break
                         else:
-                            self._defaults.get(field['name'], list()).append([value['name']])
+                            default = self._defaults.get(field['name'], list())
+                            default.extend([value['name']])
+                            self._defaults[field['name']] = default
 
         self._keys_to_field_names = {}
         for name, field_def in six.iteritems(self._fields_by_name):
