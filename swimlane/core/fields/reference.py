@@ -161,6 +161,10 @@ class ReferenceField(CursorField):
             except IndexError:
                 return None
 
+    def get_batch_representation(self):
+        """Return best batch process representation of field value"""
+        return self.get_swimlane()
+
     def cast_to_report(self, value):
         return value.id
 
