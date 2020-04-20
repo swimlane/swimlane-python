@@ -139,7 +139,9 @@ To operate on large search results as records are returned from API or retrieve 
 Create New Record
 ^^^^^^^^^^^^^^^^^
 
-Record creation is done through the :obj:`app.records` adapter, and adheres to all field validation as documented below
+Record creation is done through the :obj:`app.records` adapter, and adheres to all field validation as documented below.
+Any values in Selection Fields that are configured to be selected by default will be added to your new record.  You can
+override the default selection by specifying the value wanted on creation.
 
 The newly created record is returned from the create create call after first being persisted on the server
 
