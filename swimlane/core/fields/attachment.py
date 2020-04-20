@@ -55,6 +55,10 @@ class AttachmentsField(MultiSelectField):
 
         return [self.cast_to_python(raw) for raw in raw_value]
 
+    def get_batch_representation(self):
+        """Return best batch process representation of field value"""
+        return self.get_swimlane()
+
     def _set(self, value):
         """Override setter, allow clearing cursor"""
         super(AttachmentsField, self)._set(value)
