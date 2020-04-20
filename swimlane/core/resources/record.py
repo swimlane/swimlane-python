@@ -60,6 +60,7 @@ class Record(APIResource):
         self.__premap_fields()
 
         self.__existing_values = {k:self.get_field(k).get_batch_representation() for (k,v) in self}
+        self._comments_modified = False
 
         # avoid circular reference
         from swimlane.core.adapters import RecordRevisionAdapter
@@ -208,10 +209,12 @@ class Record(APIResource):
         """Patch record on Swimlane server
 
         Raises
-            ValueError: If record.is_new
+            ValueError: If record.is_new, or if comments or attachments are attempted to be patched
         """
         if self.is_new:
             raise ValueError('Cannot patch a new Record')
+        elif self._comments_modified:
+            raise ValueError('Can not patch with added comments')
 
         copy_raw = copy.copy(self._raw)
 
@@ -221,8 +224,12 @@ class Record(APIResource):
             if pending_values[k] != self.__existing_values[k]
         }
 
-        # Use None for empty arrays to ensure field is removed from Record on PATCH
+
         for field_id, value in six.iteritems(patch_values):
+            #
+            if self.app.get_field_definition_by_id(field_id)['fieldType'] == 'attachment':
+                raise ValueError('Can not patch new attachments')
+            # Use None for empty arrays to ensure field is removed from Record on PATCH
             if not value:
                 patch_values[field_id] = None
 
