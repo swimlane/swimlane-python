@@ -388,6 +388,11 @@ def record_factory(app, fields=None):
 
     fields = fields or {}
 
+    # Apply Default Values
+    for name, value in six.iteritems(app._defaults):
+        record[name] = value
+
+    # Apply Provided Field Values
     for name, value in six.iteritems(fields):
         record[name] = value
 
