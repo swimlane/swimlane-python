@@ -24,6 +24,9 @@ class CommentCursor(FieldCursor):
         self._record._raw['comments'].setdefault(self._field.id, [])
         self._record._raw['comments'][self._field.id].append(comment._raw)
 
+        #Tracking comment changes for patch endpoint
+        self._record._comments_modified = True
+
         return comment
 
 

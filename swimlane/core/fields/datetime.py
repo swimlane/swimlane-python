@@ -93,6 +93,10 @@ class DatetimeField(Field):
 
         return self.format_datetime(value)
 
+    def get_batch_representation(self):
+        """Return best batch process representation of field value"""
+        return self.get_swimlane()
+
     def for_json(self):
         """Return date ISO8601 string formats for datetime, date, and time values, milliseconds for intervals"""
         value = super(DatetimeField, self).for_json()
