@@ -40,10 +40,10 @@ class App(APIResource):
         for field in self._raw['fields']:
             self._fields_by_id[field['id']] = field
             self._fields_by_name[field['name']] = field
-            if field['fieldType'] == "valuesList":
+            if 'fieldType' in field and field['fieldType'] == "valuesList":
                 selection_type = field['selectionType']
                 for value in field['values']:
-                    if value['selected']:
+                    if 'selected' in value and value['selected']:
                         if selection_type == 'single':
                             self._defaults[field['name']] = value['name']
                             break
