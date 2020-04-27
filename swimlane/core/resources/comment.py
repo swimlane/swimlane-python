@@ -19,6 +19,7 @@ class Comment(APIResource):
         self.user = UserGroup(swimlane, self._raw['createdByUser'])
         self.created_date = pendulum.parse(self._raw['createdDate'])
         self.message = self._raw['message']
+        self.is_rich_text = self._raw.get('isRichText', False)
 
     def __str__(self):
         return self.message
