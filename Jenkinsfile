@@ -44,6 +44,10 @@ spec:
     booleanParam(name: 'PUBLISH_BRANCH_NEXUS', defaultValue: false, description: 'Do you want to publish the python wheel for this branch to Nexus?')
   }
 
+  environment {
+    CODACY_PROJECT_TOKEN = credentials('codacy-project-token-swimlane-python')
+  }
+
   options {
     disableConcurrentBuilds()
     timeout(time: 15, unit: 'MINUTES')
