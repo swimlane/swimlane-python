@@ -41,7 +41,7 @@ spec:
   }
 
   parameters {
-    booleanParam(name: 'PUBLISH_BRANCH_NEXUS', defaultValue: false, description: 'Do you want to publish the python wheel for this branch to Nexus?')
+    booleanParam(name: 'PUBLISH_BRANCH_TO_NEXUS', defaultValue: false, description: 'Do you want to publish the python wheel for this branch to Nexus?')
   }
 
   environment {
@@ -153,9 +153,9 @@ spec:
             stage('Install dependencies') {
               steps {
                 container('jenkins-linux-slave'){
-                  sh('/usr/local/bin/pip3 install -U -r requirements.txt')
-                  sh('/usr/local/bin/pip3 install -U -r test-requirements.txt')
-                  sh('/usr/local/bin/pip3 install codacy-coverage')
+                  sh('/usr/bin/pip3 install -U -r requirements.txt')
+                  sh('/usr/bin/pip3 install -U -r test-requirements.txt')
+                  sh('/usr/bin/pip3 install codacy-coverage')
                 }
               }
             }
@@ -184,7 +184,7 @@ spec:
           branch 'master'
           branch 'hotfix-*'
           branch 'release-*'
-          expression { return params.PUBLISH_BRANCH_NEXUS }
+          expression { return params.PUBLISH_BRANCH_TO_NEXUS }
         }
       }
 
