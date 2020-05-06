@@ -59,28 +59,36 @@ spec:
         stage('Python 2.7') {
           stages {
             stage('Install dependencies') {
-              container('jenkins-linux-slave'){
-                sh('/usr/local/bin/pip2.7 install -U -r requirements.txt')
-                sh('/usr/local/bin/pip2.7 install -U -r test-requirements.txt')
-                sh('/usr/local/bin/pip2.7 install codacy-coverage')
+              steps {
+                container('jenkins-linux-slave'){
+                  sh('/usr/local/bin/pip2.7 install -U -r requirements.txt')
+                  sh('/usr/local/bin/pip2.7 install -U -r test-requirements.txt')
+                  sh('/usr/local/bin/pip2.7 install codacy-coverage')
+                }
               }
             }
             stage('Test') {
-              container('jenkins-linux-slave'){
-                sh('py.test -v --cov=swimlane --cov-report=xml')
-                sh('python-codacy-coverage -r coverage.xml')
+              steps {
+                container('jenkins-linux-slave'){
+                  sh('py.test -v --cov=swimlane --cov-report=xml')
+                  sh('python-codacy-coverage -r coverage.xml')
+                }
               }
             }
             stage('Build') {
-              container('jenkins-linux-slave'){
-                sh('python2.7 offline_installer/build_installer.py')
+              steps {
+                container('jenkins-linux-slave'){
+                  sh('python2.7 offline_installer/build_installer.py')
+                }
               }
             }
           }
         }
         stage ('Python 3.6') {
-          container('jenkins-linux-slave'){
-            sh('echo hi')
+          steps {
+            container('jenkins-linux-slave'){
+              sh('echo hi')
+            }
           }
         }
       }
@@ -95,8 +103,10 @@ spec:
         }
       }
 
-      container('jenkins-linux-slave'){
-        sh('echo hi')
+      steps {
+        container('jenkins-linux-slave'){
+          sh('echo hi')
+        }
       }
     }
     stage('Publish') {
@@ -106,13 +116,17 @@ spec:
 
       stages {
         stage('Create Github Release') {
-          container('jenkins-linux-slave'){
-            sh('echo hi')
+          steps {
+            container('jenkins-linux-slave'){
+              sh('echo hi')
+            }
           }
         }
         stage('Push to pypi') {
-          container('jenkins-linux-slave'){
-            sh('echo hi')
+          steps {
+            container('jenkins-linux-slave'){
+              sh('echo hi')
+            }
           }
         }
       }
