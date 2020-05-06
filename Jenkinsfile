@@ -60,9 +60,9 @@ spec:
           stages {
             stage('Install dependencies') {
               steps {
-                sh('/usr/local/bin/pip2.7 install -U -r requirements.txt')
-                sh('/usr/local/bin/pip2.7 install -U -r test-requirements.txt')
-                sh('/usr/local/bin/pip2.7 install codacy-coverage')
+                sh('pip install -U -r requirements.txt')
+                sh('pip install -U -r test-requirements.txt')
+                sh('pip install codacy-coverage')
               }
             }
             stage('Test') {
