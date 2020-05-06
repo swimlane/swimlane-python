@@ -59,27 +59,27 @@ spec:
         stage('Python 2.7') {
           stages {
             stage('Install dependencies') {
-              steps {
-                sh('pip install -U -r requirements.txt')
-                sh('pip install -U -r test-requirements.txt')
-                sh('pip install codacy-coverage')
+              container('jenkins-linux-slave'){
+                sh('/usr/local/bin/pip2.7 install -U -r requirements.txt')
+                sh('/usr/local/bin/pip2.7 install -U -r test-requirements.txt')
+                sh('/usr/local/bin/pip2.7 install codacy-coverage')
               }
             }
             stage('Test') {
-              steps {
+              container('jenkins-linux-slave'){
                 sh('py.test -v --cov=swimlane --cov-report=xml')
                 sh('python-codacy-coverage -r coverage.xml')
               }
             }
             stage('Build') {
-              steps {
+              container('jenkins-linux-slave'){
                 sh('python2.7 offline_installer/build_installer.py')
               }
             }
           }
         }
         stage ('Python 3.6') {
-          steps {
+          container('jenkins-linux-slave'){
             sh('echo hi')
           }
         }
@@ -95,7 +95,7 @@ spec:
         }
       }
 
-      steps {
+      container('jenkins-linux-slave'){
         sh('echo hi')
       }
     }
@@ -106,12 +106,12 @@ spec:
 
       stages {
         stage('Create Github Release') {
-          steps {
+          container('jenkins-linux-slave'){
             sh('echo hi')
           }
         }
         stage('Push to pypi') {
-          steps {
+          container('jenkins-linux-slave'){
             sh('echo hi')
           }
         }
