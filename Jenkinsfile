@@ -149,9 +149,30 @@ spec:
             }
           }
 
-          steps {
-            container('jenkins-linux-slave'){
-              sh('echo hi')
+          stages {
+            stage('Install dependencies') {
+              steps {
+                container('jenkins-linux-slave'){
+                  sh('/usr/local/bin/pip3 install -U -r requirements.txt')
+                  sh('/usr/local/bin/pip3 install -U -r test-requirements.txt')
+                  sh('/usr/local/bin/pip3 install codacy-coverage')
+                }
+              }
+            }
+            stage('Test') {
+              steps {
+                container('jenkins-linux-slave'){
+                  sh('/home/build-user/.local/bin/py.test -v --cov=swimlane --cov-report=xml')
+                  sh('/home/build-user/.local/bin/python-codacy-coverage -r coverage.xml')
+                }
+              }
+            }
+            stage('Build') {
+              steps {
+                container('jenkins-linux-slave'){
+                  sh('python3 offline_installer/build_installer.py')
+                }
+              }
             }
           }
         }
