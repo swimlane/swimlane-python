@@ -57,6 +57,36 @@ spec:
 
       parallel {
         stage('Python 2.7') {
+          agent {
+            kubernetes {
+              cloud 'eks-swimlane-io'
+              label "jenkins-k8s-${UUID.randomUUID().toString()}"
+              yaml """
+kind: Pod
+metadata:
+  name: jenkins-k8s
+spec:
+  securityContext:
+    runAsUser: 1001
+  containers:
+  - name: jnlp
+    image: 'jenkins/jnlp-slave:latest'
+  - name: jenkins-linux-slave
+    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:master-35'
+    command: ["tail", "-f", "/dev/null"]
+    resources:
+      requests:
+        memory: "4000Mi"
+        cpu: "2000m"
+      limits:
+        memory: "4000Mi"
+        cpu: "2000m"
+  imagePullSecrets:
+  - name: swimlane-nexus
+"""
+            }
+          }
+
           stages {
             stage('Install dependencies') {
               steps {
@@ -70,8 +100,8 @@ spec:
             stage('Test') {
               steps {
                 container('jenkins-linux-slave'){
-                  sh('py.test -v --cov=swimlane --cov-report=xml')
-                  sh('python-codacy-coverage -r coverage.xml')
+                  sh('/home/build-user/.local/bin/py.test -v --cov=swimlane --cov-report=xml')
+                  sh('/home/build-user/.local/bin/python-codacy-coverage -r coverage.xml')
                 }
               }
             }
@@ -85,6 +115,36 @@ spec:
           }
         }
         stage ('Python 3.6') {
+          agent {
+            kubernetes {
+              cloud 'eks-swimlane-io'
+              label "jenkins-k8s-${UUID.randomUUID().toString()}"
+              yaml """
+kind: Pod
+metadata:
+  name: jenkins-k8s
+spec:
+  securityContext:
+    runAsUser: 1001
+  containers:
+  - name: jnlp
+    image: 'jenkins/jnlp-slave:latest'
+  - name: jenkins-linux-slave
+    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:master-35'
+    command: ["tail", "-f", "/dev/null"]
+    resources:
+      requests:
+        memory: "4000Mi"
+        cpu: "2000m"
+      limits:
+        memory: "4000Mi"
+        cpu: "2000m"
+  imagePullSecrets:
+  - name: swimlane-nexus
+"""
+            }
+          }
+
           steps {
             container('jenkins-linux-slave'){
               sh('echo hi')
