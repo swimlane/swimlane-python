@@ -162,15 +162,14 @@ spec:
 
       steps {
         container('jenkins-linux-slave'){
-          dir('projects/installer-linux') {
-            withCredentials([usernamePassword(credentialsId: 'nexusLogin', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD'),
-            usernamePassword(credentialsId: 'pypiLogin', usernameVariable: 'PYPI_USER', passwordVariable: 'PYPI_PASSWORD')]) {
-              sh 'python /usr/local/bin/jj2.py -v NEXUS_USER=${NEXUS_USER} -v NEXUS_PASSWORD=${NEXUS_PASSWORD} -v PYPI_USER=${PYPI_USER} -v PYPI_PASSWORD=${PYPI_PASSWORD} pypirc.jinja2 > .pypirc'
+          withCredentials([usernamePassword(credentialsId: 'nexusLogin', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD'),
+          usernamePassword(credentialsId: 'pypiLogin', usernameVariable: 'PYPI_USER', passwordVariable: 'PYPI_PASSWORD')]) {
+            sh("rm -rf dist")
+            sh 'python /usr/local/bin/jj2.py -v NEXUS_USER=${NEXUS_USER} -v NEXUS_PASSWORD=${NEXUS_PASSWORD} -v PYPI_USER=${PYPI_USER} -v PYPI_PASSWORD=${PYPI_PASSWORD} pypirc.jinja2 > .pypirc'
 
-              sh('python2.7 setup.py sdist bdist_wheel')
-              sh('twine upload --repository-url https://nexus.swimlane.io/repository/pypi/ -u ${NEXUS_USER} -p ${NEXUS_PASSWORD} dist/*')
-              sh("rm -rf dist")
-            }
+            sh('python2.7 setup.py sdist bdist_wheel')
+            sh('twine upload --repository-url https://nexus.swimlane.io/repository/pypi/ -u ${NEXUS_USER} -p ${NEXUS_PASSWORD} dist/*')
+            sh("rm -rf dist")
           }
         }
       }
@@ -191,7 +190,15 @@ spec:
         stage('Push to pypi') {
           steps {
             container('jenkins-linux-slave'){
-              sh('echo hi')
+              withCredentials([usernamePassword(credentialsId: 'nexusLogin', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD'),
+              usernamePassword(credentialsId: 'pypiLogin', usernameVariable: 'PYPI_USER', passwordVariable: 'PYPI_PASSWORD')]) {
+                sh("rm -rf dist")
+                sh 'python /usr/local/bin/jj2.py -v NEXUS_USER=${NEXUS_USER} -v NEXUS_PASSWORD=${NEXUS_PASSWORD} -v PYPI_USER=${PYPI_USER} -v PYPI_PASSWORD=${PYPI_PASSWORD} pypirc.jinja2 > .pypirc'
+
+                sh('python setup.py sdist bdist_wheel')
+                sh('twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*')
+                sh("rm -rf dist")
+              }
             }
           }
         }
