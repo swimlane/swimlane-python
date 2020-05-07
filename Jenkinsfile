@@ -25,7 +25,7 @@ spec:
   - name: jnlp
     image: 'jenkins/jnlp-slave:latest'
   - name: jenkins-linux-slave
-    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-1'
+    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-2'
     command: ["tail", "-f", "/dev/null"]
     resources:
       requests:
@@ -64,36 +64,6 @@ spec:
 
       parallel {
         stage('Python 2.7') {
-          agent {
-            kubernetes {
-              cloud 'eks-swimlane-io'
-              label "jenkins-k8s-${UUID.randomUUID().toString()}"
-              yaml """
-kind: Pod
-metadata:
-  name: jenkins-k8s
-spec:
-  securityContext:
-    runAsUser: 1001
-  containers:
-  - name: jnlp
-    image: 'jenkins/jnlp-slave:latest'
-  - name: jenkins-linux-slave
-    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-1'
-    command: ["tail", "-f", "/dev/null"]
-    resources:
-      requests:
-        memory: "4000Mi"
-        cpu: "2000m"
-      limits:
-        memory: "4000Mi"
-        cpu: "2000m"
-  imagePullSecrets:
-  - name: swimlane-nexus
-"""
-            }
-          }
-
           stages {
             stage('Install dependencies') {
               steps {
@@ -137,7 +107,7 @@ spec:
   - name: jnlp
     image: 'jenkins/jnlp-slave:latest'
   - name: jenkins-linux-slave
-    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-1'
+    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-2'
     command: ["tail", "-f", "/dev/null"]
     resources:
       requests:
@@ -151,7 +121,6 @@ spec:
 """
             }
           }
-
           stages {
             stage('Install dependencies') {
               steps {
@@ -193,7 +162,18 @@ spec:
 
       steps {
         container('jenkins-linux-slave'){
-          sh('echo hi')
+          steps {
+            dir('projects/installer-linux') {
+              withCredentials([usernamePassword(credentialsId: 'nexusLogin', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD'),
+              usernamePassword(credentialsId: 'pypiLogin', usernameVariable: 'PYPI_USER', passwordVariable: 'PYPI_PASSWORD')]) {
+                sh 'python /usr/local/bin/jj2.py -v NEXUS_USER=${NEXUS_USER} -v NEXUS_PASSWORD=${NEXUS_PASSWORD} -v PYPI_USER=${PYPI_USER} -v PYPI_PASSWORD=${PYPI_PASSWORD} pypirc.jinja2 > .pypirc'
+
+                sh('python2.7 setup.py sdist bdist_wheel')
+                sh('twine upload --repository-url https://nexus.swimlane.io/repository/pypi/ -u ${NEXUS_USER} -p ${NEXUS_PASSWORD} dist/*')
+                sh("rm -rf dist")
+              }
+            }
+          }
         }
       }
     }
