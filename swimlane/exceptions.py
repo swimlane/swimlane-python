@@ -132,6 +132,7 @@ class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
         2006: 'DuplicateAppletName',
         2007: 'DuplicateAppletAcronym',
         2008: 'DuplicateApplicationAcronym',
+        2011: 'SectionNameTooLong',
         3000: 'DuplicateFieldValue',
         3001: 'InvalidDateField',
         3002: 'RecordNotFound',
