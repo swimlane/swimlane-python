@@ -25,7 +25,7 @@ spec:
   - name: jnlp
     image: 'jenkins/jnlp-slave:latest'
   - name: jenkins-linux-slave
-    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:master-35'
+    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-1'
     command: ["tail", "-f", "/dev/null"]
     resources:
       requests:
@@ -45,6 +45,9 @@ spec:
   }
 
   environment {
+    GIT_COMMIT_SHORT = "${env.GIT_COMMIT[0..7]}"
+    ACTUAL_BRANCH = "${env.CHANGE_BRANCH ?: env.BRANCH_NAME}"
+    IMAGE_BRANCH = getImageTag(env.ACTUAL_BRANCH)
     CODACY_PROJECT_TOKEN = credentials('codacy-project-token-swimlane-python')
   }
 
@@ -76,7 +79,7 @@ spec:
   - name: jnlp
     image: 'jenkins/jnlp-slave:latest'
   - name: jenkins-linux-slave
-    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:master-35'
+    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-1'
     command: ["tail", "-f", "/dev/null"]
     resources:
       requests:
@@ -134,7 +137,7 @@ spec:
   - name: jnlp
     image: 'jenkins/jnlp-slave:latest'
   - name: jenkins-linux-slave
-    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:master-35'
+    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-1'
     command: ["tail", "-f", "/dev/null"]
     resources:
       requests:
@@ -153,9 +156,9 @@ spec:
             stage('Install dependencies') {
               steps {
                 container('jenkins-linux-slave'){
-                  sh('/usr/bin/pip3 install -U -r requirements.txt')
-                  sh('/usr/bin/pip3 install -U -r test-requirements.txt')
-                  sh('/usr/bin/pip3 install codacy-coverage')
+                  sh('/usr/local/bin/pip3.6 install -U -r requirements.txt')
+                  sh('/usr/local/bin/pip3.6 install -U -r test-requirements.txt')
+                  sh('/usr/local/bin/pip3.6 install codacy-coverage')
                 }
               }
             }
@@ -170,7 +173,7 @@ spec:
             stage('Build') {
               steps {
                 container('jenkins-linux-slave'){
-                  sh('python3 offline_installer/build_installer.py')
+                  sh('/usr/local/bin/python3.6 offline_installer/build_installer.py')
                 }
               }
             }
