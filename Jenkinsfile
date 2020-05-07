@@ -156,9 +156,9 @@ spec:
             stage('Install dependencies') {
               steps {
                 container('jenkins-linux-slave'){
-                  sh('/usr/local/bin/pip3.6 install -U -r requirements.txt')
-                  sh('/usr/local/bin/pip3.6 install -U -r test-requirements.txt')
-                  sh('/usr/local/bin/pip3.6 install codacy-coverage')
+                  sh('/usr/local/bin/pip3.6 install --user -U -r requirements.txt')
+                  sh('/usr/local/bin/pip3.6 install --user -U -r test-requirements.txt')
+                  sh('/usr/local/bin/pip3.6 install --user codacy-coverage')
                 }
               }
             }
