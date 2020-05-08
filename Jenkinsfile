@@ -160,10 +160,14 @@ spec:
       }
     }
     stage ('Build wheel') {
-      sh("rm -rf dist")
-      sh 'python /usr/local/bin/jj2.py -v NEXUS_USER=${NEXUS_USER} -v NEXUS_PASSWORD=${NEXUS_PASSWORD} -v PYPI_USER=${PYPI_USER} -v PYPI_PASSWORD=${PYPI_PASSWORD} pypirc.jinja2 > .pypirc'
+      steps {
+        container('jenkins-linux-slave'){
+          sh("rm -rf dist")
+          sh 'python /usr/local/bin/jj2.py -v NEXUS_USER=${NEXUS_USER} -v NEXUS_PASSWORD=${NEXUS_PASSWORD} -v PYPI_USER=${PYPI_USER} -v PYPI_PASSWORD=${PYPI_PASSWORD} pypirc.jinja2 > .pypirc'
 
-      sh('python2.7 setup.py sdist bdist_wheel')
+          sh('python2.7 setup.py sdist bdist_wheel')
+        }
+      }
     }
     stage ('Publish to Nexus') {
       when{
