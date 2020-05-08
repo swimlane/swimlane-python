@@ -42,9 +42,12 @@ spec:
 
   parameters {
     booleanParam(name: 'PUBLISH_BRANCH_TO_NEXUS', defaultValue: false, description: 'Do you want to publish the python wheel for this branch to Nexus?')
+    booleanParam(name: 'PUBLISH_BRANCH_TO_S3', defaultValue: false, description: 'Do you want to publish the 2.7 offline for this branch to S3?')
   }
 
   environment {
+    PLATFORM_SEMVER = "10.1.2"
+    SWIMLANE_PYTHON_SEMVER = "10.1.3"
     GIT_COMMIT_SHORT = "${env.GIT_COMMIT[0..7]}"
     ACTUAL_BRANCH = "${env.CHANGE_BRANCH ?: env.BRANCH_NAME}"
     IMAGE_BRANCH = getImageTag(env.ACTUAL_BRANCH)
@@ -194,10 +197,41 @@ spec:
               channel: '#platform_notification',
               color: 'good',
               message: """\
-Swimlane-python has been pushed to Nexus for branch ${ACTUAL_BRANCH} commit ${GIT_COMMIT_SHORT}!
+Swimlane-python has been pushed to Nexus for branch ${ACTUAL_BRANCH} commit ${GIT_COMMIT_SHORT}
               """.stripIndent(),
               teamDomain: 'swimlane',
               tokenCredentialId: 'slack-token')
+          }
+        }
+      }
+    }
+    stage ('Publish branch to S3') {
+      when{
+        anyOf{
+          branch 'master'
+          branch 'hotfix-*'
+          branch 'release-*'
+          expression { return params.PUBLISH_BRANCH_TO_S3 }
+        }
+      }
+
+      steps {
+        container('jenkins-linux-slave'){
+          withAWS(region:'us-west-2', credentials: 'aws-publish-key') {
+            s3Upload(file:"offline-installers/swimlane-python-${SWIMLANE_PYTHON_SEMVER}-offline-installer-win_amd64-py27.pyz", bucket:'swimlane-builds', path:"python_driver/${ACTUAL_BRANCH}/${PLATFORM_SEMVER}/")
+            script {
+              env.OFFLINE_INSTALLER_LINK = sh (script: "aws s3 presign s3://swimlane-builds/python_driver/${ACTUAL_BRANCH}/${PLATFORM_SEMVER}/swimlane-python-${SWIMLANE_PYTHON_SEMVER}-offline-installer-win_amd64-py27.pyz --expires-in 157680000", returnStdout: true).trim()
+              slackSend(
+                baseUrl: 'https://swimlane.slack.com/services/hooks/jenkins-ci/',
+                channel: '#platform_notification',
+                color: 'good',
+                message: """\
+  Swimlane-python offline installer has been uploaded to S3 for branch ${ACTUAL_BRANCH} commit ${GIT_COMMIT_SHORT}
+  ${env.OFFLINE_INSTALLER_LINK}
+                """.stripIndent(),
+                teamDomain: 'swimlane',
+                tokenCredentialId: 'slack-token')
+            }
           }
         }
       }
@@ -208,6 +242,28 @@ Swimlane-python has been pushed to Nexus for branch ${ACTUAL_BRANCH} commit ${GI
       }
 
       stages {
+        stage ('Publish to S3') {
+          steps {
+            container('jenkins-linux-slave'){
+              withAWS(region:'us-west-2', credentials: 'aws-publish-key') {
+                s3Upload(file:"offline-installers/swimlane-python-${SWIMLANE_PYTHON_SEMVER}-offline-installer-win_amd64-py27.pyz", bucket:'swimlane-builds', path:"python_driver/${ACTUAL_BRANCH}/${PLATFORM_SEMVER}/")
+                script {
+                  env.OFFLINE_INSTALLER_LINK = sh (script: "aws s3 presign s3://swimlane-builds/python_driver/${PLATFORM_SEMVER}/swimlane-python-${SWIMLANE_PYTHON_SEMVER}-offline-installer-win_amd64-py27.pyz --expires-in 157680000", returnStdout: true).trim()
+                  slackSend(
+                    baseUrl: 'https://swimlane.slack.com/services/hooks/jenkins-ci/',
+                    channel: '#platform_notification',
+                    color: 'good',
+                    message: """\
+Swimlane-python offline installer has been uploaded to S3 for version ${TAG_NAME} commit ${GIT_COMMIT_SHORT}
+${env.OFFLINE_INSTALLER_LINK}
+                    """.stripIndent(),
+                    teamDomain: 'swimlane',
+                    tokenCredentialId: 'slack-token')
+                }
+              }
+            }
+          }
+        }
         stage('Push to pypi') {
           steps {
             container('jenkins-linux-slave'){
@@ -219,7 +275,7 @@ Swimlane-python has been pushed to Nexus for branch ${ACTUAL_BRANCH} commit ${GI
                   channel: '#platform_notification',
                   color: 'good',
                   message: """\
-Swimlane-python has been pushed to Pypi for branch ${ACTUAL_BRANCH} commit ${GIT_COMMIT_SHORT}!
+Swimlane-python has been pushed to Pypi for ${TAG_NAME} commit ${GIT_COMMIT_SHORT}
               """.stripIndent(),
                   teamDomain: 'swimlane',
                   tokenCredentialId: 'slack-token')
@@ -235,7 +291,7 @@ Swimlane-python has been pushed to Pypi for branch ${ACTUAL_BRANCH} commit ${GIT
 
               // The same filename can't be attached to a release multiple times so if a tagged build needs to be run again 
               // the old attachments will need to be deleted from the release first
-              sh("hub release edit -a offline-installers/swimlane-python-*-offline-installer-win_amd64-py27.pyz -a offline-installers/swimlane-python-*-offline-installer-win_amd64-py36.pyz -m '' ${TAG_NAME}")
+              sh("hub release edit -a offline-installers/swimlane-python-${SWIMLANE_PYTHON_SEMVER}-offline-installer-win_amd64-py27.pyz -a offline-installers/swimlane-python-${SWIMLANE_PYTHON_SEMVER}-offline-installer-win_amd64-py36.pyz -m '' ${TAG_NAME}")
             }
           }
         }
