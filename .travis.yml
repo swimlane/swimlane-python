@@ -19,7 +19,7 @@ deploy:
   secret_access_key: $S3_SECRET_KEY
   bucket: $S3_BUCKET
   upload-dir: python_driver/mntest/10.1.2/
-  local_dir: dist/
+  glob: "dist/*"
   on:
     #tags: true
     branch: SPT-5882_make_travis_build_upload_to_s3
