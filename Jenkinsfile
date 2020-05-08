@@ -190,7 +190,6 @@ Swimlane-python has been pushed to Nexus for branch ${ACTUAL_BRANCH} commit ${GI
               """.stripIndent(),
               teamDomain: 'swimlane',
               tokenCredentialId: 'slack-token')
-            sh("rm -rf dist")
           }
         }
       }
@@ -216,7 +215,6 @@ Swimlane-python has been pushed to pypi for branch ${ACTUAL_BRANCH} commit ${GIT
               """.stripIndent(),
                   teamDomain: 'swimlane',
                   tokenCredentialId: 'slack-token')
-                sh("rm -rf dist")
               }
             }
           }
