@@ -31,3 +31,15 @@ deploy:
     repo: swimlane/swimlane-python
     # Package uploaded is universal for Python 2 and 3, just only push to pip during one version build cycle
     condition: $TRAVIS_PYTHON_VERSION = '2.7'
+- provider: s3
+  access_key_id: $S3_ACCESS_KEY
+  secret_access_key: $S3_SECRET_KEY
+  region: us-west-2
+  bucket: "swimlane-builds"
+  upload-dir: python_driver/mntest/10.1.2/
+  glob: dist/swimlane-python-*-offline-installer-win_amd64-py27.pyz
+  skip_cleanup: true
+  on:
+    #tags: true
+    repo: swimlane/swimlane-python
+    condition: $TRAVIS_PYTHON_VERSION = '2.7'
