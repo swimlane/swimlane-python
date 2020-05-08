@@ -34,12 +34,12 @@ deploy:
 - provider: s3
   access_key_id: $S3_ACCESS_KEY
   secret_access_key: $S3_SECRET_KEY
-  region: us-west-2
-  bucket: "swimlane-builds"
+  bucket: "$S3_BUCKET"
   upload-dir: python_driver/mntest/10.1.2/
   glob: dist/swimlane-python-*-offline-installer-win_amd64-py27.pyz
   skip_cleanup: true
   on:
     #tags: true
+    branch: SPT-5882_make_travis_build_upload_to_s3
     repo: swimlane/swimlane-python
     condition: $TRAVIS_PYTHON_VERSION = '2.7'
