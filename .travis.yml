@@ -21,7 +21,6 @@ deploy:
   bucket: $S3_BUCKET
   upload_dir: python_driver/mntest/10.1.2/
   local_dir: dist
-  glob: dist/*
   on:
     #tags: true
     branch: SPT-5882_make_travis_build_upload_to_s3
