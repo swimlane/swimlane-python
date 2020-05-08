@@ -62,7 +62,7 @@ spec:
   }
 
   stages {
-    stage('Build') {
+    stage('Build offline installers') {
       failFast true
 
       parallel {
@@ -85,12 +85,13 @@ spec:
                 }
               }
             }
-            stage('Build offline installer') {
+            stage('Build') {
               steps {
                 container('jenkins-linux-slave'){
                   sh('python2.7 offline_installer/build_installer.py')
                   // Rename the dist directory so it doesn't conflict with the dist dir that is created during the wheel build
                   sh('mv dist offline-installers')
+                  archiveArtifacts(artifacts: "offline-installers/*")
                   stash includes: 'offline-installers/*', name: 'py27-installer'
                 }
               }
@@ -145,12 +146,13 @@ spec:
                 }
               }
             }
-            stage('Build offline installer') {
+            stage('Build') {
               steps {
                 container('jenkins-linux-slave'){
                   sh('/usr/local/bin/python3.6 offline_installer/build_installer.py')
                   // Rename the dist directory so it doesn't conflict with the dist dir that is created during the wheel build
                   sh('mv dist offline-installers')
+                  archiveArtifacts(artifacts: "offline-installers/*")
                   stash includes: 'offline-installers/*', name: 'py36-installer'
                 }
               }
@@ -166,6 +168,8 @@ spec:
           sh 'python /usr/local/bin/jj2.py -v NEXUS_USER=${NEXUS_USER} -v NEXUS_PASSWORD=${NEXUS_PASSWORD} -v PYPI_USER=${PYPI_USER} -v PYPI_PASSWORD=${PYPI_PASSWORD} pypirc.jinja2 > .pypirc'
 
           sh('python2.7 setup.py sdist bdist_wheel')
+
+          archiveArtifacts(artifacts: "dist/*")
         }
       }
     }
@@ -215,7 +219,7 @@ Swimlane-python has been pushed to Nexus for branch ${ACTUAL_BRANCH} commit ${GI
                   channel: '#platform_notification',
                   color: 'good',
                   message: """\
-Swimlane-python has been pushed to pypi for branch ${ACTUAL_BRANCH} commit ${GIT_COMMIT_SHORT}!
+Swimlane-python has been pushed to Pypi for branch ${ACTUAL_BRANCH} commit ${GIT_COMMIT_SHORT}!
               """.stripIndent(),
                   teamDomain: 'swimlane',
                   tokenCredentialId: 'slack-token')
@@ -232,8 +236,6 @@ Swimlane-python has been pushed to pypi for branch ${ACTUAL_BRANCH} commit ${GIT
               // The same filename can't be attached to a release multiple times so if a tagged build needs to be run again 
               // the old attachments will need to be deleted from the release first
               sh("hub release edit -a offline-installers/swimlane-python-*-offline-installer-win_amd64-py27.pyz -a offline-installers/swimlane-python-*-offline-installer-win_amd64-py36.pyz -m '' ${TAG_NAME}")
-
-              archiveArtifacts(artifacts: "offline-installers/*")
             }
           }
         }
