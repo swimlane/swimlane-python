@@ -25,7 +25,7 @@ spec:
   - name: jnlp
     image: 'jenkins/jnlp-slave:latest'
   - name: jenkins-linux-slave
-    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-2'
+    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-4'
     command: ["tail", "-f", "/dev/null"]
     resources:
       requests:
@@ -49,6 +49,9 @@ spec:
     ACTUAL_BRANCH = "${env.CHANGE_BRANCH ?: env.BRANCH_NAME}"
     IMAGE_BRANCH = getImageTag(env.ACTUAL_BRANCH)
     CODACY_PROJECT_TOKEN = credentials('codacy-project-token-swimlane-python')
+    GIT_CREDENTIALS = credentials('github-jenkins-pat-new')
+    GITHUB_USER = "${env.GIT_CREDENTIALS_USR}"
+    GITHUB_PASSWORD = "${env.GIT_CREDENTIALS_PSW}"
   }
 
   options {
@@ -86,6 +89,9 @@ spec:
               steps {
                 container('jenkins-linux-slave'){
                   sh('python2.7 offline_installer/build_installer.py')
+                  // Rename the dist directory so it doesn't conflict with the dist dir that is created during the wheel build
+                  sh('mv dist offline-installers')
+                  stash includes: 'offline-installers/*', name: 'py27-installer'
                 }
               }
             }
@@ -107,7 +113,7 @@ spec:
   - name: jnlp
     image: 'jenkins/jnlp-slave:latest'
   - name: jenkins-linux-slave
-    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-2'
+    image: 'nexus.swimlane.io:5000/jenkins-linux-slave:PR-19-4'
     command: ["tail", "-f", "/dev/null"]
     resources:
       requests:
@@ -143,6 +149,9 @@ spec:
               steps {
                 container('jenkins-linux-slave'){
                   sh('/usr/local/bin/python3.6 offline_installer/build_installer.py')
+                  // Rename the dist directory so it doesn't conflict with the dist dir that is created during the wheel build
+                  sh('mv dist offline-installers')
+                  stash includes: 'offline-installers/*', name: 'py36-installer'
                 }
               }
             }
@@ -153,6 +162,7 @@ spec:
     stage ('Publish to Nexus') {
       when{
         anyOf{
+          buildingTag()
           branch 'master'
           branch 'hotfix-*'
           branch 'release-*'
@@ -169,6 +179,15 @@ spec:
 
             sh('python2.7 setup.py sdist bdist_wheel')
             sh('twine upload --repository-url https://nexus.swimlane.io/repository/pypi/ -u ${NEXUS_USER} -p ${NEXUS_PASSWORD} dist/*')
+            slackSend(
+              baseUrl: 'https://swimlane.slack.com/services/hooks/jenkins-ci/',
+              channel: '#platform_notification',
+              color: 'good',
+              message: """\
+Swimlane-python has been pushed to Nexus for branch ${ACTUAL_BRANCH} commit ${GIT_COMMIT_SHORT}!
+              """.stripIndent(),
+              teamDomain: 'swimlane',
+              tokenCredentialId: 'slack-token')
             sh("rm -rf dist")
           }
         }
@@ -183,7 +202,14 @@ spec:
         stage('Create Github Release') {
           steps {
             container('jenkins-linux-slave'){
-              sh('echo hi')
+              unstash 'py27-installer'
+              unstash 'py36-installer'
+
+              // The same filename can't be attached to a release multiple times so if a tagged build needs to be run again 
+              // the old attachments will need to be deleted from the release first
+              sh("hub release edit -a offline-installers/swimlane-python-*-offline-installer-win_amd64-py27.pyz -a offline-installers/swimlane-python-*-offline-installer-win_amd64-py36.pyz -m '' ${TAG_NAME}")
+
+              archiveArtifacts(artifacts: "offline-installers/*")
             }
           }
         }
@@ -196,7 +222,17 @@ spec:
                 sh 'python /usr/local/bin/jj2.py -v NEXUS_USER=${NEXUS_USER} -v NEXUS_PASSWORD=${NEXUS_PASSWORD} -v PYPI_USER=${PYPI_USER} -v PYPI_PASSWORD=${PYPI_PASSWORD} pypirc.jinja2 > .pypirc'
 
                 sh('python setup.py sdist bdist_wheel')
-                sh('twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*')
+                // @TODO remove the testpypi option before merging to master
+                sh('twine upload --repository testpypi -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*')
+                slackSend(
+                  baseUrl: 'https://swimlane.slack.com/services/hooks/jenkins-ci/',
+                  channel: '#platform_notification',
+                  color: 'good',
+                  message: """\
+Swimlane-python has been pushed to pypi for branch ${ACTUAL_BRANCH} commit ${GIT_COMMIT_SHORT}!
+              """.stripIndent(),
+                  teamDomain: 'swimlane',
+                  tokenCredentialId: 'slack-token')
                 sh("rm -rf dist")
               }
             }
