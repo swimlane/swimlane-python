@@ -38,7 +38,7 @@ deploy:
   secret_access_key: $S3_SECRET_KEY
   bucket: $S3_BUCKET
   upload-dir: python_driver/mntest/10.1.2/
-  glob: "dist/swimlane-python-*-offline-installer-win_amd64-py27.pyz"
+  local_dir: dist
   on:
     #tags: true
     branch: SPT-5882_make_travis_build_upload_to_s3
