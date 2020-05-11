@@ -38,11 +38,10 @@ deploy:
   access_key_id: $S3_ACCESS_KEY
   secret_access_key: $S3_SECRET_KEY
   bucket: $S3_BUCKET
-  upload_dir: python_driver/mntest/10.1.2
+  upload_dir: python_driver/$TRAVIS_BRANCH/10.1.2
   local_dir: dist
   on:
     #tags: true
     branch: SPT-5882_make_travis_build_upload_to_s3
     repo: swimlane/swimlane-python
     condition: $TRAVIS_PYTHON_VERSION = '2.7'
-    
