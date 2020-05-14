@@ -35,12 +35,12 @@ deploy:
     tags: true
     repo: swimlane/swimlane-python
     condition: $TRAVIS_PYTHON_VERSION = '2.7'
-# - provider: pypi
-#   user: swimlane
-#   distributions: sdist bdist_wheel
-#   password: $PIP_PASSWORD
-#   on:
-#     tags: true
-#     repo: swimlane/swimlane-python
-#     # Package uploaded is universal for Python 2 and 3, just only push to pip during one version build cycle
-#     condition: $TRAVIS_PYTHON_VERSION = '2.7'
+- provider: pypi
+  user: swimlane
+  distributions: sdist bdist_wheel
+  password: $PIP_PASSWORD
+  on:
+    tags: true
+    repo: swimlane/swimlane-python
+    # Package uploaded is universal for Python 2 and 3, just only push to pip during one version build cycle
+    condition: $TRAVIS_PYTHON_VERSION = '2.7'
