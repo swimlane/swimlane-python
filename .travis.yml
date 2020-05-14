@@ -22,16 +22,6 @@ deploy:
   on:
     tags: true
     repo: swimlane/swimlane-python
-- provider: pypi
-  user: swimlane
-  distributions: sdist bdist_wheel
-  password: $PIP_PASSWORD
-  skip_cleanup: true
-  on:
-    tags: true
-    repo: swimlane/swimlane-python
-    # Package uploaded is universal for Python 2 and 3, just only push to pip during one version build cycle
-    condition: $TRAVIS_PYTHON_VERSION = '2.7'
 - provider: s3
   edge: true
   region: $S3_REGION
@@ -40,7 +30,17 @@ deploy:
   bucket: $S3_BUCKET
   upload_dir: python_driver/$TRAVIS_TAG
   local_dir: dist
+  skip_cleanup: true
   on:
     tags: true
     repo: swimlane/swimlane-python
+    condition: $TRAVIS_PYTHON_VERSION = '2.7'
+- provider: pypi
+  user: swimlane
+  distributions: sdist bdist_wheel
+  password: $PIP_PASSWORD
+  on:
+    tags: true
+    repo: swimlane/swimlane-python
+    # Package uploaded is universal for Python 2 and 3, just only push to pip during one version build cycle
     condition: $TRAVIS_PYTHON_VERSION = '2.7'
