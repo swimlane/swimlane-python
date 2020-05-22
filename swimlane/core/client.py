@@ -158,11 +158,12 @@ class Swimlane(object):
             ))
 
         if compare_versions(_lib_major_version, self.product_version) != 0:
-            raise InvalidSwimlaneProductVersion(
-                self,
-                '{}.0'.format(_lib_major_version),
-                '{}.0'.format(str(int(_lib_major_version) + 1))
-            )
+            pass
+            # raise InvalidSwimlaneProductVersion(
+            #     self,
+            #     '{}.0'.format(_lib_major_version),
+            #     '{}.0'.format(str(int(_lib_major_version) + 1))
+            # )
 
     def __repr__(self):
         return '<{cls}: {user} @ {host} v{version}>'.format(

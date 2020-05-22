@@ -327,6 +327,14 @@ class Record(APIResource):
             if selection not in allowed:
                 allowed.append(selection)
 
+
+        self.validate()
+        self._swimlane.request(
+            'put',
+            'app/{}/record/{}/restrict'.format(self.app.id, self.id),
+             json=allowed
+        )
+
         self._raw['allowed'] = allowed
 
     def remove_restriction(self, *usergroups):
