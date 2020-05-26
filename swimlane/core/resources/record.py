@@ -306,7 +306,6 @@ class Record(APIResource):
         UserGroups already in the restricted list can be added multiple times and duplicates will be ignored
 
         Notes:
-            Does not take effect until calling `record.save()`
 
         Args:
             *usergroups (UserGroup): 1 or more Swimlane UserGroup(s) to add to restriction list
@@ -343,7 +342,6 @@ class Record(APIResource):
         .. versionadded:: 2.16.1
 
         Notes:
-            Does not take effect until calling `record.save()`
 
         Warnings:
             Providing no UserGroups will clear the restriction list, opening access to ALL accounts
@@ -367,6 +365,13 @@ class Record(APIResource):
                     raise ValueError('UserGroup `{}` not in record `{}` restriction list'.format(usergroup, self))
         else:
             allowed = []
+
+        self.validate()
+        self._swimlane.request(
+            'put',
+            'app/{}/record/{}/restrict'.format(self.app.id, self.id),
+             json=allowed
+        )
 
         self._raw['allowed'] = allowed
 
