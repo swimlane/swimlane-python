@@ -427,7 +427,7 @@ class Record(APIResource):
           ).json()
           self.locked = False 
           self.locking_user = None
-          self.locked_date = response['lockedDate']
+          self.locked_date = None
 
 
 def record_factory(app, fields=None):
