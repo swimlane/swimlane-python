@@ -59,8 +59,12 @@ class Record(APIResource):
         self._fields = {}
         self.__premap_fields()
 
-        self.__existing_values = {k:self.get_field(k).get_batch_representation() for (k,v) in self}
+        self.__existing_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
         self._comments_modified = False
+
+        self.locked = False
+        self.locking_user = None
+        self.locked_date = None
 
         # avoid circular reference
         from swimlane.core.adapters import RecordRevisionAdapter
@@ -106,7 +110,7 @@ class Record(APIResource):
 
     def __premap_fields(self):
         """Build field instances using field definitions in app manifest
-        
+
         Map raw record field data into appropriate field instances with their correct respective types
         """
         # Circular imports
@@ -159,7 +163,8 @@ class Record(APIResource):
         """
         for field in (_field for _field in six.itervalues(self._fields) if _field.required):
             if field.get_swimlane() is None:
-                raise ValidationError(self, 'Required field "{}" is not set'.format(field.name))
+                raise ValidationError(
+                    self, 'Required field "{}" is not set'.format(field.name))
 
     def __request_and_reinitialize(self, method, endpoint, data):
         response = self._swimlane.request(
@@ -218,12 +223,12 @@ class Record(APIResource):
 
         copy_raw = copy.copy(self._raw)
 
-        pending_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
+        pending_values = {k: self.get_field(
+            k).get_batch_representation() for (k, v) in self}
         patch_values = {
             self.get_field(k).id: pending_values[k] for k in set(pending_values) & set(self.__existing_values)
             if pending_values[k] != self.__existing_values[k]
         }
-
 
         for field_id, value in six.iteritems(patch_values):
             #
@@ -244,7 +249,6 @@ class Record(APIResource):
             'app/{}/record/{}'.format(self.app.id, self.id),
             copy_raw
         )
-
 
     def delete(self):
         """Delete record from Swimlane server
@@ -314,24 +318,25 @@ class Record(APIResource):
             TypeError: If 0 UserGroups provided or provided a non-UserGroup instance
         """
         if not usergroups:
-            raise TypeError('Must provide at least one UserGroup for restriction')
+            raise TypeError(
+                'Must provide at least one UserGroup for restriction')
 
         allowed = copy.copy(self._raw.get('allowed', []))
 
         for usergroup in usergroups:
             if not isinstance(usergroup, UserGroup):
-                raise TypeError('Expected UserGroup, received `{}` instead'.format(usergroup))
+                raise TypeError(
+                    'Expected UserGroup, received `{}` instead'.format(usergroup))
 
             selection = usergroup.as_usergroup_selection()
             if selection not in allowed:
                 allowed.append(selection)
 
-
         self.validate()
         self._swimlane.request(
             'put',
             'app/{}/record/{}/restrict'.format(self.app.id, self.id),
-             json=allowed
+            json=allowed
         )
 
         self._raw['allowed'] = allowed
@@ -358,11 +363,13 @@ class Record(APIResource):
 
             for usergroup in usergroups:
                 if not isinstance(usergroup, UserGroup):
-                    raise TypeError('Expected UserGroup, received `{}` instead'.format(usergroup))
+                    raise TypeError(
+                        'Expected UserGroup, received `{}` instead'.format(usergroup))
                 try:
                     allowed.remove(usergroup.as_usergroup_selection())
                 except ValueError:
-                    raise ValueError('UserGroup `{}` not in record `{}` restriction list'.format(usergroup, self))
+                    raise ValueError(
+                        'UserGroup `{}` not in record `{}` restriction list'.format(usergroup, self))
         else:
             allowed = []
 
@@ -370,10 +377,35 @@ class Record(APIResource):
         self._swimlane.request(
             'put',
             'app/{}/record/{}/restrict'.format(self.app.id, self.id),
-             json=allowed
+            json=allowed
         )
 
         self._raw['allowed'] = allowed
+
+
+    def lock(self):
+        """
+        Lock the record to the Current User (in this case the API User).
+
+
+        Notes:
+
+        Warnings:
+
+        Args:
+
+        """
+
+
+        self.validate()
+        response = self._swimlane.request(
+            'post',
+            'app/{}/record/{}/lock'.format(
+                self.app.id, self.id)
+        ).json()
+        self.locked = True
+        self.locking_user = response['lockingUser']['id']
+        self.locked_date = response['lockedDate']
 
 
 def record_factory(app, fields=None):
