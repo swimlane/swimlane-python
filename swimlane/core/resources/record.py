@@ -420,7 +420,7 @@ class Record(APIResource):
 
           """
           self.validate()
-          response = self._swimlane.request(
+          self._swimlane.request(
               'post',
               'app/{}/record/{}/unlock'.format(
                   self.app.id, self.id)
