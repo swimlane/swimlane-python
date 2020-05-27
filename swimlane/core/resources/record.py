@@ -5,7 +5,7 @@ import pendulum
 import six
 
 from swimlane.core.resources.base import APIResource
-from swimlane.core.resources.usergroup import UserGroup
+from swimlane.core.resources.usergroup import UserGroup, User
 from swimlane.exceptions import UnknownField, ValidationError
 
 
@@ -385,7 +385,7 @@ class Record(APIResource):
 
     def lock(self):
         """
-        Lock the record to the Current User (in this case the API User).
+        Lock the record to the Current User.
 
 
         Notes:
@@ -404,8 +404,30 @@ class Record(APIResource):
                 self.app.id, self.id)
         ).json()
         self.locked = True
-        self.locking_user = response['lockingUser']['id']
+        self.locking_user = User(self._swimlane, response['lockingUser'])
         self.locked_date = response['lockedDate']
+
+    def unlock(self):
+          """
+          Unlock the record.
+
+
+          Notes:
+
+          Warnings:
+
+          Args:
+
+          """
+          self.validate()
+          response = self._swimlane.request(
+              'post',
+              'app/{}/record/{}/unlock'.format(
+                  self.app.id, self.id)
+          ).json()
+          self.locked = False 
+          self.locking_user = None
+          self.locked_date = response['lockedDate']
 
 
 def record_factory(app, fields=None):
