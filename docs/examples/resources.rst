@@ -410,6 +410,20 @@ Records can be iterated over like :meth:`dict.items()`, yielding `(field_name, f
     for field_name, field_value in record:
         assert record[field_name] == field_value
 
+Lock Record
+^^^^^^^^^^^
+
+Record locks can be modified using :meth:`~swimlane.core.resources.record.Record.lock` and
+:meth:`~swimlane.core.resources.record.Record.unlock` methods.
+The record is locked to the user making the API call.
+
+.. code-block:: python
+
+    # Lock the record
+    record.lock()
+
+    # Unlock the record
+    record.unlock()
 
 Pretty Iteration + JSON Serialization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
