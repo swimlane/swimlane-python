@@ -473,15 +473,12 @@ Record restrictions can be modified using :meth:`~swimlane.core.resources.record
 
     # Add user(s) to set of users allowed to modify record
     record.add_restriction(swimlane.user, other_user)
-    record.save()
 
     # Remove one or more users from restriction set
     record.remove_restriction(swimlane.user)
-    record.save()
 
     # Clear the entire restricted user set
     record.remove_restriction()
-    record.save()
 
 
 Retrieve Record Revisions
