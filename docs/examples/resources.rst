@@ -481,7 +481,7 @@ Restrict Record
 ^^^^^^^^^^^^^^^
 
 Record restrictions can be modified using :meth:`~swimlane.core.resources.record.Record.add_restriction` and
-:meth:`~swimlane.core.resources.record.Record.remove_restriction` methods
+:meth:`~swimlane.core.resources.record.Record.remove_restriction` methods.
 
 .. code-block:: python
 
