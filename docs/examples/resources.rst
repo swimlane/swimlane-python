@@ -410,6 +410,20 @@ Records can be iterated over like :meth:`dict.items()`, yielding `(field_name, f
     for field_name, field_value in record:
         assert record[field_name] == field_value
 
+Lock Record
+^^^^^^^^^^^
+
+Record locks can be modified using :meth:`~swimlane.core.resources.record.Record.lock` and
+:meth:`~swimlane.core.resources.record.Record.unlock` methods.
+The record is locked to the user making the API call.
+
+.. code-block:: python
+
+    # Lock the record
+    record.lock()
+
+    # Unlock the record
+    record.unlock()
 
 Pretty Iteration + JSON Serialization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -467,21 +481,18 @@ Restrict Record
 ^^^^^^^^^^^^^^^
 
 Record restrictions can be modified using :meth:`~swimlane.core.resources.record.Record.add_restriction` and
-:meth:`~swimlane.core.resources.record.Record.remove_restriction` methods
+:meth:`~swimlane.core.resources.record.Record.remove_restriction` methods.
 
 .. code-block:: python
 
     # Add user(s) to set of users allowed to modify record
     record.add_restriction(swimlane.user, other_user)
-    record.save()
 
     # Remove one or more users from restriction set
     record.remove_restriction(swimlane.user)
-    record.save()
 
     # Clear the entire restricted user set
     record.remove_restriction()
-    record.save()
 
 
 Retrieve Record Revisions
