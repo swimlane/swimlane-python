@@ -262,9 +262,7 @@ class Swimlane(object):
             # Post product/build version separation
             # This will handle <product_version>+<build_version>+<build_number>
             # or <build_version>+<build_number> formats of the version
-            versionList = self.version.split(version_separator)
-            versionList.reverse()
-            return versionList[1]
+            return return self.version.split(version_separator)[-2]
         # Pre product/build version separation
         return self.product_version
 
