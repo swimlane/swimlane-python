@@ -70,3 +70,4 @@ venv/
 .vscode/
 
 # functional Testing:
+.pytest_cache/

@@ -28,7 +28,7 @@ pytest driver_tests/test_app_adaptor.py --skipverify
 To run all the tests against 10.20.30.40:
 
 ```bash
-pytest --url "https://10.20.30.40"
+pytest --url "https://10.20.30.40" --pass PaSsWoRd
 ```
 
 ## More Info
