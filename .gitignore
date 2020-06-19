@@ -68,3 +68,5 @@ Session.vim
 /.idea/
 venv/
 .vscode/
+
+# functional Testing:
