@@ -1,0 +1,57 @@
+{
+  "groups": [
+    {
+      "name": "groupOne",
+      "groups": [],
+      "roles": [],
+      "users": []
+    },
+    {
+      "name": "groupTwo",
+      "groups": [],
+      "roles": [],
+      "users": []
+    },
+    {
+      "name": "groupThree",
+      "groups": [],
+      "roles": [],
+      "users": []
+    },
+    {
+      "name": "groupFour",
+      "groups": [],
+      "roles": [],
+      "users": []
+    },
+    {
+      "name": "groupCombo",
+      "groups": ["groupOne", "groupTwo", "groupThree"],
+      "roles": [],
+      "users": []
+    }
+  ],
+
+  "users": [
+    {
+      "name": "userOne",
+      "groups": ["groupTwo"],
+      "roles": []
+    },
+    {
+      "name": "userTwo",
+      "groups": ["groupTwo"],
+      "roles": []
+    },
+    {
+      "name": "userThree",
+      "groups": ["groupTwo"],
+      "roles": []
+    },
+    {
+      "name": "userFour",
+      "groups": [],
+      "roles": []
+    }
+  ]
+}
