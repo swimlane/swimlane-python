@@ -161,7 +161,7 @@ class Helpers:
         return newGroup
 
     def createRole(self, name=None, groups=None, users=None, sections=None):
-        if sections == None:
+        if sections is None:
             sections = ['Application', 'Report', 'Workspace',
                         'Dashboard', 'Applet', 'Settings']
         globalPerms = self.swimlane_instance.request('get', 'global').json()
