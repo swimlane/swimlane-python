@@ -71,3 +71,6 @@ venv/
 
 # functional Testing:
 .pytest_cache/
+functional_tests/assets/style.css
+functional_tests/pydriver-junit.xml
+functional_tests/pydriver-report.html

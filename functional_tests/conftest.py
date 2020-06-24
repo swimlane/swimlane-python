@@ -66,9 +66,7 @@ class Helpers:
     def open_swimlane_instance(self, url, user, password, verifyVersion, write_to_read_only=False):
         print ('\nINITIALIZATION\n')
         print ('Version Verification check: %s\n' % verifyVersion)
-        # Use the following call once the pyDriver has been released
         return Swimlane(url, user,  password, verify_ssl=False, verify_server_version=verifyVersion, write_to_read_only=write_to_read_only)
-        # return Swimlane(url, user,  password, verify_ssl=False, verify_server_version=verifyVersion)
 
     def findCreateApp(self, defaultApp):
         appId = ""
@@ -91,7 +89,6 @@ class Helpers:
                     newapp = self.swimlane_instance.request(
                         'post', 'app/import', json={"manifest": manifest, "modifications": modifications}).json()
                     refFieldData = getAppIdsForRefField(newapp['application'])
-                    # defaultApp2 = newapp['application']['name']
                     self.appIds.append(newapp['application']['id'])
                 modifications = [{'field': "name", 'value': "PYTHON-%s" % defaultApp, 'type': "create"}, {'field': "acronym", 'value': generateUniqueAcronym(
                     self.swimlane_instance), 'type': 1}, {'field': "description", 'value': pytest.fake.sentence(), 'type': 1}]
@@ -258,8 +255,8 @@ class Helpers:
                     newUser = self.createUser(
                         username=eachUser['name'], groups=user_groups, roles=eachUser['roles'])
                     pytest.usersCreated[newUser['displayName']] = newUser['id']
-        except IOError as error:
-            print('No users or groups to create: %s' % error)
+        except IOError:
+            print('No users or groups to create')
 
     def loadFileStream(self, filename):
         with open('fixtures/%s' % filename, 'rb') as file_handle:
