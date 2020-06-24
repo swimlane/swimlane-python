@@ -260,7 +260,9 @@ class Swimlane(object):
         version_separator = '+'
         if version_separator in self.version:
             # Post product/build version separation
-            return self.version.split(version_separator)[1]
+            # This will handle <product_version>+<build_version>+<build_number>
+            # or <build_version>+<build_number> formats of the version
+            return self.version.split(version_separator)[-2]
         # Pre product/build version separation
         return self.product_version
 

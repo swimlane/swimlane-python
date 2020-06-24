@@ -68,3 +68,6 @@ Session.vim
 /.idea/
 venv/
 .vscode/
+
+# functional Testing:
+.pytest_cache/

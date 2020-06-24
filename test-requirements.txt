@@ -1,6 +1,6 @@
 coverage
 mock
 pytest==3.10.1
-pytest-cov
+pytest-cov==2.8.1
 pytest-pythonpath
 tox
