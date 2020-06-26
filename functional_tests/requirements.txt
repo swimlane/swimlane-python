@@ -1,4 +1,4 @@
 Faker==0.8.15
 pytest==3.5.0
-pytest-hmtl==1.22.1
+pytest-hmtl>=1.22.1
 swimlane
