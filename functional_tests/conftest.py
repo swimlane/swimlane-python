@@ -22,22 +22,18 @@ def pytest_addoption(parser):
                      help="pass in to not verify the server version with the pydriver version")
 
 
-@pytest.fixture(scope='session')
 def api_url(pytestconfig):
     return pytestconfig.getoption("--url")
 
 
-@pytest.fixture(scope='session')
 def api_user(pytestconfig):
     return pytestconfig.getoption("--user").lower()
 
 
-@pytest.fixture(scope='session')
 def api_pass(pytestconfig):
     return pytestconfig.getoption("--pass")
 
 
-@pytest.fixture(scope='session')
 def api_verifyVersion(pytestconfig):
     return pytestconfig.getoption("--skipverify")
 
