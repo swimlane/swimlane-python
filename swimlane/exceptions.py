@@ -165,7 +165,8 @@ class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
         9002: 'ThreatIntelTypeNotSupportedByThisProvider',
         10000: 'DuplicateTaskName',
         10001: 'TaskNotFound',
-        17001: 'DuplicateAssetName'
+        17001: 'DuplicateAssetName',
+        19001: 'HangfireError'
     }
 
     def __init__(self, http_error):
