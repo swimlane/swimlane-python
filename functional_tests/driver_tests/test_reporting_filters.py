@@ -129,8 +129,8 @@ class TestAppReportsTextListFiltering():
         report.filter('Text List', 'contains', ['a', 'b'])
         assert len(report) == 3
         for record in report:
-            assert list(set(record['Text List']) &
-                        set(['a', 'b'])) == ['a', 'b']
+            assert (set(record['Text List']) &
+                    set(['a', 'b'])) == set(['a', 'b'])
 
     def test_text_list_excludes(helpers):
         report = pytest.app.reports.build(
