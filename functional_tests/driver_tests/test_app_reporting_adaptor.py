@@ -22,7 +22,6 @@ def my_fixture(helpers):
 
 
 class TestAppReportsList():
-    @pytest.mark.xfail(reason="SPT-6296: The reports list should only contain reports for the app")
     def test_list_count(helpers):
         reportList = pytest.app.reports.list()
         assert len(reportList) == 1
