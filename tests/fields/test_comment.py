@@ -50,7 +50,10 @@ def test_comment_field(mock_record, mock_swimlane):
         mock_request.return_value = mock_response
 
         comments.comment('New comment message')
+        comments.comment('Rich text comment message', rich_text=True)
 
         # Not persisted until saved, but still listed on local record
-        assert len(comments) == 2
+        assert len(comments) == 3
         assert comments[1].message == 'New comment message'
+        assert comments[2].message == 'Rich text comment message'
+        assert comments[2].is_rich_text == True
