@@ -23,7 +23,7 @@ class ReportAdapter(SwimlaneResolver):
         Returns:
             :class:`list` of :class:`~swimlane.core.resources.report.Report`: List of all returned reports
         """
-        raw_reports = self._swimlane.request('get', "reports?appId={}".format(self._app.id)).json()
+        raw_reports = self._swimlane.request('get', "reports/app/{}".format(self._app.id)).json()
         # Ignore StatsReports for now
         return [Report(self._app, raw_report) for raw_report in raw_reports if raw_report['$type'] == Report._type]
 
