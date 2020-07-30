@@ -577,9 +577,13 @@ Cursor managing iteration and addition of comments
         assert isinstance(comment.message, str)
         assert isinstance(comment.user, UserGroup)
         assert isinstance(comment.created_date, datetime)
+        assert isinstance(comment.is_rich_text, boolean)
 
     # Add new comment
     comments.comment('New comment message')
+
+    # Add new rich text comment
+    comments.comment('<p>New Comment</p>', rich_text=True)
 
     # Not persisted until saved, but still listed on local record
     assert len(comments) == 2

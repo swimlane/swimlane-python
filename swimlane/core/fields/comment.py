@@ -7,7 +7,7 @@ from .base import CursorField, FieldCursor, ReadOnly
 class CommentCursor(FieldCursor):
     """Returned by CommentField to allow iteration and creation of Comment instances"""
 
-    def comment(self, message):
+    def comment(self, message, rich_text=False):
         """Add new comment to record comment field"""
         message = str(message)
 
@@ -15,7 +15,8 @@ class CommentCursor(FieldCursor):
             '$type': 'Core.Models.Record.Comments, Core',
             'createdByUser': self._record._swimlane.user.as_usergroup_selection(),
             'createdDate': pendulum.now().to_rfc3339_string(),
-            'message': message
+            'message': message,
+            'isRichText': rich_text
         }
 
         comment = Comment(self._swimlane, sw_repr)
