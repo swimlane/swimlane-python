@@ -52,6 +52,30 @@ class TestHelpersAddCommentAdaptor:
         assert editedRecord['Comments'][-1].message == commentText2
         assert editedRecord['Comments'][-2].message == commentText
 
+    def test_add_rich_text_comment(helpers):
+        sourceRecord = pytest.app.records.create(
+            **{'Text': pytest.fake.sentence()})
+        commentText = pytest.fake.sentence()
+        pytest.swimlane_instance.helpers.add_comment(
+            pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText)
+        commentText2 = '<p>{}</p>'.format(pytest.fake.sentence())
+        pytest.swimlane_instance.helpers.add_comment(
+            pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText2, True)
+        editedRecord = pytest.app.records.get(id=sourceRecord.id)
+        assert editedRecord['Comments'][-1].message == commentText2
+        assert editedRecord['Comments'][-1].is_rich_text == True
+        assert editedRecord['Comments'][-2].message == commentText
+        assert editedRecord['Comments'][-2].is_rich_text == False
+
+    def test_add_rich_text_not_bool_comment(helpers):
+        sourceRecord = pytest.app.records.create(
+            **{'Text': pytest.fake.sentence()})
+        commentText = pytest.fake.sentence()
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_comment(
+                pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText, 123)
+        assert str(excinfo.value) == "rich_text must be a boolean value."
+
     @pytest.mark.xfail(reason="SPT-6196: Message Value is not checked for valid test.")
     def test_comment_empty(helpers):
         sourceRecord = pytest.app.records.create(
@@ -99,7 +123,7 @@ class TestHelpersAddCommentAdaptor:
             pytest.swimlane_instance.helpers.add_comment(
                 pytest.app.id, sourceRecord.id, pytest.CommentFieldID)
         assert str(excinfo.value) == 'add_comment() {}'.format(
-            pytest.helpers.py_ver_missing_param(5, 4, "message", "exactly"))
+            pytest.helpers.py_ver_missing_param(5, 4, "message", "at least"))
 
     @pytest.mark.xfail(reason="SPT-6196: Pydriver should verify that the commentFieldID should be a valid value")
     def test_comment_empty_fieldId(helpers):
