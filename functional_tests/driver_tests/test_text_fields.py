@@ -600,3 +600,109 @@ class TestMinMaxWordCountTextField:
         with pytest.raises(exceptions.SwimlaneHTTP400Error) as excinfo:
             theRecord.save()
         assert str(excinfo.value) == 'ModelValidationError:5008 (Field Min Max Words Text value of 11 is higher than MaxLength of 10.): Bad Request for url: %s/api/app/%s/record' % (pytest.helpers.url, pytest.app.id)
+
+
+class TestCommentTextField:
+    def test_comment_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        commentText = pytest.fake.sentence()
+        comments = theRecord["Comments"]
+        comments.comment(commentText)
+        theRecord.save()
+        editedRecord = pytest.app.records.get(id=theRecord.id)
+        assert editedRecord['Comments'][-1].message == commentText
+        assert editedRecord['Comments'][-1].is_rich_text == False
+
+    def test_comment_empty_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        commentText = ""
+        comments = theRecord["Comments"]
+        comments.comment(commentText)
+        theRecord.save()
+        editedRecord = pytest.app.records.get(id=theRecord.id)
+        assert editedRecord['Comments'][-1].message == commentText
+        assert editedRecord['Comments'][-1].is_rich_text == False
+
+    def test_comment_null_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        commentText = None
+        comments = theRecord["Comments"]
+        comments.comment(commentText)
+        theRecord.save()
+        editedRecord = pytest.app.records.get(id=theRecord.id)
+        assert editedRecord['Comments'][-1].message == 'None'
+        assert editedRecord['Comments'][-1].is_rich_text == False
+
+    def test_comment_numeric_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        commentText = 1234
+        comments = theRecord["Comments"]
+        comments.comment(commentText)
+        theRecord.save()
+        editedRecord = pytest.app.records.get(id=theRecord.id)
+        assert editedRecord['Comments'][-1].message == '1234'
+        assert editedRecord['Comments'][-1].is_rich_text == False
+
+    def test_comment_json_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        commentText = {'comment': 'hello'}
+        comments = theRecord["Comments"]
+        comments.comment(commentText)
+        theRecord.save()
+        editedRecord = pytest.app.records.get(id=theRecord.id)
+        assert editedRecord['Comments'][-1].message == str(commentText)
+        assert editedRecord['Comments'][-1].is_rich_text == False
+
+    def test_comment_object_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        commentText = theRecord
+        comments = theRecord["Comments"]
+        comments.comment(commentText)
+        theRecord.save()
+        editedRecord = pytest.app.records.get(id=theRecord.id)
+        assert editedRecord['Comments'][-1].message == str(commentText)
+        assert editedRecord['Comments'][-1].is_rich_text == False
+
+    def test_comment_rich_text_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        commentText = pytest.fake.sentence()
+        comments = theRecord["Comments"]
+        comments.comment(commentText, rich_text=True)
+        theRecord.save()
+        editedRecord = pytest.app.records.get(id=theRecord.id)
+        assert editedRecord['Comments'][-1].message == commentText
+        assert editedRecord['Comments'][-1].is_rich_text == True
+
+    def test_comment_rich_text_false_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        commentText = pytest.fake.sentence()
+        comments = theRecord["Comments"]
+        comments.comment(commentText, rich_text=False)
+        theRecord.save()
+        editedRecord = pytest.app.records.get(id=theRecord.id)
+        assert editedRecord['Comments'][-1].message == commentText
+        assert editedRecord['Comments'][-1].is_rich_text == False
+
+    def test_comment_rich_text_not_bool_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        commentText = pytest.fake.sentence()
+        comments = theRecord["Comments"]
+        with pytest.raises(ValueError) as excinfo:
+            comments.comment(commentText, rich_text="blah")
+        assert str(excinfo.value) == "rich_text must be a boolean value."
+
+    def test_comment_no_comment_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        comments = theRecord["Comments"]
+        with pytest.raises(TypeError) as excinfo:
+            comments.comment()
+        assert str(excinfo.value) == 'comment() {}'.format(
+            pytest.helpers.py_ver_missing_param(2, 1, "message", "at least"))
+
+    def test_comment_no_comment_rich_text_on_save_exact(helpers):
+        theRecord = pytest.app.records.create(**{"Required Text": "required"})
+        comments = theRecord["Comments"]
+        with pytest.raises(TypeError) as excinfo:
+            comments.comment(rich_text=True)
+        assert str(excinfo.value) == 'comment() {}'.format(
+            pytest.helpers.py_ver_missing_param(2, 2, "message", "at least"))

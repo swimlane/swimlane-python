@@ -10,6 +10,8 @@ class CommentCursor(FieldCursor):
     def comment(self, message, rich_text=False):
         """Add new comment to record comment field"""
         message = str(message)
+        if not isinstance(rich_text, bool):
+            raise ValueError("rich_text must be a boolean value.")
 
         sw_repr = {
             '$type': 'Core.Models.Record.Comments, Core',
@@ -25,7 +27,7 @@ class CommentCursor(FieldCursor):
         self._record._raw['comments'].setdefault(self._field.id, [])
         self._record._raw['comments'][self._field.id].append(comment._raw)
 
-        #Tracking comment changes for patch endpoint
+        # Tracking comment changes for patch endpoint
         self._record._comments_modified = True
 
         return comment

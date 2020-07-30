@@ -30,7 +30,7 @@ class HelperAdapter(SwimlaneResolver):
             }
         )
 
-    def add_comment(self, app_id, record_id, field_id, message):
+    def add_comment(self, app_id, record_id, field_id, message, rich_text=False):
         """Directly add a comment to a record without retrieving the app or record first
 
         Warnings:
@@ -41,7 +41,10 @@ class HelperAdapter(SwimlaneResolver):
             record_id (str): Full parent Record ID string
             field_id (str): Full field ID to target reference field on parent Record string
             message (str): New comment message body
+            rich_text (bool): Declare the message as being rich text, default is False
         """
+        if not isinstance(rich_text, bool):
+            raise ValueError("rich_text must be a boolean value.")
 
         self._swimlane.request(
             'post',
@@ -52,6 +55,7 @@ class HelperAdapter(SwimlaneResolver):
             ),
             json={
                 'message': message,
+                'isRichText': rich_text,
                 'createdDate': pendulum.now().to_rfc3339_string()
             }
         )
@@ -68,4 +72,3 @@ class HelperAdapter(SwimlaneResolver):
         """
 
         return self._swimlane.request('get', "logging/job/{0}".format(job_id)).json()
-
