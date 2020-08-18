@@ -326,7 +326,7 @@ class SwimlaneTokenAuth(SwimlaneResolver):
 class SwimlaneJwtAuth(SwimlaneResolver):
     """Handles authentication for all requests"""
 
-    _token_expiration_buffer = pendulum.Interval(minutes=5)
+    _token_expiration_buffer = pendulum.Duration(minutes=5)
 
     def __init__(self, swimlane, username, password):
         super(SwimlaneJwtAuth, self).__init__(swimlane)

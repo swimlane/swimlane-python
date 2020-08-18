@@ -36,30 +36,27 @@ class DatetimeField(Field):
     def _set(self, value):
         # Force to appropriate Pendulum instance for consistency
         if value is not None:
-            if self.input_type == self._type_interval:
-                # Pendulum interval
-                value = pendulum.interval.instance(value)
-            else:
+            if self.input_type != self._type_interval:
                 if self.input_type == self._type_date:
                     # Pendulum date
                     if isinstance(value, date):
-                        value = pendulum.combine(value, pendulum.time(0))
+                        value = pendulum.DateTime.combine(value, pendulum.time(0))
                 elif self.input_type == self._type_time:
                     # Pendulum time
                     if isinstance(value, time):
-                        value = pendulum.combine(pendulum.date.today(), value)
+                        value = pendulum.DateTime.combine(pendulum.today().date(), value)
 
                 # Convert to Pendulum instance in UTC
                 value = UTC.convert(pendulum.instance(value))
                 # Drop nanosecond precision to match Mongo precision
-                value = value.microsecond_(int(math.floor(value.microsecond / 1000) * 1000))
+                value = value.set(microsecond=int(math.floor(value.microsecond / 1000) * 1000))
 
         return super(DatetimeField, self)._set(value)
 
     def cast_to_python(self, value):
         if value is not None:
             if self.input_type == self._type_interval:
-                value = pendulum.interval(milliseconds=int(value))
+                value = pendulum.duration(milliseconds=int(value))
             else:
                 value = pendulum.parse(value)
 
@@ -102,7 +99,7 @@ class DatetimeField(Field):
         value = super(DatetimeField, self).for_json()
 
         # Order of instance checks matters for proper inheritance checks
-        if isinstance(value, pendulum.Interval):
+        if isinstance(value, pendulum.Duration):
             return value.in_seconds() * 1000
         if isinstance(value, datetime):
             return self.format_datetime(value)

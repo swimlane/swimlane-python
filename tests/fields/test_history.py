@@ -55,7 +55,7 @@ class TestHistory(object):
         for idx, revision in enumerate(history):
             assert isinstance(revision, RecordRevision)
             assert isinstance(revision.app_version, App)
-            assert isinstance(revision.modified_date, pendulum.datetime)
+            assert isinstance(revision.modified_date, pendulum.DateTime)
             assert isinstance(revision.user, UserGroup)
             assert isinstance(revision.version, Record)
             assert revision.version.id == mock_history_record.id

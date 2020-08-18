@@ -9,7 +9,7 @@ class Comment(APIResource):
 
     Attributes:
         user (UserGroup): UserGroup instance of user who created the comment
-        created_date (pendulum.Pendulum): Pendulum datetime of when comment was created
+        created_date (pendulum.DateTime): Pendulum datetime of when comment was created
         message (str): Comment message body
     """
 

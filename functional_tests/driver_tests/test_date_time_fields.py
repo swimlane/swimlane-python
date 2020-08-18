@@ -253,13 +253,13 @@ class TestTimespanField:
         assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Timespan\' expects one of \'timedelta\', got \'int\' instead' % theRecord.tracking_id
 
     def test_timespan_field_pendulum_interval(helpers):
-        delta = pendulum.interval(days=15)
+        delta = pendulum.duration(days=15)
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now(), "Timespan": delta})
         assert theRecord["Timespan"] == delta
 
     def test_timespan_field_pendulum_interval_on_save(helpers):
-        delta = pendulum.interval(days=30)
+        delta = pendulum.duration(days=30)
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
         theRecord["Timespan"] = delta
