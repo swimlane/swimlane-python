@@ -88,7 +88,7 @@ Date & Time
 
 Full specific date & time field
 
-Returns :class:`pendulum.Pendulum` instances
+Returns :class:`pendulum.DateTime` instances
 
 .. code-block:: python
 
@@ -234,18 +234,18 @@ Timespan
 
 Time period (2 hours, 4 minutes, 15 seconds).
 
-Returns :class:`pendulum.Interval` instances
+Returns :class:`pendulum.Duration` instances
 
 .. code-block:: python
 
     timespan_field = record['Timespan']
     assert isinstance(timespan_field, datetime.timedelta)
-    assert isinstance(timespan_field, pendulum.Interval)
+    assert isinstance(timespan_field, pendulum.Duration)
 
 
 .. note::
 
-    Only subtype that cannot handle datetime/Pendulum instances. Must use datetime.timedelta or pendulum.Interval
+    Only subtype that cannot handle datetime/Pendulum instances. Must use datetime.timedelta or pendulum.Duration
     instances instead.
 
 

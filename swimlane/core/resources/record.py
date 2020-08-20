@@ -16,8 +16,8 @@ class Record(APIResource):
     Attributes:
         id (str): Full Record ID
         tracking_id (str): Record tracking ID
-        created (pendulum.Pendulum): Pendulum datetime for Record created date
-        modified (pendulum.Pendulum): Pendulum datetime for Record last modified date
+        created (pendulum.DateTime): Pendulum datetime for Record created date
+        modified (pendulum.DateTime): Pendulum datetime for Record last modified date
         is_new (bool): True if Record does not yet exist on server. Other values may be temporarily None if True
         app (App): App instance that Record belongs to
     """

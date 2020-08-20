@@ -218,7 +218,7 @@ class TestRecord(object):
 
         mock_swimlane._write_to_read_only = True
         mock_record['Datetime (Read-only)'] = now
-        assert mock_record['Datetime (Read-only)'] == now
+        assert mock_record['Datetime (Read-only)'] == now.date()
 
 
     def test_iteration(self, mock_record):

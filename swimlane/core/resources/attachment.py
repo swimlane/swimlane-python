@@ -11,7 +11,7 @@ class Attachment(APIResource):
     Attributes:
         file_id (str): Full file ID used in download request URL
         filename (str): Attachment filename
-        upload_date (pendulum.Pendulum): Pendulum datetime when attachment was uploaded
+        upload_date (pendulum.DateTime): Pendulum datetime when attachment was uploaded
     """
 
     _type = 'Core.Models.Record.Attachment, Core'

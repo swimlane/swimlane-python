@@ -15,7 +15,7 @@ datetime_now = datetime.datetime.now(pytz.timezone('MST'))
 datetime_now = datetime_now.replace(microsecond=int(math.floor(datetime_now.microsecond / 1000) * 1000))
 pendulum_now = pendulum.instance(datetime_now)
 
-pendulum_interval = pendulum.interval(minutes=5)
+pendulum_interval = pendulum.duration(minutes=5)
 
 
 @pytest.mark.parametrize('field_name,dt,expected_raw', [
@@ -23,7 +23,7 @@ pendulum_interval = pendulum.interval(minutes=5)
     (
         'Date Field',
         pendulum_now,
-        DatetimeField.format_datetime(pendulum.Pendulum(pendulum_now.year, pendulum_now.month, pendulum_now.day))
+        DatetimeField.format_datetime(pendulum.DateTime(pendulum_now.year, pendulum_now.month, pendulum_now.day))
     ),
     ('Time Field', pendulum_now, DatetimeField.format_datetime(pendulum_now)),
     ('Incident Duration', pendulum_interval, pendulum_interval.in_seconds() * 1000)
