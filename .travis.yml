@@ -13,8 +13,8 @@ after_script: python-codacy-coverage -r coverage.xml
 before_deploy: python offline_installer/build_installer.py
 deploy:
 - provider: releases
-  api_key:
-    secure: drdaaqfnq+Oe33wJRT8w62Z7hyW9OTKprG1PlJUszjM19+sKVG9f2GeG+0E1FR690FrL6bUBCuEaRFu8JcqxgvZuGdHNq0Z47XDwpAHfViawcujN7agMEGzlMjlR/SAHcUztPdNS7xIwMxps5qulM+/xiDMfEuAo44yZV+iQUrIxMJjOPxpqR1rvtBmxMjf5Oq8O5+3KepCyNIKxxXCbaLuTfe2il3RJ1BxQBLYD69H+RP97R6kBuOqxlB0QPWeGCyV3OF104bJQSKbx1ZcC5ag8VWYq7k36inSQEfh/JGVZR302tL1AX0w5A1Izl1NwrpDdcCdQjbUek3I6gdbr+Wzre3daZtgcve6VQT7ffMDfnRlOd85WQf03tabJP02fftN+rKpB2RV/NgjIJxcVSSJJ1Y3sNjQrq9IGsIJBNck1QnumSNdJqrt99zLIq1h9k4fWcgjMNIGgiqUJOu5ozeOlsbfKx337ezqiVvVnYDdrJKQm4YUvLPIwOQIgjBX3lh2i4I6nHSsGPUzTCHCzvuoS6nE90zwEteEnSqwqvYoKjYsUhFnZIMGAHcpo6yxbSSR7LIFXdE4iQSqAK2rnEGumUb6A8mIfIusRHBJ+Z11VSB6uo+6PeVsaJ85oB4raBy4pJtjsC1V2eseZF55UIVI6dXuS7VjAKBel8PpBozM=
+  user: $GITHUB_USER
+  password: $GITHUB_PASSWORD
   file_glob: true
   file: dist/*offline-installer*
   skip_cleanup: true
