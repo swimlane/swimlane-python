@@ -13,8 +13,8 @@ after_script: python-codacy-coverage -r coverage.xml
 before_deploy: python offline_installer/build_installer.py
 deploy:
 - provider: releases
-  user: $GITHUB_USER
-  password: $GITHUB_PASSWORD
+  api_key:
+    secure: $GITHUB_PAT
   file_glob: true
   file: dist/*offline-installer*
   skip_cleanup: true
