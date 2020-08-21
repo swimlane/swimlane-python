@@ -12,7 +12,7 @@ script: py.test -v --cov=swimlane --cov-report=xml
 after_script: python-codacy-coverage -r coverage.xml
 before_deploy: python offline_installer/build_installer.py
 deploy:
-  provider: releases
+- provider: releases
   api_key:
     secure: ZPYiNqeGlaUNG3vmsJmZCI4XODvanZmVJQuEqEmkUDbkeYbYfGDXiP48KDPtL6qy8JNyCjlCAu2tDMZTakHzIe8qGSfKeewaf/JvERQ7jeYgVLdQP9V75Z7UnkOfa4dn8o2iQYW/hbo32t2mC3fucqtTvky0hNZ/mZ+rWFG9We31egNRcP7waLDjmm34G+j7J4btUxcudenMp0s0TgTlxNRygL/VDSvpBXFhsTag3Kyxspj8XdEuraKImYwQWLR1F6dVoc8jesuW7Uuooos+/k4P5mNrI2rmWQjvo84BWzed1VPEgX90zGzjFLNv6du/lHt+JXmyzHSnxPvhbiy5Jz6v8k1PjcLXlpbSgwhrWWDN9fVO0BQKBNcHQbrLUAggAsGCzUMTAmTUJR7GQIWvU137JfO+WiYddQy4JRVwTJ2F8sXBOhCGsTB5hK26gz2F+Op8+O4RUclPFMJaHI7ikKfSX+CVRLkV3TzsMH/FFnuAVxpUO8ppMjtTQkn5JfRhK9rOe6nAIgaIZCuK3gslzoHwc4ae83VPPk72V8pBuaxj5XTegPDra3fpzrXpskn1GxwVo7skzLf2uKoDohFVBrXdxRBTD8n+sYMVOw8oAP8wLKY16jJNQ6TcTxXQ2/JEGAoORkEDYXQE4Lf8yMf2r7t/mRxUOv+iyWk3a1vz4e0=
   file_glob: true
