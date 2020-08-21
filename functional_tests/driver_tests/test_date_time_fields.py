@@ -19,8 +19,8 @@ class TestRequiredDateTimeField:
         timeNow = pendulum.now()
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": timeNow})
-        assert theRecord["Required Date & Time"].format(
-            'YYYY-MM-DD HH:mm:ss', locale='utc') == timeNow.format('YYYY-MM-DD HH:mm:ss', locale='utc')
+        assert theRecord["Required Date & Time"].in_tz('utc').format(
+            'YYYY-MM-DD HH:mm:ss') == timeNow.in_tz('utc').format('YYYY-MM-DD HH:mm:ss')
 
     def test_required_field_not_set(helpers):
         with pytest.raises(exceptions.ValidationError) as excinfo:
@@ -33,8 +33,8 @@ class TestDateTimeField:
         timeNow = pendulum.now()
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": timeNow, "Date & Time": timeNow})
-        assert theRecord["Date & Time"].format(
-            'YYYY-MM-DD HH:mm:ss', locale='utc') == timeNow.format('YYYY-MM-DD HH:mm:ss', locale='utc')
+        assert theRecord["Date & Time"].in_tz('utc').format(
+            'YYYY-MM-DD HH:mm:ss') == timeNow.in_tz('utc').format('YYYY-MM-DD HH:mm:ss')
 
     def test_datetime_field_datetime_on_save(helpers):
         theRecord = pytest.app.records.create(
@@ -74,7 +74,7 @@ class TestDateField:
         timeNow = pendulum.now()
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": timeNow, "Date": timeNow})
-        assert theRecord["Date"] == timeNow
+        assert theRecord["Date"] == timeNow.date()
 
     def test_date_field_datetime_on_save(helpers):
         theRecord = pytest.app.records.create(
@@ -126,8 +126,7 @@ class TestTimeField:
         timeNow = pendulum.now()
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": timeNow, "Time": timeNow.time()})
-        assert theRecord["Time"].format(
-            "%H:%M:%S") == timeNow.format("%H:%M:%S")
+        assert theRecord["Time"].format('HH:mm:ss') == timeNow.format('HH:mm:ss')
 
     def test_time_field_time_on_save(helpers):
         theRecord = pytest.app.records.create(
@@ -139,8 +138,7 @@ class TestTimeField:
         timeNow = pendulum.now('utc')
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": timeNow, "Time": timeNow})
-        assert theRecord["Time"].format(
-            "%H:%M:%S") == timeNow.to_time_string()
+        assert theRecord["Time"].format('HH:mm:ss') == timeNow.format('HH:mm:ss')
 
     def test_time_field_datetime_on_save(helpers):
         theRecord = pytest.app.records.create(
@@ -230,14 +228,14 @@ class TestTimespanField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Date & Time": pendulum.now(), "Timespan": pendulum.now()})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Timespan\' expects one of \'timedelta\', got \'Pendulum\' instead' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Timespan\' expects one of \'timedelta\', got \'DateTime\' instead' % pytest.app.acronym
 
     def test_timespan_field_datetime_on_save(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Timespan"] = pendulum.now()
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Timespan\' expects one of \'timedelta\', got \'Pendulum\' instead' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Timespan\' expects one of \'timedelta\', got \'DateTime\' instead' % theRecord.tracking_id
 
     def test_timespan_field_number(helpers):
         with pytest.raises(exceptions.ValidationError) as excinfo:

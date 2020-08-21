@@ -21,14 +21,14 @@ def my_fixture(helpers):
         2013, 1, 1, 1, 2, 3) - pendulum.datetime(2011, 12, 31, 22, 2, 3)
     pytest.delta3 = pendulum.datetime(
         2012, 10, 1, 1, 2, 3) - pendulum.datetime(2011, 12, 31, 22, 2, 3)
-    pytest.app.records.bulk_create({"Text": 'Hello', "Numeric": 123, 'Selection': 'one', 'Date & Time': pendulum.parse("Apr 1, 2020 12:00 AM -06:00"), 'User/Groups': pytest.newUser1, "Timespan": pytest.delta1, "Numeric List": [10, 20, 30], "Text List": ['a', 'b', 'c'], "Multi-select": ['Jan', 'Feb'], "Multi-Select User/Groups": [pytest.newUser1, pytest.newUser2]},
-                                   {"Text": 'Hello', "Numeric": -1, 'Selection': 'two', 'Date & Time': pendulum.parse("May 1, 2020 12:00 AM -06:00"), 'User/Groups': pytest.newUser2, "Timespan": pytest.delta2, "Numeric List": [
+    pytest.app.records.bulk_create({"Text": 'Hello', "Numeric": 123, 'Selection': 'one', 'Date & Time': pendulum.parse("Apr 1, 2020 12:00 AM -06:00", strict=False), 'User/Groups': pytest.newUser1, "Timespan": pytest.delta1, "Numeric List": [10, 20, 30], "Text List": ['a', 'b', 'c'], "Multi-select": ['Jan', 'Feb'], "Multi-Select User/Groups": [pytest.newUser1, pytest.newUser2]},
+                                   {"Text": 'Hello', "Numeric": -1, 'Selection': 'two', 'Date & Time': pendulum.parse("May 1, 2020 12:00 AM -06:00", strict=False), 'User/Groups': pytest.newUser2, "Timespan": pytest.delta2, "Numeric List": [
                                        10, 20, 30], "Text List": ['x', 'y', 'z'], "Multi-select": ['March', 'April'], "Multi-Select User/Groups": [pytest.newUser3, pytest.newUser2]},
-                                   {"Text": 'Bye', "Numeric": 123, 'Selection': 'four', 'Date & Time': pendulum.parse("Apr 10, 2020 12:00 AM -06:00"), 'User/Groups': pytest.newUser1, "Timespan": pytest.delta2, "Numeric List": [
+                                   {"Text": 'Bye', "Numeric": 123, 'Selection': 'four', 'Date & Time': pendulum.parse("Apr 10, 2020 12:00 AM -06:00", strict=False), 'User/Groups': pytest.newUser1, "Timespan": pytest.delta2, "Numeric List": [
                                        20, 40, 60], "Text List": ['a', 'b', 'c'], "Multi-select": ['Jan', 'Feb', 'March'], "Multi-Select User/Groups": [pytest.newUser1, pytest.newUser2]},
-                                   {"Text": 'Bye', "Numeric": -1, 'Selection': 'two', 'Date & Time': pendulum.parse("May 1, 2020 12:00 AM -06:00"), 'User/Groups': pytest.newUser3, "Timespan": pytest.delta3, "Numeric List": [
+                                   {"Text": 'Bye', "Numeric": -1, 'Selection': 'two', 'Date & Time': pendulum.parse("May 1, 2020 12:00 AM -06:00", strict=False), 'User/Groups': pytest.newUser3, "Timespan": pytest.delta3, "Numeric List": [
                                        10, 20, 30, 90], "Text List": ['a', 'b', 'c', 'd'], "Multi-select": ['Feb', 'March', 'April'], "Multi-Select User/Groups": [pytest.newUser1, pytest.newUser3]},
-                                   {"Text": '123', "Numeric": 0, 'Selection': 'one', 'Date & Time': pendulum.parse("Apr 1, 2020 12:00 AM -06:00"), 'User/Groups': pytest.newUser2, "Timespan": pytest.delta1, "Numeric List": [20, 40, 60], "Text List": ['x', 'y', 'z'], "Multi-select": ['Jan', 'Feb'], "Multi-Select User/Groups": [pytest.newUser1, pytest.newUser3]})
+                                   {"Text": '123', "Numeric": 0, 'Selection': 'one', 'Date & Time': pendulum.parse("Apr 1, 2020 12:00 AM -06:00", strict=False), 'User/Groups': pytest.newUser2, "Timespan": pytest.delta1, "Numeric List": [20, 40, 60], "Text List": ['x', 'y', 'z'], "Multi-select": ['Jan', 'Feb'], "Multi-Select User/Groups": [pytest.newUser1, pytest.newUser3]})
     yield
     # teardown stuff
     helpers.cleanupData()
@@ -456,28 +456,28 @@ class TestAppReportsDateTimeFiltering():
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         report.filter('Date & Time', 'equals', pendulum.parse(
-            "May 1, 2020 12:00 AM -06:00"))
+            "May 1, 2020 12:00 AM -06:00", strict=False))
         assert len(report) == 2
         for record in report:
             assert record['Date & Time'] == pendulum.parse(
-                "May 1, 2020 12:00 AM -06:00")
+                "May 1, 2020 12:00 AM -06:00", strict=False)
 
     def test_date_time_does_not_equal(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         report.filter('Date & Time', 'doesNotEqual',
-                      pendulum.parse("May 1, 2020 12:00 AM -06:00"))
+                      pendulum.parse("May 1, 2020 12:00 AM -06:00", strict=False))
         assert len(report) == 3
         for record in report:
             assert record['Date & Time'] != pendulum.parse(
-                "May 1, 2020 12:00 AM -06:00")
+                "May 1, 2020 12:00 AM -06:00", strict=False)
 
     @pytest.mark.xfail(reason="SPT-6389: This actually processes, contains should only work on multi-select fields")
     def test_date_time_contains(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         report.filter('Date & Time', 'contains',
-                      pendulum.parse("May 1, 2020 12:00 AM -06:00"))
+                      pendulum.parse("May 1, 2020 12:00 AM -06:00"), strict=False)
         assert len(report) == 2
 
     @pytest.mark.xfail(reason="SPT-6389: This actually processes, excludes should only work on multi-select fields")
@@ -485,48 +485,48 @@ class TestAppReportsDateTimeFiltering():
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         report.filter('Date & Time', 'excludes',
-                      pendulum.parse("May 1, 2020 12:00 AM -06:00"))
+                      pendulum.parse("May 1, 2020 12:00 AM -06:00", strict=False))
         assert len(report) == 3
 
     def test_date_time_less_than(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         report.filter('Date & Time', 'lessThan', pendulum.parse(
-            "Apr 10, 2020 12:00 AM -06:00"))
+            "Apr 10, 2020 12:00 AM -06:00", strict=False))
         assert len(report) == 2
         for record in report:
             assert record['Date & Time'] < pendulum.parse(
-                "Apr 10, 2020 12:00 AM -06:00")
+                "Apr 10, 2020 12:00 AM -06:00", strict=False)
 
     def test_date_time_greater_than(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         report.filter('Date & Time', 'greaterThan',
-                      pendulum.parse("Apr 10, 2020 12:00 AM -06:00"))
+                      pendulum.parse("Apr 10, 2020 12:00 AM -06:00", strict=False))
         assert len(report) == 2
         for record in report:
             assert record['Date & Time'] > pendulum.parse(
-                "Apr 10, 2020 12:00 AM -06:00")
+                "Apr 10, 2020 12:00 AM -06:00", strict=False)
 
     def test_date_time_less_than_or_equal(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         report.filter('Date & Time', 'lessThanOrEqual',
-                      pendulum.parse("Apr 10, 2020 12:00 AM -06:00"))
+                      pendulum.parse("Apr 10, 2020 12:00 AM -06:00", strict=False))
         assert len(report) == 3
         for record in report:
             assert record['Date & Time'] <= pendulum.parse(
-                "Apr 10, 2020 12:00 AM -06:00")
+                "Apr 10, 2020 12:00 AM -06:00", strict=False)
 
     def test_date_time_greater_than_or_equal(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         report.filter('Date & Time', 'greaterThanOrEqual',
-                      pendulum.parse("Apr 10, 2020 12:00 AM -06:00"))
+                      pendulum.parse("Apr 10, 2020 12:00 AM -06:00", strict=False))
         assert len(report) == 3
         for record in report:
             assert record['Date & Time'] >= pendulum.parse(
-                "Apr 10, 2020 12:00 AM -06:00")
+                "Apr 10, 2020 12:00 AM -06:00", strict=False)
 
 
 class TestAppReportsTimespanFiltering():
@@ -750,7 +750,7 @@ class TestAppReportsOddFieldsFiltering():
         assert len(report) == 2
         for record in report:
             assert record['Attachment'] == pendulum.parse(
-                "May 1, 2020 12:00 AM -06:00")
+                "May 1, 2020 12:00 AM -06:00", strict=False)
 
     @pytest.mark.xfail(reason="SPT-6389: This actually processes, the pyDriver should be throwing an error")
     def test_comments_contains(helpers):
@@ -760,7 +760,7 @@ class TestAppReportsOddFieldsFiltering():
         assert len(report) == 2
         for record in report:
             assert record['Comments'] == pendulum.parse(
-                "May 1, 2020 12:00 AM -06:00")
+                "May 1, 2020 12:00 AM -06:00", strict=False)
 
     @pytest.mark.xfail(reason="SPT-6389: This actually processes, the pyDriver should be throwing an error")
     def test_references_contains(helpers):
@@ -770,4 +770,4 @@ class TestAppReportsOddFieldsFiltering():
         assert len(report) == 2
         for record in report:
             assert record['Reference'] == pendulum.parse(
-                "May 1, 2020 12:00 AM -06:00")
+                "May 1, 2020 12:00 AM -06:00", strict=False)
