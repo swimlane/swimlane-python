@@ -59,7 +59,7 @@ class Record(APIResource):
         self._fields = {}
         self.__premap_fields()
 
-        self.__existing_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
+        self.__existing_values = {k: self.get_field(k).get_batch_representation() for k in self}
         self._comments_modified = False
 
         self.locked = False
@@ -91,7 +91,7 @@ class Record(APIResource):
 
     def __iter__(self):
         for field_name, field in six.iteritems(self._fields):
-            yield field_name, field.get_python()
+            yield field_name
 
     def __hash__(self):
         return hash((self.id, self.app))
