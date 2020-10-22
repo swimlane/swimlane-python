@@ -5,7 +5,7 @@ from swimlane.core.resources.attachment import Attachment
 
 
 class AttachmentCursor(FieldCursor):
-    """Allows creation and iteration of attachments"""
+    """Allows creation, deletion, and iteration of attachments"""
 
     def add(self, filename, stream, content_type=None):
         """Upload a new attachment, and add it to current fields raw data to be persisted on save
@@ -33,6 +33,24 @@ class AttachmentCursor(FieldCursor):
         self._sync_field()
 
         return attachment
+
+    def delete(self, attachment):
+        """Deletes an attachment and removes it from the current field to be persisted on save
+
+        Args:
+            attachment (swimlane.core.resources.attachment.Attachment): Abstraction of an attachment from an AttachmentsField
+        """
+        
+        file_id = attachment.file_id
+        response = self._record._swimlane.request(
+            'DELETE',
+            'attachment/{}'.format(file_id)
+        )
+
+        self._elements.remove(attachment)
+
+        self._sync_field()
+
 
 
 class AttachmentsField(MultiSelectField):
