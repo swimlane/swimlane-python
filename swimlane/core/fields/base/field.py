@@ -46,6 +46,10 @@ class Field(SwimlaneResolver):
         """Default getter used for both representations unless overridden"""
         return self._value
 
+    def get_item(self):
+        """Return best python representation of field value for get attribute method"""
+        return self.get_python()
+
     def get_python(self):
         """Return best python representation of field value"""
         return self._get()

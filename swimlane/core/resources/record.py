@@ -1,9 +1,7 @@
 import copy
 from functools import total_ordering
-
 import pendulum
 import six
-
 from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.usergroup import UserGroup, User
 from swimlane.exceptions import UnknownField, ValidationError
@@ -84,7 +82,7 @@ class Record(APIResource):
         self.get_field(field_name).set_python(value)
 
     def __getitem__(self, field_name):
-        return self.get_field(field_name).get_python()
+        return self.get_field(field_name).get_item()
 
     def __delitem__(self, field_name):
         self[field_name] = None
@@ -223,8 +221,7 @@ class Record(APIResource):
 
         copy_raw = copy.copy(self._raw)
 
-        pending_values = {k: self.get_field(
-            k).get_batch_representation() for (k, v) in self}
+        pending_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
         patch_values = {
             self.get_field(k).id: pending_values[k] for k in set(pending_values) & set(self.__existing_values)
             if pending_values[k] != self.__existing_values[k]
@@ -382,7 +379,6 @@ class Record(APIResource):
 
         self._raw['allowed'] = allowed
 
-
     def lock(self):
         """
         Lock the record to the Current User.
@@ -395,8 +391,6 @@ class Record(APIResource):
         Args:
 
         """
-
-
         self.validate()
         response = self._swimlane.request(
             'post',
