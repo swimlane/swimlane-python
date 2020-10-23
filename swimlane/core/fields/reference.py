@@ -1,8 +1,6 @@
 import logging
-
 import six
 from sortedcontainers import SortedDict
-
 from swimlane.core.fields.base import CursorField, FieldCursor
 from swimlane.core.resources.record import Record
 from swimlane.exceptions import ValidationError, SwimlaneHTTP400Error
@@ -15,7 +13,6 @@ class ReferenceCursor(FieldCursor):
 
     def __init__(self, *args, **kwargs):
         super(ReferenceCursor, self).__init__(*args, **kwargs)
-
         self._elements = self._elements or SortedDict()
 
     @property
@@ -25,9 +22,7 @@ class ReferenceCursor(FieldCursor):
 
     def _evaluate(self):
         """Scan for orphaned records and retrieve any records that have not already been grabbed"""
-
         retrieved_records = SortedDict()
-
         for record_id, record in six.iteritems(self._elements):
             if record is self._field._unset:
                 # Record has not yet been retrieved, get it
@@ -41,7 +36,6 @@ class ReferenceCursor(FieldCursor):
             retrieved_records[record_id] = record
 
         self._elements = retrieved_records
-
         return self._elements.values()
 
     def add(self, record):
@@ -65,7 +59,6 @@ class ReferenceField(CursorField):
 
     def __init__(self, *args, **kwargs):
         super(ReferenceField, self).__init__(*args, **kwargs)
-
         self.__target_app_id = self.field_definition['targetId']
         self.__target_app = None
 
@@ -130,31 +123,21 @@ class ReferenceField(CursorField):
             self.validate_value(record)
             records[record.id] = record
 
-        return_value = self._set(records)
+        self._set(records)
         self.record._raw['values'][self.id] = self.get_swimlane()
-
-        return return_value
 
     def get_swimlane(self):
         """Return list of record ids"""
         value = super(ReferenceField, self).get_swimlane()
         if value:
             ids = list(value.keys())
+            return ids if self.multiselect else ids[0]
 
-            if self.multiselect:
-                return ids
-
-            return ids[0]
-
-        return None
-
-    def get_python(self):
+    def get_item(self):
         """Return cursor if multi-select, direct value if single-select"""
         cursor = super(ReferenceField, self).get_python()
-
         if self.multiselect:
             return cursor
-
         else:
             try:
                 return cursor[0]

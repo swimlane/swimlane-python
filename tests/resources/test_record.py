@@ -1,10 +1,8 @@
-import copy
 import json
 import pendulum
-
 import mock
 import pytest
-
+from swimlane.core.fields.reference import ReferenceCursor
 from swimlane.core.adapters import RecordRevisionAdapter
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.exceptions import UnknownField, ValidationError
@@ -227,7 +225,10 @@ class TestRecord(object):
 
         for field_name, field_value in mock_record:
             num_fields += 1
-            assert field_value == mock_record[field_name]
+            if isinstance(field_value, ReferenceCursor) and not field_value._field.multiselect:
+                assert mock_record[field_name] is None
+            else:
+                assert field_value == mock_record[field_name]
 
         assert num_fields > 0
 
