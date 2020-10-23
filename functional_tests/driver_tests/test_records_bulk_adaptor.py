@@ -481,7 +481,7 @@ class TestRecordAdaptorBulkModifyAppend:
         assert len(pytest.app.records.search(
             ('Text', 'contains', "glow"))) == initialRecords + alreadyHaveGlow
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_append_numeric(helpers):
         pytest.app.records.bulk_create({'Numeric': 123}, {'Numeric': 123}, {
                                        'Numeric': 123}, {'Numeric': 1234})
@@ -494,7 +494,7 @@ class TestRecordAdaptorBulkModifyAppend:
         assert len(pytest.app.records.search(
             ('Numeric', 'equals', 128))) == initialRecords
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_append_selection(helpers):
         pytest.app.records.bulk_create({'Selection': 'New Value'}, {'Selection': 'New Value'}, {
                                        'Selection': 'New Value'}, {'Selection': 'New Value'})
@@ -521,7 +521,7 @@ class TestRecordAdaptorBulkModifyAppend:
         assert len(pytest.app.records.search(
             ('Multi-select', 'contains', ["two"]))) == initialRecords
 
-    @pytest.mark.xfail(reason="SPT-????: IS the bulk modify not working for text list???")
+    @pytest.mark.xfail(reason="SPT-7933: IS the bulk modify not working for text list")
     def test_record_bulk_modify_append_text_list(helpers):
         pytest.app.records.bulk_create({'Text List': ['hello']}, {'Text List': ['hello', 'goodbye']}, {
                                        'Text List': ['goodbye']}, {'Text List': ['hello', 'goodbye', 'fred']})
@@ -562,7 +562,7 @@ class TestRecordAdaptorBulkModifyAppend:
         assert len(pytest.app.records.search(
             ('Multi-Select Users', 'contains', [swimUser2]))) == initialRecords
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_append_date_time(helpers):
         baseDate = pendulum.now()
         pytest.app.records.bulk_create({'Date & Time': baseDate}, {'Date & Time': baseDate}, {
@@ -576,7 +576,7 @@ class TestRecordAdaptorBulkModifyAppend:
         assert len(pytest.app.records.search(
             ('Date & Time', 'equals', baseDate))) == 0
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_append_first_created(helpers):
         baseDate = pendulum.now()
         changeDate = pendulum.tomorrow()
@@ -591,7 +591,7 @@ class TestRecordAdaptorBulkModifyAppend:
         assert len(pytest.app.records.search(
             ('First Created', 'equals', changeDate))) == 0
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_append_last_updated(helpers):
         baseDate = pendulum.now()
         changeDate = pendulum.tomorrow()
@@ -606,7 +606,7 @@ class TestRecordAdaptorBulkModifyAppend:
         assert len(pytest.app.records.search(
             ('Last Updated', 'equals', changeDate))) == 0
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_append_created_by(helpers):
         swimUser = pytest.swimlane_instance.users.get(
             display_name=pytest.tempUser1['displayName'])
@@ -624,7 +624,7 @@ class TestRecordAdaptorBulkModifyAppend:
         assert len(pytest.app.records.search(
             ('Created by', 'equals', swimUser))) == initialRecords + alreadySetRecords
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_append_last_updated_by(helpers):
         swimUser = pytest.swimlane_instance.users.get(
             display_name=pytest.tempUser1['displayName'])
@@ -664,7 +664,7 @@ class TestRecordAdaptorBulkModifyAppend:
         assert str(
             excinfo.value) == 'Field \'Attachment\' of Type \'AttachmentsField\', is not supported for bulk modify'
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, but the passed in targetRecord, which is a record class, thinks it is a tuple??")
+    @pytest.mark.xfail(reason="SPT-7932: There was no error about the field type, but the passed in targetRecord, which is a record class, thinks it is a tuple??")
     def test_record_bulk_modify_append_references(helpers):
         baseText = "Has Reference"
         pytest.app.records.bulk_create({'Text': baseText}, {'Text': baseText}, {
@@ -689,7 +689,7 @@ class TestRecordAdaptorBulkModifyRemove:
         assert len(pytest.app.records.search(
             ('Text', 'contains', "hello"))) == 0
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_remove_numeric(helpers):
         pytest.app.records.bulk_create({'Numeric': 123}, {'Numeric': 123}, {
                                        'Numeric': 123}, {'Numeric': 1234})
@@ -698,7 +698,7 @@ class TestRecordAdaptorBulkModifyRemove:
         pytest.waitOnJobByID(records)
         assert len(pytest.app.records.search(('Numeric', 'equals', 123))) == 0
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_remove_selection(helpers):
         pytest.app.records.bulk_create({'Selection': 'New Value'}, {'Selection': 'New Value'}, {
                                        'Selection': 'New Value'}, {'Selection': 'New Value'})
@@ -722,7 +722,7 @@ class TestRecordAdaptorBulkModifyRemove:
         assert len(pytest.app.records.search(
             ('Multi-select', 'contains', ["three"]))) == 0
 
-    @pytest.mark.xfail(reason="SPT-????: IS the bulk modify not removing text list item if it is the last item???")
+    @pytest.mark.xfail(reason="SPT-7929: IS the bulk modify not removing text list item if it is the last item")
     def test_record_bulk_modify_remove_text_list(helpers):
         pytest.app.records.bulk_create({'Text List': ['bob']}, {'Text List': ['bob', 'goodbye']}, {
                                        'Text List': ['bob']}, {'Text List': ['bob', 'goodbye', 'fred']})
@@ -732,7 +732,7 @@ class TestRecordAdaptorBulkModifyRemove:
         assert len(pytest.app.records.search(
             ('Text List', 'contains', ["bob"]))) == 0
 
-    @pytest.mark.xfail(reason="SPT-????: IS the bulk modify not removing numeric list item if it is the last item???")
+    @pytest.mark.xfail(reason="SPT-7929: IS the bulk modify not removing numeric list item if it is the last item")
     def test_record_bulk_modify_remove_numeric_list(helpers):
         pytest.app.records.bulk_create({'Numeric List': [123]}, {'Numeric List': [123, 456]}, {
                                        'Numeric List': [456, 123]}, {'Numeric List': [123, 456, 789]})
@@ -758,7 +758,7 @@ class TestRecordAdaptorBulkModifyRemove:
         assert len(pytest.app.records.search(
             ('Multi-Select Users', 'contains', [swimUser2]))) == initialRecords
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_remove_date_time(helpers):
         baseDate = pendulum.now()
         pytest.app.records.bulk_create({'Date & Time': baseDate}, {'Date & Time': baseDate}, {
@@ -772,7 +772,7 @@ class TestRecordAdaptorBulkModifyRemove:
         assert len(pytest.app.records.search(
             ('Date & Time', 'equals', baseDate))) == 0
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_remove_first_created(helpers):
         baseDate = pendulum.now()
         pytest.app.records.bulk_create({'Date & Time': baseDate}, {'Date & Time': baseDate}, {
@@ -787,7 +787,7 @@ class TestRecordAdaptorBulkModifyRemove:
         assert len(pytest.app.records.search(
             ('First Created', 'equals', createdDate))) == 0
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_remove_last_updated(helpers):
         baseDate = pendulum.now()
         pytest.app.records.bulk_create({'Date & Time': baseDate}, {'Date & Time': baseDate}, {
@@ -802,7 +802,7 @@ class TestRecordAdaptorBulkModifyRemove:
         assert len(pytest.app.records.search(
             ('Last Updated', 'equals', updatedDate))) == 0
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_remove_created_by(helpers):
         defaultText = "remove created by"
         pytest.app.records.bulk_create({'Text': defaultText}, {'Text': defaultText}, {
@@ -819,7 +819,7 @@ class TestRecordAdaptorBulkModifyRemove:
         assert len(pytest.app.records.search(
             ('Created by', 'equals', None))) == len(initialRecords) + alreadySetRecords
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, nor any changes to the value")
+    @pytest.mark.xfail(reason="SPT-7928: There was no error about the field type, nor any changes to the value")
     def test_record_bulk_modify_remove_last_updated_by(helpers):
         defaultText = "remove last updated by"
         pytest.app.records.bulk_create({'Text': defaultText}, {'Text': defaultText}, {
@@ -858,7 +858,7 @@ class TestRecordAdaptorBulkModifyRemove:
         assert str(
             excinfo.value) == 'Field \'Attachment\' of Type \'AttachmentsField\', is not supported for bulk modify'
 
-    @pytest.mark.xfail(reason="SPT-????: There was no error about the field type, but the passed in targetRecord, which is a record class, thinks it is a tuple??")
+    @pytest.mark.xfail(reason="SPT-7932: There was no error about the field type, but the passed in targetRecord, which is a record class, thinks it is a tuple??")
     def test_record_bulk_modify_remove_references(helpers):
         baseText = "Has Reference"
         pytest.app.records.bulk_create({'Text': baseText}, {'Text': baseText}, {
