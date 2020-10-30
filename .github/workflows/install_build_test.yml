@@ -17,6 +17,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+    - name: Environment 01
+      run: ${{ matrix.runtime }} -m pip install --upgrade setuptools
     - name: Install requirements
       run: ${{ matrix.runtime }} -m pip install -U -r requirements.txt -r test-requirements.txt
     - name: Install Codacy coverage
