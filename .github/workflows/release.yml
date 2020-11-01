@@ -3,8 +3,8 @@ name: "Release"
 on:
   push:
     branches: [master, kraken/story/SPT-7975/SPT-7983]
-  tags:
-    - 'v*'
+    tags:
+      - 'v*'
 
 jobs:
   create-release:
