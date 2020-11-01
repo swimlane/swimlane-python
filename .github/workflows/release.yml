@@ -1,0 +1,66 @@
+name: "Release"
+
+on:
+  push:
+    branches: [master]
+  tag:
+    - *
+
+jobs:
+  create-release:
+    name: Create Release
+    id: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+  build-installers:
+    need: create-release
+    name: Build and upload offline installers.
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: [2.7, 3.6]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Build off-line installer
+      id: build
+      run: |
+        output=$(python offline_installer/build.py)
+        echo "::set-output name=file_name::$output"
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ create-release.steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/${{ steps.build.outputs.file_name }}
+        asset_name: ${{ steps.build.outputs.file_name }}
+        asset_content_type: application/zip
+
+#    - name: Install dependencies
+#      run: |
+#        python -m pip install --upgrade pip setuptools
+#        python -m pip install -U -r requirements.txt
+#    - name: Build
+#      run: python setup.py sdist bdist_wheel
+#    - name: Publish PyPi
+#      env:
+#        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+#        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+#      run: twine upload dist/*
+
