@@ -22,7 +22,7 @@ jobs:
           draft: false
           prerelease: false
   build-installers:
-    need: create-release
+    needs: create-release
     name: Build and upload offline installers.
     runs-on: ${{ matrix.os }}
     strategy:
