@@ -4,7 +4,7 @@ on:
   push:
     branches: [master, kraken/story/SPT-7975/SPT-7983]
   tag:
-    - *
+    - 'v*'
 
 jobs:
   create-release:
