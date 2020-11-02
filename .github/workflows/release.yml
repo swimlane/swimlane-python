@@ -56,6 +56,7 @@ jobs:
         asset_name: ${{ steps.build.outputs.file_name }}
         asset_content_type: application/zip
     - id: tag_version
+      shell: bash
       run: |
         output=$(${{ github.ref }} | cut -c2-)
         echo "::set-output name=version::$output"
@@ -63,15 +64,15 @@ jobs:
       id: s3
       if: matrix.os == 'windows-latest' && matrix.python-version == '2.7'
       uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read
-        env:
-          AWS_S3_BUCKET: swimlane-builds
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'us-west-2'
-          SOURCE_DIR: ./dist/${{ steps.build.outputs.file_name }}
-          DEST_DIR: python_driver/${{ steps.tag_version.outputs.version }}
+      with:
+        args: --acl public-read
+      env:
+        AWS_S3_BUCKET: swimlane-builds
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'us-west-2'
+        SOURCE_DIR: ./dist/${{ steps.build.outputs.file_name }}
+        DEST_DIR: python_driver/${{ steps.tag_version.outputs.version }}
 
 #    - name: Install dependencies
 #      run: |
