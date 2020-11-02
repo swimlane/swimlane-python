@@ -55,11 +55,6 @@ jobs:
         asset_path: ./dist/${{ steps.build.outputs.file_name }}
         asset_name: ${{ steps.build.outputs.file_name }}
         asset_content_type: application/zip
-    - id: tag_version
-      shell: bash
-      run: |
-        output=$(echo "${{ github.ref }}" | cut -c12-)
-        echo "::set-output name=version::$output"
     - name: Upload windows package to S3
       id: s3
       if: matrix.os == 'windows-latest' && matrix.python-version == '2.7'
@@ -68,7 +63,7 @@ jobs:
         aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
         aws_bucket: swimlane-builds
-        source_dir: ./dist/${{ steps.build.outputs.file_name }}
+        source_dir: ./dist
         destination_dir: python_driver/${{ steps.tag_version.outputs.version }}
 
 
