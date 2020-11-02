@@ -58,7 +58,7 @@ jobs:
     - id: tag_version
       shell: bash
       run: |
-        output=$("${{ github.ref }}" | cut -c12-)
+        output=$(echo "${{ github.ref }}" | cut -c12-)
         echo "::set-output name=version::$output"
     - name: Upload windows package to S3
       id: s3
