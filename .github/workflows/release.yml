@@ -2,7 +2,7 @@ name: "Release"
 
 on:
   push:
-    branches: [master, kraken/story/SPT-7975/SPT-7983]
+    branches: [kraken/story/SPT-7975/SPT-7983]
     tags:
       - 'v*'
 
@@ -43,9 +43,13 @@ jobs:
         python -m pip install wheel
     - name: Build off-line installer
       id: build
-      run: |
-        output=$(python offline_installer/build.py)
-        echo "::set-output name=file_name::$output"
+      run: python offline_installer/build.py
+    - name: Get file name action
+      id: pl
+      uses: Rishabh510/Path-lister-action@master
+      with:
+        path: "./dist/"
+        type: ".pyz"
     - name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
@@ -53,8 +57,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.create-release.outputs.url }}
-        asset_path: ./dist/${{ steps.build.outputs.file_name }}
-        asset_name: ${{ steps.build.outputs.file_name }}
+        asset_path: ${{ steps.pl.outputs.paths[0] }}
+        asset_name: ${{ steps.pl.outputs.paths[0] }}
         asset_content_type: application/zip
 
 #    - name: Install dependencies
