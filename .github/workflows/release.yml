@@ -55,6 +55,11 @@ jobs:
         asset_path: ./dist/${{ steps.build.outputs.file_name }}
         asset_name: ${{ steps.build.outputs.file_name }}
         asset_content_type: application/zip
+    - id: tag_version
+      shell: bash
+      run: |
+        output=$(echo "${{ github.ref }}" | cut -c12-)
+        echo "::set-output name=version::$output"
     - name: Upload windows package to S3
       id: s3
       if: matrix.os == 'windows-latest' && matrix.python-version == '2.7'
