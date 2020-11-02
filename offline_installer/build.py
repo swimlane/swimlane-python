@@ -20,14 +20,14 @@ CACHE_DIR = tempfile.mkdtemp()
 
 os.chdir(ROOT_DIR)
 cmd = 'pip --cache-dir="{cache}" wheel --no-deps -w "{deps_dir}" .'.format(deps_dir=ALL_DEPS_DIR, cache=CACHE_DIR)
-subprocess.check_call(cmd, stdout=subprocess.DEVNULL, shell=True)
+subprocess.check_output(cmd, shell=True)
 swimlane_whl = glob.glob(path.join(ALL_DEPS_DIR, 'swimlane-*'))[0]
 swimlane_version = swimlane_whl.split('/')[-1].split('-')[1]
 
 os.chdir(ALL_DEPS_DIR)
 cmd = 'pip --cache-dir="{cache_dir}"  download -r {requirements} --prefer-binary'\
     .format(cache_dir=CACHE_DIR, requirements=path.join(ROOT_DIR, 'requirements.txt'))
-subprocess.check_call(cmd, stdout=subprocess.DEVNULL, shell=True)
+subprocess.check_output(cmd, shell=True)
 
 DIST_DIR = path.join(ROOT_DIR, 'dist')
 if not path.isdir(DIST_DIR):
