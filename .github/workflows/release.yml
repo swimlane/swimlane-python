@@ -2,7 +2,6 @@ name: "Release"
 
 on:
   push:
-    branches: [kraken/story/SPT-7975/SPT-7983]
     tags:
       - 'v*'
 
