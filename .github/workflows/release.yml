@@ -2,8 +2,7 @@ name: "Release"
 
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ['v*']
 
 jobs:
   create-release:
@@ -42,13 +41,10 @@ jobs:
         python -m pip install wheel
     - name: Build off-line installer
       id: build
-      run: python offline_installer/build.py
-    - name: Get file name action
-      id: pl
-      uses: Rishabh510/Path-lister-action@master
-      with:
-        path: "./dist/"
-        type: ".pyz"
+      shell: bash
+      run: |
+        output=$(python offline_installer/build.py)
+        echo "::set-output name=file_name::$output"
     - name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
@@ -56,8 +52,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.create-release.outputs.url }}
-        asset_path: ${{ steps.pl.outputs.paths }}
-        asset_name: ${{ steps.pl.outputs.paths }}
+        asset_path: ./dist/${{ steps.build.outputs.file_name }}
+        asset_name: ${{ steps.build.outputs.file_name }}
         asset_content_type: application/zip
 
 #    - name: Install dependencies
