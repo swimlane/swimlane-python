@@ -69,12 +69,13 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.python-version == '2.7'
       uses: swimlane/s3-upload-file-action@main
       with:
-        aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws_region: 'us-west-2'
         aws_bucket: swimlane-builds
         file_path: ./dist/${{ steps.build.outputs.file_name }}
-        destination_dir: python_driver/${{ steps.tag_version.outputs.version }}
+        file_mime_type: 'application/zip'
+        dest_dir: python_driver/${{ steps.tag_version.outputs.version }}
 
 #    - name: Install dependencies
 #      run: |
