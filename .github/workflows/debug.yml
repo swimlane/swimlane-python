@@ -1,0 +1,30 @@
+name: "Debug"
+
+on:
+  push:
+    branches: [kraken/story/SPT-7975/SPT-7983]
+
+jobs:
+  show:
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+            echo "${{ steps.tag_version.outputs.version }}"
+            echo $AWS_ACCESS_KEY_ID
+            echo $AWS_SECRET_ACCESS_KEY
+#      - name: Upload windows package to S3
+#        id: s3
+#        if: matrix.os == 'windows-latest' && matrix.python-version == '2.7'
+#        uses: shallwefootball/s3-upload-action@master
+#        with:
+#          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws_bucket: swimlane-builds
+#          source_dir: ./dist
+#          destination_dir: python_driver/${{ steps.tag_version.outputs.version }}
+
+
