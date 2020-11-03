@@ -1,4 +1,4 @@
-name: "Release"
+name: "Release on Tag"
 
 on:
   push:
@@ -67,7 +67,7 @@ jobs:
     - name: Upload windows package to S3
       id: s3
       if: matrix.os == 'windows-latest' && matrix.python-version == '2.7'
-      uses: swimlane/s3-upload-file-action@master
+      uses: swimlane/s3-upload-file-action@main
       with:
         aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -75,10 +75,6 @@ jobs:
         aws_bucket: swimlane-builds
         file_path: ./dist/${{ steps.build.outputs.file_name }}
         destination_dir: python_driver/${{ steps.tag_version.outputs.version }}
-
-
-#        AWS_REGION: 'us-west-2'
-
 
 #    - name: Install dependencies
 #      run: |
