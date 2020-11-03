@@ -67,12 +67,13 @@ jobs:
     - name: Upload windows package to S3
       id: s3
       if: matrix.os == 'windows-latest' && matrix.python-version == '2.7'
-      uses: shallwefootball/s3-upload-action@master
+      uses: swimlane/s3-upload-file-action@master
       with:
         aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_region: 'us-west-2'
         aws_bucket: swimlane-builds
-        source_dir: ./dist
+        file_path: ./dist/${{ steps.build.outputs.file_name }}
         destination_dir: python_driver/${{ steps.tag_version.outputs.version }}
 
 
