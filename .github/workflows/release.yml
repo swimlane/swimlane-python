@@ -1,10 +1,14 @@
-name: "Release on Tag"
+# This workflow is responsible for publishing off-line packages to GitHub and S3
+# The S3 package is only Python 2.7 for windows. Should be removed when we removes support
+# for one of them.
+name: "ReleaseOnTag"
 
 on:
   push:
     tags: ['v*']
 
 jobs:
+# Create release is not matrixed because must only run once.
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
@@ -21,6 +25,7 @@ jobs:
           release_name: ${{ github.ref }}
           draft: false
           prerelease: false
+# Build 4 offline installers in python - os matix.
   build-installers:
     needs: create-release
     name: Build and upload offline installers.
@@ -45,6 +50,7 @@ jobs:
       run: |
         output=$(python offline_installer/build.py)
         echo "::set-output name=file_name::$output"
+# Upload to GitHub releases.
     - name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
@@ -55,15 +61,12 @@ jobs:
         asset_path: ./dist/${{ steps.build.outputs.file_name }}
         asset_name: ${{ steps.build.outputs.file_name }}
         asset_content_type: application/zip
+# The S3 stores folders without v - ergo this step. This is less then ideal, but soon will go away with Windows.
     - id: tag_version
       shell: bash
       run: |
         output=$(echo "${{ github.ref }}" | cut -c12-)
         echo "::set-output name=version::$output"
-    - run: |
-        echo "${{ steps.tag_version.outputs.version }}"
-        echo "${{ secrets.AWS_ACCESS_KEY_ID }}"
-        echo "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
     - name: Upload windows package to S3
       id: s3
       if: matrix.os == 'windows-latest' && matrix.python-version == '2.7'
