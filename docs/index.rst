@@ -129,8 +129,11 @@ Quick Start
     from swimlane import Swimlane
 
 
-    # Connect Swimlane client
+    # Connect Swimlane client outside of Swimlane
     swimlane = Swimlane('https://192.168.1.1', 'username', 'password')
+
+    # Connect Swimlane client from Python task in Swimlane
+    swimlane = Swimlane(sw_context.config['InternalSwimlaneUrl'],'username','password')
 
 
     # Retrieve App by name
