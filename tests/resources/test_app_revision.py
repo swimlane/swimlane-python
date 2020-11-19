@@ -32,7 +32,7 @@ class TestAppRevision(object):
     def test_get_cache_index(self, mock_ar_app_revision):
         keys = mock_ar_app_revision.get_cache_index_keys()
 
-        assert len(keys) is 1
+        assert len(keys) == 1
         assert 'app_id_revision' in keys
         assert keys['app_id_revision'] == 'a34xbNOoo2P3ivyjY --- 3.0'
 

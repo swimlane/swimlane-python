@@ -1,8 +1,6 @@
 import random
-
 import mock
 import pytest
-
 from swimlane.core.client import SwimlaneJwtAuth, Swimlane
 from swimlane.core.resources.app import App
 from swimlane.core.resources.record import Record

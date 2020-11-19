@@ -1,0 +1,94 @@
+# This workflow is responsible for publishing off-line packages to GitHub and S3
+# The S3 package is only Python 2.7 for windows. Should be removed when we removes support
+# for one of them.
+name: "ReleaseOnTag"
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+# Create release is not matrixed because must only run once.
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+# Build 4 offline installers in python - os matix.
+  build-installers:
+    needs: create-release
+    name: Build and upload offline installers.
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: [2.7, 3.6]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install build dependencies.
+      run: |
+        python -m pip install --upgrade pip setuptools
+        python -m pip install wheel
+    - name: Build off-line installer
+      id: build
+      shell: bash
+      run: |
+        output=$(python offline_installer/build.py)
+        echo "::set-output name=file_name::$output"
+# Upload to GitHub releases.
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.url }}
+        asset_path: ./dist/${{ steps.build.outputs.file_name }}
+        asset_name: ${{ steps.build.outputs.file_name }}
+        asset_content_type: application/zip
+# The S3 stores folders without v - ergo this step. This is less then ideal, but soon will go away with Windows.
+    - id: tag_version
+      shell: bash
+      run: |
+        output=$(echo "${{ github.ref }}" | cut -c12-)
+        echo "::set-output name=version::$output"
+    - name: Upload windows package to S3
+      id: s3
+      if: matrix.os == 'windows-latest' && matrix.python-version == '2.7'
+      uses: swimlane/s3-upload-file-action@main
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_region: 'us-west-2'
+        aws_bucket: swimlane-builds
+        file_path: ./dist/${{ steps.build.outputs.file_name }}
+        file_mime_type: 'application/zip'
+        dest_dir: python_driver/${{ steps.tag_version.outputs.version }}
+
+#    - name: Install dependencies
+#      run: |
+#        python -m pip install --upgrade pip setuptools
+#        python -m pip install -U -r requirements.txt
+#    - name: Build
+#      run: python setup.py sdist bdist_wheel
+#    - name: Publish PyPi
+#      env:
+#        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+#        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+#      run: twine upload dist/*
+

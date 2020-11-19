@@ -31,7 +31,7 @@ class TestReferenceField(object):
         with mock.patch.object(mock_swimlane.apps, 'get', return_value=mock_record.app):
             field = mock_record.get_field(self.single_field_name)
 
-            assert field.get_python() is None
+            assert field.get_item() is None
 
             # Assert setting to None adds the field's key to raw values
             field.set_python(None)
