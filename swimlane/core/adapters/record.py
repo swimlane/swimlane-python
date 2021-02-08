@@ -49,6 +49,8 @@ class RecordAdapter(AppResolver):
             keywords (list(str)): List of strings of keywords to use in report search
             limit (int): Set maximum number of returned Records, defaults to `Report.default_limit`. Set to 0 to return
                 all records
+            page_size: Set the maximum page number of returned records per page, defaults to Report.default_page_size.
+                Set to 0 to return all records
 
         Notes:
             Uses a temporary Report instance with a random name to facilitate search. Records are normally paginated,
@@ -89,7 +91,8 @@ class RecordAdapter(AppResolver):
         report = self._app.reports.build(
             'search-' + random_string(8),
             keywords=kwargs.pop('keywords', []),
-            limit=kwargs.pop('limit', Report.default_limit)
+            limit=kwargs.pop('limit', Report.default_limit),
+            page_size=kwargs.pop('page_size', Report.default_page_size)
         )
 
         for filter_tuples in filters:

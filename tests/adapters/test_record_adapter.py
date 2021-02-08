@@ -1,5 +1,4 @@
 import numbers
-import warnings
 
 import mock
 import pytest
@@ -115,9 +114,15 @@ def test_search(mock_swimlane, mock_app, mock_record):
             '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[Core.Models.Record.Record[], Core]], mscorlib',
             '58e4bb4407637a0e4c4f9873': [mock_record._raw]}}
 
-    with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
+    with mock.patch.object(mock_swimlane, 'request', return_value=mock_response) as mock_func:
         with mock.patch('swimlane.core.adapters.report.Report._parse_raw_element', return_value=mock_record):
-            assert mock_app.records.search(('Tracking Id', 'equals', 'RA-7')) == [mock_record]
+            assert mock_app.records.search(('Tracking Id', 'equals', 'RA-7'), limit=0, page_size=1234) == [mock_record]
+
+    mock_func.assert_called_once_with('post', 'search', json=mock.ANY)
+    call_args, call_kwargs = mock_func.call_args
+    parameter = call_kwargs['json']
+    assert 'pageSize' in parameter
+    assert parameter['pageSize'] == 1234
 
 
 def test_bulk_delete(mock_swimlane, mock_app, mock_record):

@@ -59,10 +59,11 @@ class Report(APIResource, PaginatedCursor):
     )
 
     default_limit = 50
+    default_page_size = 10
 
     def __init__(self, app, raw, **kwargs):
         APIResource.__init__(self, app._swimlane, raw)
-        PaginatedCursor.__init__(self, limit=kwargs.pop('limit', self.default_limit))
+        PaginatedCursor.__init__(self, limit=kwargs.pop('limit', self.default_limit), page_size=kwargs.pop('page_size', self.default_page_size))
 
         self.name = self._raw['name']
         self.keywords = kwargs.pop('keywords', [])

@@ -28,15 +28,13 @@ class PaginatedCursor(Cursor):
     """Handle paginated lists, exposes hooks to simplify retrieval and parsing of paginated data"""
 
     default_limit = 0
-    page_size = 10
+    default_page_size = 10
 
-    def __init__(self, limit=None):
+    def __init__(self, limit=default_limit, page_size=default_page_size):
         super(PaginatedCursor, self).__init__()
 
-        if limit is None:
-            limit = self.default_limit
-
         self.__limit = limit
+        self.page_size = page_size
 
         if self.__limit:
             self.page_size = min(self.page_size, self.__limit)
@@ -58,8 +56,9 @@ class PaginatedCursor(Cursor):
                         break
 
                 if any([
-                    len(raw_elements) < self.page_size,
-                    (self.__limit and len(self._elements) >= self.__limit)
+                    (len(raw_elements) < self.page_size),
+                    (self.__limit and len(self._elements) >= self.__limit),
+                    (self.page_size == 0)
                 ]):
                     break
 
