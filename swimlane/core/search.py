@@ -25,3 +25,7 @@ WEEK = "groupByWeek"
 MONTH = "groupByMonth"
 QUARTER = "groupByQuarter"
 YEAR = "groupByYear"
+
+# Sorts
+ASC = "ascending"
+DESC = "descending"

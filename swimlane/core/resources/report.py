@@ -3,7 +3,7 @@ import pendulum
 from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.record import record_factory
-from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ, LT, GT, LTE, GTE
+from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ, LT, GT, LTE, GTE, ASC, DESC
 
 
 class Report(APIResource, PaginatedCursor):
@@ -42,6 +42,7 @@ class Report(APIResource, PaginatedCursor):
 
     Keyword Args:
         limit (int): Max number of records to return from report/search
+        page_size (int): Max number of records per page
         keywords (list(str)): List of keywords to use in report/search
     """
 
@@ -56,6 +57,11 @@ class Report(APIResource, PaginatedCursor):
         GT,
         LTE,
         GTE
+    )
+
+    _SORT_ORDERS = (
+        ASC,
+        DESC
     )
 
     default_limit = 50
@@ -95,7 +101,7 @@ class Report(APIResource, PaginatedCursor):
         Args:
             field_name (str): Target field name to filter on
             operand (str): Operand used in comparison. See `swimlane.core.search` for options
-            value: Target value used in comparision
+            value: Target value used in comparison
         """
         if operand not in self._FILTER_OPERANDS:
             raise ValueError('Operand must be one of {}'.format(', '.join(self._FILTER_OPERANDS)))
@@ -110,6 +116,21 @@ class Report(APIResource, PaginatedCursor):
             "value": field.get_report(value)
         })
 
+    def sort(self, field_name, order):
+        """Adds a sort to report
+
+        Args:
+            field_name (str): Target field name to sort by
+            order (str): Sort order
+        """
+        if (order not in self._SORT_ORDERS):
+            raise ValueError('Order must be one of {}'.format(', '.join(self._SORT_ORDERS)))
+
+        # Use temp Record instance for target app to translate values into expected API format
+        record_stub = record_factory(self._app)
+        field = record_stub.get_field(field_name)
+
+        self._raw['sorts'][field.id] = order
 
 def report_factory(app, report_name, **kwargs):
     """Report instance factory populating boilerplate raw data
