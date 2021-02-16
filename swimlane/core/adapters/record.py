@@ -49,7 +49,7 @@ class RecordAdapter(AppResolver):
             keywords (list(str)): List of strings of keywords to use in report search
             limit (int): Set maximum number of returned Records, defaults to `Report.default_limit`. Set to 0 to return
                 all records
-            page_size: Set maximum number of returned Records per page, defaults to Report.default_page_size.
+            page_size: Set maximum number of returned Records per page, defaults to 1000.
                 Set to 0 to return all records
             sort: Tuple of (field_name, order) by which results will be sorted
             columns (list(str)): List of strings of field names to populate in the resulting records. Defaults to all
@@ -100,7 +100,7 @@ class RecordAdapter(AppResolver):
             'search-' + random_string(8),
             keywords=kwargs.pop('keywords', []),
             limit=kwargs.pop('limit', Report.default_limit),
-            page_size=kwargs.pop('page_size', Report.default_page_size)
+            page_size=kwargs.pop('page_size', 1000)
         )
 
         for filter_tuples in filters:
