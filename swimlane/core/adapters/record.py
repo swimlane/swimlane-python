@@ -52,6 +52,8 @@ class RecordAdapter(AppResolver):
             page_size: Set maximum number of returned Records per page, defaults to Report.default_page_size.
                 Set to 0 to return all records
             sort: Tuple of (field_name, order) by which results will be sorted
+            columns (list(str)): List of strings of field names to populate in the resulting records. Defaults to all
+                available fields
 
         Notes:
             Uses a temporary Report instance with a random name to facilitate search. Records are normally paginated,
@@ -86,8 +88,8 @@ class RecordAdapter(AppResolver):
 
             ::
 
-                # Sort results
-                records = app.records.search(sort=('field_name', 'ascending'))
+                # Populate only the specified field and sort results
+                records = app.records.search(columns=['field_name'], sort=('field_name', 'ascending'))
 
 
         Returns:
@@ -107,6 +109,10 @@ class RecordAdapter(AppResolver):
         sort_tuple = kwargs.pop('sort', None)
         if sort_tuple:
             report.sort(*sort_tuple)
+
+        columns = kwargs.pop('columns', None)
+        if columns:
+            report.set_columns(*columns)
 
         return list(report)
 
