@@ -135,6 +135,9 @@ class Report(APIResource, PaginatedCursor):
     def set_columns(self, *field_names):
         """Set specified columns for report
 
+        Notes:
+            The Tracking Id column is always included
+
         Args:
             *field_names (str): Zero or more column names
         """
@@ -143,6 +146,9 @@ class Report(APIResource, PaginatedCursor):
             field = self._get_stub_field(field_name)
 
             self._raw['columns'].append(field.id)
+
+        if self._app.tracking_id not in self._raw['columns']:
+            self._raw['columns'].append(self._app.tracking_id)
 
     def _get_stub_field(self, field_name):
         # Use temp Record instance for target app to translate values into expected API format

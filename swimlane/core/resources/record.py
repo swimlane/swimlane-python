@@ -57,6 +57,10 @@ class Record(APIResource):
         self._fields = {}
         self.__premap_fields()
 
+        # Get trackingFull if available
+        if app.tracking_id in self._raw['values']:
+            self._raw['trackingFull'] = self._raw['values'].get(app.tracking_id)
+
         self.__existing_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
         self._comments_modified = False
 
