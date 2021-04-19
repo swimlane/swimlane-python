@@ -38,12 +38,14 @@ class ReferenceCursor(FieldCursor):
         self._elements = retrieved_records
         return self._elements.values()
 
-    def add(self, record):
-        """Add a reference to the provided record"""
-        self._field.validate_value(record)
-        self._elements[record.id] = record
-        self._sync_field()
+    def add(self, *records):
+        """Add a reference to the provided record"""        
+        for record in records:
+            self._field.validate_value(record)
+            self._elements[record.id] = record
 
+        self._sync_field()
+        
     def remove(self, record):
         """Remove a reference to the provided record"""
         self._field.validate_value(record)
