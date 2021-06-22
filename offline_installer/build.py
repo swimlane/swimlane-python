@@ -13,7 +13,7 @@ from os import path
 
 
 PY_VERSION = '{}{}'.format(sys.version_info.major, sys.version_info.minor)
-PY_PLATFORM = 'win_amd64' if platform.system() == 'Windows' else 'linux_x86_64'
+PY_PLATFORM = 'linux_x86_64'
 ROOT_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 ALL_DEPS_DIR = tempfile.mkdtemp()
 CACHE_DIR = tempfile.mkdtemp()
