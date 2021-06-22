@@ -1,6 +1,4 @@
 # This workflow is responsible for publishing off-line packages to GitHub and S3
-# The S3 package is only Python 2.7 for windows. Should be removed when we removes support
-# for one of them.
 name: "ReleaseOnTag"
 
 on:
@@ -32,7 +30,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         python-version: [2.7, 3.6]
     steps:
     - uses: actions/checkout@v2
@@ -61,24 +59,6 @@ jobs:
         asset_path: ./dist/${{ steps.build.outputs.file_name }}
         asset_name: ${{ steps.build.outputs.file_name }}
         asset_content_type: application/zip
-# The S3 stores folders without v - ergo this step. This is less then ideal, but soon will go away with Windows.
-    - id: tag_version
-      shell: bash
-      run: |
-        output=$(echo "${{ github.ref }}" | cut -c12-)
-        echo "::set-output name=version::$output"
-    - name: Upload windows package to S3
-      id: s3
-      if: matrix.os == 'windows-latest' && matrix.python-version == '2.7'
-      uses: swimlane/s3-upload-file-action@main
-      with:
-        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws_region: 'us-west-2'
-        aws_bucket: swimlane-builds
-        file_path: ./dist/${{ steps.build.outputs.file_name }}
-        file_mime_type: 'application/zip'
-        dest_dir: python_driver/${{ steps.tag_version.outputs.version }}
 
 #    - name: Install dependencies
 #      run: |
