@@ -15,6 +15,3 @@ def test_task_init(mock_task, test_data, task_filename):
     assert mock_task.script == task_json.get('action').get('script')
     assert str(mock_task) == task_name
     assert mock_task.__repr__() == '<Task: {task_name}>'.format(task_name=task_name)
-
-def test_task_not_associated_with_an_app():
-    pytest.xfail('Write test.')
