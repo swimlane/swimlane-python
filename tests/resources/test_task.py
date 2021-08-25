@@ -1,9 +1,5 @@
 import json
-from pathlib import Path
-from shutil import copy as cp
 import pytest
-from swimlane.core.resources.app import App
-from swimlane.core.resources.task import Task
 
 @pytest.mark.parametrize('mock_task, task_filename', [
     ('sample_task.json', 'sample_task.json'),
