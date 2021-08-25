@@ -7,3 +7,4 @@ from .usergroup import UserAdapter, GroupAdapter
 from .helper import HelperAdapter
 from .app_revision import AppRevisionAdapter
 from .record_revision import RecordRevisionAdapter
+from .task import TaskAdapter
