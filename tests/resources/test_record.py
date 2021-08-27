@@ -2,10 +2,12 @@ import json
 import pendulum
 import mock
 import pytest
+from requests import Response
 from swimlane.core.fields.reference import ReferenceCursor
 from swimlane.core.adapters import RecordRevisionAdapter
 from swimlane.core.resources.record import Record, record_factory
-from swimlane.exceptions import UnknownField, ValidationError
+from swimlane.exceptions import UnknownField, ValidationError, SwimlaneException
+
 
 
 class TestRecord(object):
@@ -309,3 +311,39 @@ class TestRecord(object):
 
     def test_revisions(self, mock_record):
         assert isinstance(mock_record.revisions, RecordRevisionAdapter)
+
+
+@mock.patch('swimlane.core.adapters.task.TaskAdapter.execute')
+def test_execute_task(mock_task_adapter_execute, mock_record):
+    job_id = 'job_id'
+    mock_job_info = mock.MagicMock(spec=Response)
+    mock_job_info.text = job_id
+    mock_task_adapter_execute.return_value = mock_job_info
+    mock_status = [
+        {'status': 'created', 'job': job_id},
+        {'status': 'inProgress', 'job': job_id},
+        {'status': 'completed', 'job': job_id},
+    ]
+    with mock.patch.object(mock_record.app._swimlane.helpers, 'check_bulk_job_status', return_value=mock_status) as mock_job_status:
+        with mock.patch.object(mock_record, '_Record__request_and_reinitialize') as mock_call_reinit:
+            mock_record.execute_task('task_name')
+            mock_call_reinit.assert_has_calls(calls=[mock.call('get', '/app/{appId}/record/{id}'.format(appId=mock_record.app.id, id=mock_record.id), None)])
+            mock_job_status.assert_has_calls(calls=[mock.call(mock_job_info.text)])
+
+            # Reset mocks
+            mock_call_reinit.reset_mock()
+            mock_job_status.reset_mock()
+            mock_status[2].update({'status': 'failed', 'job': job_id})  # Replace completed status with failed
+            with pytest.raises(SwimlaneException) as exec_info:
+                mock_record.execute_task('task_name')
+            
+            mock_call_reinit.assert_not_called()
+            mock_job_status.assert_has_calls(calls=[mock.call(mock_job_info.text)])
+
+            # Reset mocks
+            mock_call_reinit.reset_mock()
+            mock_job_status.reset_mock()
+            mock_status.pop()  # Remove item so status is less than len of 3, to test timeout
+            mock_record.execute_task('task_name', timeout=3)
+            mock_call_reinit.assert_not_called()
+            assert mock_job_status.call_count == 3

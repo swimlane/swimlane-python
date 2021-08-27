@@ -1,10 +1,14 @@
 import copy
 from functools import total_ordering
+import time
 import pendulum
 import six
 from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.usergroup import UserGroup, User
-from swimlane.exceptions import UnknownField, ValidationError
+from swimlane.exceptions import SwimlaneException, UnknownField, ValidationError
+import swimlane.core.adapters.task  # avoid circular reference
+import swimlane.core.adapters.helper  # avoid circular reference
+
 
 
 @total_ordering
@@ -426,7 +430,22 @@ class Record(APIResource):
           self.locked = False 
           self.locking_user = None
           self.locked_date = None
-
+    
+    def execute_task(self, task_name, timeout=int(20)):
+        job_info = swimlane.core.adapters.task.TaskAdapter(self.app._swimlane).execute(task_name, self._raw)
+        timeout_start = pendulum.now()
+        while pendulum.now() < timeout_start.add(seconds=timeout):
+            status = self.app._swimlane.helpers.check_bulk_job_status(job_info.text)
+            if len(status) >= 3:
+                for item in status:
+                    if item.get('status') == 'completed':
+                        self.__request_and_reinitialize(
+                            'get', '/app/{appId}/record/{id}'.format(appId=self.app.id, id=self.id), None)
+                        timeout = 0
+                    if item.get('status') == 'failed':
+                        raise SwimlaneException('Task failed: {}'.format(item.get('message')))
+            time.sleep(1)
+        
 
 def record_factory(app, fields=None):
     """Return a temporary Record instance to be used for field validation and value parsing
