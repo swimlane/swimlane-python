@@ -3804,12 +3804,12 @@ def random_mock_user(mock_swimlane):
         'userName': 'admin'})
 
 
-@pytest.fixture(name='test_data', autouse=True, scope='module')
+@pytest.fixture(name='test_data', autouse=True)
 def fixture_test_data(tmp_path_factory):
     """
     Copies all files from fixtures/apps and fixtures/tasks folders to tmp_dir.
     """
-    temp_path = tmp_path_factory.mktemp('data', numbered=False)
+    temp_path = tmp_path_factory.mktemp('data')
     app_files = Path(__file__).parent.joinpath('./fixtures/apps').glob('*')
     tasks_files = Path(__file__).parent.joinpath('./fixtures/tasks').glob('*')
     for file_name in app_files:
