@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 import json
 import random
 import string
@@ -9,7 +10,7 @@ from faker import Faker
 from io import BytesIO
 
 pytest.fake = Faker()
-
+file_path = str(Path(__file__).parent)
 
 def pytest_addoption(parser):
     parser.addoption("--url", action="store", default="https://localhost",
@@ -80,7 +81,7 @@ class Helpers:
                     dependentApp = self.appPairings[defaultApp]
                     modifications = [{'field': "name", 'value': "PYTHON-%s" % dependentApp, 'type': "create"}, {'field': "acronym", 'value': generateUniqueAcronym(
                         self.swimlane_instance), 'type': 1}, {'field': "description", 'value': pytest.fake.sentence(), 'type': 1}]
-                    with open('apps/%s.json' % dependentApp) as json_data:
+                    with open('{file_path}/apps/{dependentApp}.json'.format(file_path=file_path, dependentApp=dependentApp)) as json_data:
                         manifest = json.load(json_data)
                     newapp = self.swimlane_instance.request(
                         'post', 'app/import', json={"manifest": manifest, "modifications": modifications}).json()
@@ -88,7 +89,7 @@ class Helpers:
                     self.appIds.append(newapp['application']['id'])
                 modifications = [{'field': "name", 'value': "PYTHON-%s" % defaultApp, 'type': "create"}, {'field': "acronym", 'value': generateUniqueAcronym(
                     self.swimlane_instance), 'type': 1}, {'field': "description", 'value': pytest.fake.sentence(), 'type': 1}]
-                with open('apps/%s.json' % defaultApp) as json_data:
+                with open('{file_path}/apps/{defaultApp}.json'.format(file_path=file_path, defaultApp=defaultApp)) as json_data:
                     manifest = json.load(json_data)
                 if 'Application' in manifest:
                     manifest['Application']['Fields'] = updateRefField(
@@ -237,7 +238,7 @@ class Helpers:
         pytest.groupsCreated = {}
         pytest.usersCreated = {}
         try:
-            with open('apps/%s.relations.json' % appName) as json_data:
+            with open('{file_path}/apps/{appName}.relations.json'.format(file_path=file_path, appName=appName)) as json_data:
                 usersGroups = json.load(json_data)
                 for eachGroup in usersGroups['groups']:
                     new_groups = [i for i in map(lambda arg: {"$type": "Core.Models.Base.Entity, Core", "id":  pytest.groupsCreated['PYTHON-%s' %
@@ -255,7 +256,7 @@ class Helpers:
             print('No users or groups to create')
 
     def loadFileStream(self, filename):
-        with open('fixtures/%s' % filename, 'rb') as file_handle:
+        with open('{file_path}/fixtures/{filename}'.format(file_path=file_path, filename=filename), 'rb') as file_handle:
             data = file_handle.read()
         return BytesIO(data)
 
