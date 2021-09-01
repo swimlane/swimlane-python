@@ -111,6 +111,21 @@ class Helpers:
             else:
                 print(str(E))
                 return app, appId
+    
+    def import_content(self, file_name):
+        with open('{file_path}/content/{file_name}'.format(file_name=file_name, file_path=file_path), 'rb') as file_handle:
+            file_stream = file_handle.read()
+        bytes_stream = BytesIO(file_stream)
+        files = {
+            'file': (file_name, bytes_stream, 'application/octet-stream')
+        }
+        response = self.swimlane_instance.request('post', 'content/import', files=files).json()
+        if response.get('success'):
+            for app in response.get('entities').get('application'):
+                self.appIds.append(app.get('id'))
+        else:
+            print('Failed to import: {}'.format(response.get('errors')))
+        
 
     def createUser(self, username='', groups=None, roles=None):
         password = pytest.fake.password()
