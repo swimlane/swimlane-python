@@ -2327,9 +2327,8 @@ def mock_record(mock_app):
             '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
 
 
-@pytest.fixture
-def mock_user(mock_swimlane):
-    return User(mock_swimlane, {
+def mock_user(swimlane_client):
+    return User(swimlane_client, {
         '$type': 'Core.Models.Identity.ApplicationUser, Core',
         'active': False,
         'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
@@ -2350,6 +2349,11 @@ def mock_user(mock_swimlane):
         'passwordResetRequired': False,
         'roles': [],
         'userName': 'admin'})
+
+
+@pytest.fixture(name='mock_user')
+def fixture_mock_user(mock_swimlane):
+    return mock_user(mock_swimlane)
 
 
 @pytest.fixture
