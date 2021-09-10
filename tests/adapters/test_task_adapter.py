@@ -14,24 +14,21 @@ def fixture_mock_task_adapter(mock_swimlane):
     ('sample_task.json')
     ], indirect=['mock_task'])
 def test_get(mock_task, mock_task_adapter):
-    # Requests mock needs to be installed
-    mock_return_list = [mock_task]
-    with mock.patch.object(mock_task_adapter, 'list', return_value=mock_return_list):
-
+    mock_task_response = mock.Mock(spec=Response)
+    with mock.patch.object(mock_task_adapter._swimlane, 'request', return_value=mock_task_response):
+        mock_task_response.status_code = 200
+        mock_task_response.json.return_value = mock_task._raw
         # Test by id
         task = mock_task_adapter.get(id=mock_task.id)
         assert task.id == mock_task.id
 
+
+    mock_return_list = [mock_task]
+    with mock.patch.object(mock_task_adapter, 'list', return_value=mock_return_list):
         # Test by Name
         task = mock_task_adapter.get(name=mock_task.name)
         assert task.name == mock_task.name
 
-        # Test id not found raises ValueError
-        id_does_not_exist = 'id_does_not_exist'
-        with pytest.raises(ValueError) as exec_info:
-            mock_task_adapter.get(id=id_does_not_exist)
-        
-        assert str(exec_info.value) == str(ValueError('No task with id "{}"'.format(id_does_not_exist)))
 
         # Test name not found raises ValueError
         name_does_not_exist = 'name_does_not_exist'

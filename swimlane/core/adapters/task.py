@@ -11,14 +11,12 @@ class TaskAdapter(SwimlaneResolver):
     @one_of_keyword_only('id', 'name')
     def get(self, key, value):
         """Get a single task by id or name"""
-        task_list = self.list()
         if key == 'id':
-            for task in task_list:
-                if value == task.id:
-                    return task
-            raise ValueError('No task with id "{value}"'.format(value=value))
+            response = self._swimlane.request('get', 'task/{value}'.format(value=value))
+            return Task(self._swimlane, response.json())
+
         if key == 'name':
-            for task in task_list:
+            for task in self.list():
                 if value == task.name:
                     return task
             raise ValueError('No task with name "{value}"'.format(value=value))
