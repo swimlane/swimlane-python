@@ -16,9 +16,10 @@ class TaskAdapter(SwimlaneResolver):
             return Task(self._swimlane, response.json())
 
         if key == 'name':
-            for task in self.list():
-                if value == task.name:
-                    return task
+            response = self._swimlane.request('get', 'task/light')
+            for task in response.json():
+                if value == task.get('name'):
+                    return self._get_full(task.get('id'))
             raise ValueError('No task with name "{value}"'.format(value=value))
 
     def list(self):
