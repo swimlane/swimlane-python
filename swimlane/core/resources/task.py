@@ -14,5 +14,3 @@ class Task(APIResource):
     def __str__(self):
         return '{self.name}'.format(self=self)
 
-    def __hash__(self):
-        return hash((self.app_id, self.id, self.name, self.script))

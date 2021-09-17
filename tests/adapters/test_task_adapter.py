@@ -91,5 +91,8 @@ def test_get_full(mock_task, mock_task_adapter):
         mock_response.json.return_value = mock_task._raw
         task_object = mock_task_adapter._get_full(mock_task.id)
         assert isinstance(task_object, Task)
-        assert task_object == mock_task
+        assert task_object.id == mock_task.id
+        assert task_object.name == mock_task.name
+        assert task_object.app_id == mock_task.app_id
+        assert task_object.script == mock_task.script
  
