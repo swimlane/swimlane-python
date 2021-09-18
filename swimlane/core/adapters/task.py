@@ -12,7 +12,7 @@ class TaskAdapter(SwimlaneResolver):
     def get(self, key, value):
         """Get a single task by id or name"""
         if key == 'id':
-            response = self._swimlane.request('get', 'task/{value}'.format(value=value))
+            response = self._swimlane.request('get', 'task/{id}'.format(id=value))
             return Task(self._swimlane, response.json())
 
         if key == 'name':
