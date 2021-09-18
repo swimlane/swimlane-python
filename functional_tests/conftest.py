@@ -1,5 +1,4 @@
 import pytest
-from pathlib import Path
 import json
 import random
 import string
@@ -8,6 +7,11 @@ import sys
 from swimlane import Swimlane
 from faker import Faker
 from io import BytesIO
+
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
 
 pytest.fake = Faker()
 file_path = str(Path(__file__).parent)
@@ -21,21 +25,37 @@ def pytest_addoption(parser):
                      help="Password to log in as the supplied user")
     parser.addoption("--skipverify", action="store_false",
                      help="pass in to not verify the server version with the pydriver version")
+    parser.addini("url", help="By default: https://localhost")
+    parser.addini("user", help="By default: admin")
+    parser.addini("pass", help="Password to log in as the supplied user")
+    parser.addini("skipverify", help="pass in to not verify the server version with the pydriver version")
 
 
 def api_url(pytestconfig):
+    ini_option = pytestconfig.getini('url')
+    if len(ini_option) > 0:
+        return ini_option
     return pytestconfig.getoption("--url")
 
 
 def api_user(pytestconfig):
+    ini_option = pytestconfig.getini('user')
+    if len(ini_option) > 0:
+        return ini_option
     return pytestconfig.getoption("--user").lower()
 
 
 def api_pass(pytestconfig):
+    ini_option = pytestconfig.getini('pass')
+    if len(ini_option) > 0:
+        return ini_option  
     return pytestconfig.getoption("--pass")
 
 
 def api_verifyVersion(pytestconfig):
+    ini_option = pytestconfig.getini('skipverify')
+    if len(ini_option) > 0:
+        return ini_option
     return pytestconfig.getoption("--skipverify")
 
 
