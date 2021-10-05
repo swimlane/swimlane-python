@@ -6,7 +6,7 @@ from swimlane.core.resources.usergroup import Group, User
 
 def test_group_list(mock_group, mock_swimlane):
     mock_response = mock.MagicMock()
-    mock_response.json.return_value = {'groups': [mock_group._raw for _ in range(3)]}
+    mock_response.json.return_value = {'items': [mock_group._raw for _ in range(3)]}
 
     with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
         groups = mock_swimlane.groups.list()
@@ -46,7 +46,7 @@ def test_group_get_invalid_args(mock_swimlane, kwargs):
 
 def test_user_list(mock_user, mock_swimlane):
     mock_response = mock.MagicMock()
-    mock_response.json.return_value = {'users': [mock_user._raw for _ in range(3)]}
+    mock_response.json.return_value = {'items': [mock_user._raw for _ in range(3)]}
 
     with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
         users = mock_swimlane.users.list()
