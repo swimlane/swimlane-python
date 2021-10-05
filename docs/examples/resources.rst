@@ -26,7 +26,7 @@ from other apps will fail to be retrieved.
 
 .. code-block:: python
 
-    app = swimlane.apps.get(acronym='APP')
+    app = swimlane.apps.get(name='Target App')
 
     # Get by Tracking ID
     record_from_tracking = app.records.get(tracking_id='APP-1')

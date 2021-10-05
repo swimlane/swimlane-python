@@ -8,8 +8,13 @@ from swimlane import Swimlane
 from faker import Faker
 from io import BytesIO
 
-pytest.fake = Faker()
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
 
+pytest.fake = Faker()
+file_path = str(Path(__file__).parent)
 
 def pytest_addoption(parser):
     parser.addoption("--url", action="store", default="https://localhost",
@@ -20,21 +25,37 @@ def pytest_addoption(parser):
                      help="Password to log in as the supplied user")
     parser.addoption("--skipverify", action="store_false",
                      help="pass in to not verify the server version with the pydriver version")
+    parser.addini("url", help="By default: https://localhost")
+    parser.addini("user", help="By default: admin")
+    parser.addini("pass", help="Password to log in as the supplied user")
+    parser.addini("skipverify", help="pass in to not verify the server version with the pydriver version")
 
 
 def api_url(pytestconfig):
+    ini_option = pytestconfig.getini('url')
+    if len(ini_option) > 0:
+        return ini_option
     return pytestconfig.getoption("--url")
 
 
 def api_user(pytestconfig):
+    ini_option = pytestconfig.getini('user')
+    if len(ini_option) > 0:
+        return ini_option
     return pytestconfig.getoption("--user").lower()
 
 
 def api_pass(pytestconfig):
+    ini_option = pytestconfig.getini('pass')
+    if len(ini_option) > 0:
+        return ini_option  
     return pytestconfig.getoption("--pass")
 
 
 def api_verifyVersion(pytestconfig):
+    ini_option = pytestconfig.getini('skipverify')
+    if len(ini_option) > 0:
+        return ini_option
     return pytestconfig.getoption("--skipverify")
 
 
@@ -80,7 +101,7 @@ class Helpers:
                     dependentApp = self.appPairings[defaultApp]
                     modifications = [{'field': "name", 'value': "PYTHON-%s" % dependentApp, 'type': "create"}, {'field': "acronym", 'value': generateUniqueAcronym(
                         self.swimlane_instance), 'type': 1}, {'field': "description", 'value': pytest.fake.sentence(), 'type': 1}]
-                    with open('apps/%s.json' % dependentApp) as json_data:
+                    with open('{file_path}/apps/{dependentApp}.json'.format(file_path=file_path, dependentApp=dependentApp)) as json_data:
                         manifest = json.load(json_data)
                     newapp = self.swimlane_instance.request(
                         'post', 'app/import', json={"manifest": manifest, "modifications": modifications}).json()
@@ -88,7 +109,7 @@ class Helpers:
                     self.appIds.append(newapp['application']['id'])
                 modifications = [{'field': "name", 'value': "PYTHON-%s" % defaultApp, 'type': "create"}, {'field': "acronym", 'value': generateUniqueAcronym(
                     self.swimlane_instance), 'type': 1}, {'field': "description", 'value': pytest.fake.sentence(), 'type': 1}]
-                with open('apps/%s.json' % defaultApp) as json_data:
+                with open('{file_path}/apps/{defaultApp}.json'.format(file_path=file_path, defaultApp=defaultApp)) as json_data:
                     manifest = json.load(json_data)
                 if 'Application' in manifest:
                     manifest['Application']['Fields'] = updateRefField(
@@ -110,6 +131,21 @@ class Helpers:
             else:
                 print(str(E))
                 return app, appId
+    
+    def import_content(self, file_name):
+        with open('{file_path}/content/{file_name}'.format(file_name=file_name, file_path=file_path), 'rb') as file_handle:
+            file_stream = file_handle.read()
+        bytes_stream = BytesIO(file_stream)
+        files = {
+            'file': (file_name, bytes_stream, 'application/octet-stream')
+        }
+        response = self.swimlane_instance.request('post', 'content/import', files=files).json()
+        if response.get('success'):
+            for app in response.get('entities').get('application'):
+                self.appIds.append(app.get('id'))
+        else:
+            print('Failed to import: {}'.format(response.get('errors')))
+        
 
     def createUser(self, username='', groups=None, roles=None):
         password = pytest.fake.password()
@@ -237,7 +273,7 @@ class Helpers:
         pytest.groupsCreated = {}
         pytest.usersCreated = {}
         try:
-            with open('apps/%s.relations.json' % appName) as json_data:
+            with open('{file_path}/apps/{appName}.relations.json'.format(file_path=file_path, appName=appName)) as json_data:
                 usersGroups = json.load(json_data)
                 for eachGroup in usersGroups['groups']:
                     new_groups = [i for i in map(lambda arg: {"$type": "Core.Models.Base.Entity, Core", "id":  pytest.groupsCreated['PYTHON-%s' %
@@ -255,7 +291,7 @@ class Helpers:
             print('No users or groups to create')
 
     def loadFileStream(self, filename):
-        with open('fixtures/%s' % filename, 'rb') as file_handle:
+        with open('{file_path}/fixtures/{filename}'.format(file_path=file_path, filename=filename), 'rb') as file_handle:
             data = file_handle.read()
         return BytesIO(data)
 

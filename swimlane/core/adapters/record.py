@@ -49,6 +49,11 @@ class RecordAdapter(AppResolver):
             keywords (list(str)): List of strings of keywords to use in report search
             limit (int): Set maximum number of returned Records, defaults to `Report.default_limit`. Set to 0 to return
                 all records
+            page_size: Set maximum number of returned Records per page, defaults to 1000.
+                Set to 0 to return all records
+            sort: Tuple of (field_name, order) by which results will be sorted
+            columns (list(str)): List of strings of field names to populate in the resulting records. Defaults to all
+                available fields
 
         Notes:
             Uses a temporary Report instance with a random name to facilitate search. Records are normally paginated,
@@ -56,13 +61,13 @@ class RecordAdapter(AppResolver):
 
             All provided filters are AND'ed together
 
-            Filter operators are available as constants in `swimlane.core.search`
+            Filter operators and sort orders are available as constants in `swimlane.core.search`
 
         Examples:
 
             ::
 
-                # Return records matching all filters with default limit
+                # Return records matching all filters with default limit and page size
 
                 from swimlane.core import search
 
@@ -81,6 +86,11 @@ class RecordAdapter(AppResolver):
                 # Return all records from app
                 records = app.records.search(limit=0)
 
+            ::
+
+                # Populate only the specified field and sort results
+                records = app.records.search(columns=['field_name'], sort=('field_name', 'ascending'))
+
 
         Returns:
             :class:`list` of :class:`~swimlane.core.resources.record.Record`: List of Record instances returned from the
@@ -89,11 +99,20 @@ class RecordAdapter(AppResolver):
         report = self._app.reports.build(
             'search-' + random_string(8),
             keywords=kwargs.pop('keywords', []),
-            limit=kwargs.pop('limit', Report.default_limit)
+            limit=kwargs.pop('limit', Report.default_limit),
+            page_size=kwargs.pop('page_size', 1000)
         )
 
         for filter_tuples in filters:
             report.filter(*filter_tuples)
+
+        sort_tuple = kwargs.pop('sort', None)
+        if sort_tuple:
+            report.sort(*sort_tuple)
+
+        columns = kwargs.pop('columns', None)
+        if columns:
+            report.set_columns(*columns)
 
         return list(report)
 

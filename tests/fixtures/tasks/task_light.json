@@ -1,0 +1,27 @@
+[
+    {
+      "$type": "<>f__AnonymousType2`6[[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib],[System.Boolean, System.Private.CoreLib],[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib]], api",
+      "id": "aAeFtIXU6Qi7XUhfI",
+      "name": "task_no_app",
+      "description": "Task not associated with an app.",
+      "disabled": false,
+      "actionType": "python36"
+    },
+    {
+      "$type": "<>f__AnonymousType2`6[[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib],[System.Boolean, System.Private.CoreLib],[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib]], api",
+      "id": "aGJfrazDjqlBf1fi4",
+      "name": "failed_task",
+      "description": "Task to test failure.",
+      "disabled": false,
+      "applicationId": "aFgmZM_gL89BGPKaZ",
+      "actionType": "python36"
+    },
+    {
+      "$type": "<>f__AnonymousType2`6[[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib],[System.Boolean, System.Private.CoreLib],[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib]], api",
+      "id": "aF_jCzUS1zxgyDV8p",
+      "name": "sample_task",
+      "disabled": false,
+      "applicationId": "aFgmZM_gL89BGPKaZ",
+      "actionType": "python36"
+    }
+]

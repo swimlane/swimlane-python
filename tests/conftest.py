@@ -1,13 +1,16 @@
 import random
-
+import json
+from pathlib import Path
+from shutil import copy as cp
 import mock
 import pytest
-
 from swimlane.core.client import SwimlaneJwtAuth, Swimlane
 from swimlane.core.resources.app import App
 from swimlane.core.resources.record import Record
 from swimlane.core.resources.usergroup import User, Group
 from swimlane.core.resources.report import Report
+from swimlane.core.resources.task import Task
+from swimlane.core.adapters.task import TaskAdapter
 
 
 @pytest.fixture
@@ -2324,9 +2327,8 @@ def mock_record(mock_app):
             '$type': 'System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[Core.Models.Record.VisualizationData, Core]], mscorlib]], mscorlib'}})
 
 
-@pytest.fixture
-def mock_user(mock_swimlane):
-    return User(mock_swimlane, {
+def mock_user(swimlane_client):
+    return User(swimlane_client, {
         '$type': 'Core.Models.Identity.ApplicationUser, Core',
         'active': False,
         'createdByUser': {'$type': 'Core.Models.Utilities.UserGroupSelection, Core'},
@@ -2347,6 +2349,11 @@ def mock_user(mock_swimlane):
         'passwordResetRequired': False,
         'roles': [],
         'userName': 'admin'})
+
+
+@pytest.fixture(name='mock_user')
+def fixture_mock_user(mock_swimlane):
+    return mock_user(mock_swimlane)
 
 
 @pytest.fixture
@@ -3799,6 +3806,38 @@ def random_mock_user(mock_swimlane):
         'passwordResetRequired': False,
         'roles': [],
         'userName': 'admin'})
+
+
+@pytest.fixture(name='test_data', autouse=True)
+def fixture_test_data(tmp_path_factory):
+    """
+    Copies all files from fixtures/apps and fixtures/tasks folders to tmp_dir.
+    """
+    temp_path = tmp_path_factory.mktemp('data')
+    app_files = Path(__file__).parent.joinpath('./fixtures/apps').glob('*')
+    tasks_files = Path(__file__).parent.joinpath('./fixtures/tasks').glob('*')
+    for file_name in app_files:
+        cp(str(file_name), str(temp_path))
+    for file_name in tasks_files:
+        cp(str(file_name), str(temp_path))
+    return temp_path
+
+
+@pytest.fixture(name='mock_task_app')
+def fixture_mock_task_app(test_data, mock_swimlane, request):
+    full_path = (test_data / request.param)
+    yield App(mock_swimlane, json.load(full_path.open()))
+
+
+@pytest.fixture(name='mock_task')
+def fixture_mock_task(test_data, mock_swimlane, request):
+    full_path = (test_data / request.param)
+    yield Task(mock_swimlane, json.load(full_path.open()))
+
+
+@pytest.fixture(name='mock_task_adapter')
+def fixture_mock_task_adapter(mock_swimlane):
+    yield TaskAdapter(mock_swimlane)
 
 
 pytest_plugins = ['conftest_revisions']

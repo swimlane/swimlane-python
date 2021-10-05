@@ -27,10 +27,12 @@ class TestReport(object):
         assert len(mock_report._raw['filters']) == 1
 
     def test_parse_raw_element(self, mock_app, mock_record):
-        """Test _build_record makes a retrieval to the full record"""
-        with mock.patch.object(mock_app.records, 'get', return_value=mock_record):
+        """Test _parse_raw_element does not retrieve full record"""
+        with mock.patch.object(mock_app.records, 'get') as mock_request:
             report = report_factory(mock_app, 'build_record')
-            assert report._parse_raw_element(mock_record._raw) is mock_record
+            report._parse_raw_element(mock_record._raw)
+
+            assert mock_request.call_count == 0
 
     def test_limit(self, mock_record, mock_app, mock_swimlane):
         with mock.patch.object(mock_swimlane, 'request') as mock_request:

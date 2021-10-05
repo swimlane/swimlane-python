@@ -1,12 +1,14 @@
 import copy
 from functools import total_ordering
-
+import time
 import pendulum
 import six
-
 from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.usergroup import UserGroup, User
-from swimlane.exceptions import UnknownField, ValidationError
+from swimlane.exceptions import SwimlaneException, UnknownField, ValidationError
+import swimlane.core.adapters.task  # avoid circular reference
+import swimlane.core.adapters.helper  # avoid circular reference
+
 
 
 @total_ordering
@@ -59,6 +61,10 @@ class Record(APIResource):
         self._fields = {}
         self.__premap_fields()
 
+        # Get trackingFull if available
+        if app.tracking_id in self._raw['values']:
+            self._raw['trackingFull'] = self._raw['values'].get(app.tracking_id)
+
         self.__existing_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
         self._comments_modified = False
 
@@ -84,7 +90,7 @@ class Record(APIResource):
         self.get_field(field_name).set_python(value)
 
     def __getitem__(self, field_name):
-        return self.get_field(field_name).get_python()
+        return self.get_field(field_name).get_item()
 
     def __delitem__(self, field_name):
         self[field_name] = None
@@ -223,8 +229,7 @@ class Record(APIResource):
 
         copy_raw = copy.copy(self._raw)
 
-        pending_values = {k: self.get_field(
-            k).get_batch_representation() for (k, v) in self}
+        pending_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
         patch_values = {
             self.get_field(k).id: pending_values[k] for k in set(pending_values) & set(self.__existing_values)
             if pending_values[k] != self.__existing_values[k]
@@ -382,7 +387,6 @@ class Record(APIResource):
 
         self._raw['allowed'] = allowed
 
-
     def lock(self):
         """
         Lock the record to the Current User.
@@ -395,8 +399,6 @@ class Record(APIResource):
         Args:
 
         """
-
-
         self.validate()
         response = self._swimlane.request(
             'post',
@@ -428,7 +430,22 @@ class Record(APIResource):
           self.locked = False 
           self.locking_user = None
           self.locked_date = None
-
+    
+    def execute_task(self, task_name, timeout=int(20)):
+        job_info = swimlane.core.adapters.task.TaskAdapter(self.app._swimlane).execute(task_name, self._raw)
+        timeout_start = pendulum.now()
+        while pendulum.now() < timeout_start.add(seconds=timeout):
+            status = self.app._swimlane.helpers.check_bulk_job_status(job_info.text)
+            if len(status) >= 3:
+                for item in status:
+                    if item.get('status') == 'completed':
+                        self.__request_and_reinitialize(
+                            'get', '/app/{appId}/record/{id}'.format(appId=self.app.id, id=self.id), None)
+                        timeout = 0
+                    if item.get('status') == 'failed':
+                        raise SwimlaneException('Task failed: {}'.format(item.get('message')))
+            time.sleep(1)
+        
 
 def record_factory(app, fields=None):
     """Return a temporary Record instance to be used for field validation and value parsing
