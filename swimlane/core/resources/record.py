@@ -436,7 +436,7 @@ class Record(APIResource):
         timeout_start = pendulum.now()
         while pendulum.now() < timeout_start.add(seconds=timeout):
             status = self.app._swimlane.helpers.check_bulk_job_status(job_info.text)
-            if len(status) >= 3:
+            if len(status):
                 for item in status:
                     if item.get('status') == 'completed':
                         self.__request_and_reinitialize(

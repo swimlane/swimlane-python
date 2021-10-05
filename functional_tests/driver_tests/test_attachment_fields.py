@@ -37,7 +37,7 @@ class TestAttachmentField:
         theFile = pytest.helpers.loadFileStream(fileName)
         with pytest.raises(TypeError) as excinfo:
             theRecord['Attachment'].add(None, theFile)
-        assert str(excinfo.value) == 'expected {}'.format('string or buffer' if (pytest.helpers.py_ver() == 2) else 'string or bytes-like object')
+        assert str(excinfo.value) == 'expected {}'.format('string or buffer' if (pytest.helpers.py_ver() == 2) else 'str, bytes or os.PathLike object, not NoneType')
         theRecord.save()
         updatedRecord = pytest.app.records.get(id=theRecord.id)
         assert len(updatedRecord['Attachment']) == 0
