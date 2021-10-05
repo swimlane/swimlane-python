@@ -23,10 +23,10 @@ class GroupListCursor(SwimlaneResolver, PaginatedCursor):
             'groups',
             params={
                 'size': self.page_size,
-                'offset': page
+                'pageNumber': page
             }
         )
-        return response.json().get('groups', [])
+        return response.json().get('items', [])
 
 
 class GroupAdapter(SwimlaneResolver):
@@ -89,10 +89,10 @@ class UserListCursor(SwimlaneResolver, PaginatedCursor):
             'user',
             params={
                 'size': self.page_size,
-                'offset': page
+                'pageNumber': page
             }
         )
-        return response.json().get('users', [])
+        return response.json().get('items', [])
 
 
 class UserAdapter(SwimlaneResolver):
