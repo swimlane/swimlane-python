@@ -137,9 +137,11 @@ class Helpers:
             file_stream = file_handle.read()
         bytes_stream = BytesIO(file_stream)
         files = {
-            'file': (file_name, bytes_stream, 'application/octet-stream')
+            'file': (file_name, bytes_stream, 'application/octet-stream'),
+            'runInBackground': False
         }
-        response = self.swimlane_instance.request('post', 'content/import', files=files).json()
+        trackingId = self.swimlane_instance.request('post', 'content/import', files=files).text
+        response = self.swimlane_instance.request('get', 'content/import/%s/status' % trackingId).json()
         if response.get('success'):
             for app in response.get('entities').get('application'):
                 self.appIds.append(app.get('id'))
