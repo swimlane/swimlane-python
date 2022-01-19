@@ -225,13 +225,17 @@ class Helpers:
         return newRole
 
     def waitOnJobByID(self, jobId):
+        sleepTime = 0
         while True:
             loggingStuff = self.swimlane_instance.helpers.check_bulk_job_status(
                 jobId)
             if (True in (ele['status'] == 'completed' for ele in loggingStuff)):
                 break
+            elif ( sleepTime > 3):
+                raise Exception("Timedout waiting for the job to complete")
             else:
                 time.sleep(0.1)
+                sleepTime += 0.1
 
     def updateApp(self, appID):
         newapp = self.swimlane_instance.request('get', 'app/%s' % appID).json()
