@@ -140,22 +140,22 @@ class TestMaxSizeAttachmentFiled:
         fileName = '5.35kB.json'
         theRecord = pytest.app.records.create(**{})
         theFile = pytest.helpers.loadFileStream(fileName)
-        theRecord['Attachment'].add(fileName, theFile)
+        theRecord['Max Size Attachment'].add(fileName, theFile)
         theRecord.save()
         updatedRecord = pytest.app.records.get(id=theRecord.id)
-        assert len(updatedRecord['Attachment']) == 1
-        attachment = updatedRecord['Attachment'][0]
+        assert len(updatedRecord['Max Size Attachment']) == 1
+        attachment = updatedRecord['Max Size Attachment'][0]
         assert attachment.filename == fileName
         assert len(attachment.download().read()) > 0
 
     def test_max_size_attachment_field_too_big(helpers):
-        fileName = 'froggy.jpg'
+        fileName = '316kb.jpg'
         theRecord = pytest.app.records.create(**{})
         theFile = pytest.helpers.loadFileStream(fileName)
         with pytest.raises(exceptions.SwimlaneHTTP400Error) as excinfo:
-            theRecord['Attachment'].add(fileName, theFile)
+            theRecord['Max Size Attachment'].add(fileName, theFile)
         assert str(excinfo.value) == 'MaxAttachmentSize:3006 (File is too large. Allowed maximum size for this field is 300 KB): Bad Request for url: %s/api/attachment/%s/%s' % (
-            pytest.helpers.url, pytest.app.id, theRecord['Attachment']._field.id)
+            pytest.helpers.url, pytest.app.id, theRecord['Max Size Attachment']._field.id)
         theRecord.save()
         updatedRecord = pytest.app.records.get(id=theRecord.id)
-        assert len(updatedRecord['Attachment']) == 0
+        assert len(updatedRecord['Max Size Attachment']) == 0
