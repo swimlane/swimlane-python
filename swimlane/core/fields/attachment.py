@@ -9,16 +9,17 @@ class AttachmentCursor(FieldCursor):
 
     def add(self, filename, stream, content_type=None):
         """Upload a new attachment, and add it to current fields raw data to be persisted on save
-        
+
         Can optionally manually set the content_type, will be guessed by provided filename extension and default to 
         application/octet-stream if it cannot be guessed
         """
         # Guess file Content-Type or default
-        content_type = content_type or mimetypes.guess_type(filename)[0] or 'application/octet-stream'
-
+        content_type = content_type or mimetypes.guess_type(
+            filename)[0] or 'application/octet-stream'
         response = self._record._swimlane.request(
             'post',
-            'attachment',
+            'attachment/{appId}/{fieldId}'.format(
+                appId=self._record.app.id, fieldId=self._field.id),
             files={
                 'file': (filename, stream, content_type)
             },

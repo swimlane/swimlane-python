@@ -137,6 +137,7 @@ class SwimlaneHTTP400Error(SwimlaneException, HTTPError):
         3001: 'InvalidDateField',
         3002: 'RecordNotFound',
         3003: 'FieldNotFound',
+        3006: 'MaxAttachmentSize',
         4000: 'BadStatsGroup',
         4001: 'BadFilter',
         5000: 'AppLimitExceeded',

@@ -3,16 +3,18 @@ from swimlane import exceptions
 from io import BytesIO
 # Not testing the TTL on attachment fields.
 
+
 @pytest.fixture(autouse=True, scope='module')
 def my_fixture(helpers):
     # setup stuff
     defaultApp = 'attachment fields'
     pytest.swimlane_instance = helpers.swimlane_instance
-    pytest.app, pytest.appid =  helpers.findCreateApp(defaultApp)
+    pytest.app, pytest.appid = helpers.findCreateApp(defaultApp)
     pytest.helpers = helpers
     yield
     # teardown stuff
     helpers.cleanupData()
+
 
 class TestAttachmentField:
     def test_attachment_field_value(helpers):
@@ -37,7 +39,8 @@ class TestAttachmentField:
         theFile = pytest.helpers.loadFileStream(fileName)
         with pytest.raises(TypeError) as excinfo:
             theRecord['Attachment'].add(None, theFile)
-        assert str(excinfo.value) == 'expected {}'.format('string or buffer' if (pytest.helpers.py_ver() == 2) else 'str, bytes or os.PathLike object, not NoneType')
+        assert str(excinfo.value) == 'expected {}'.format('string or buffer' if (
+            pytest.helpers.py_ver() == 2) else 'str, bytes or os.PathLike object, not NoneType')
         theRecord.save()
         updatedRecord = pytest.app.records.get(id=theRecord.id)
         assert len(updatedRecord['Attachment']) == 0
@@ -82,7 +85,8 @@ class TestAttachmentField:
         theFile = pytest.helpers.loadFileStream(fileName)
         with pytest.raises(TypeError) as excinfo:
             theRecord['Attachment'].add(theFile)
-        assert str(excinfo.value) == 'add() {}'.format(pytest.helpers.py_ver_missing_param(3,2,"stream"))
+        assert str(excinfo.value) == 'add() {}'.format(
+            pytest.helpers.py_ver_missing_param(3, 2, "stream"))
         theRecord.save()
         updatedRecord = pytest.app.records.get(id=theRecord.id)
         assert len(updatedRecord['Attachment']) == 0
@@ -117,6 +121,7 @@ class TestAttachmentField:
         updatedRecord = pytest.app.records.get(id=theRecord.id)
         assert len(updatedRecord['Attachment']) == 1
 
+
 class TestReadOnlyAttachmentField:
     def test_read_only_attachment_field(helpers):
         fileName = '277kb.jpg'
@@ -129,28 +134,28 @@ class TestReadOnlyAttachmentField:
         updatedRecord = pytest.app.records.get(id=theRecord.id)
         assert len(updatedRecord['Attachment']) == 0
 
+
 class TestMaxSizeAttachmentFiled:
     def test_max_size_attachment_field_small_enough(helpers):
         fileName = '5.35kB.json'
         theRecord = pytest.app.records.create(**{})
         theFile = pytest.helpers.loadFileStream(fileName)
-        theRecord['Attachment'].add(fileName, theFile)
+        theRecord['Max Size Attachment'].add(fileName, theFile)
         theRecord.save()
         updatedRecord = pytest.app.records.get(id=theRecord.id)
-        assert len(updatedRecord['Attachment']) == 1
-        attachment = updatedRecord['Attachment'][0]
+        assert len(updatedRecord['Max Size Attachment']) == 1
+        attachment = updatedRecord['Max Size Attachment'][0]
         assert attachment.filename == fileName
         assert len(attachment.download().read()) > 0
 
-    @pytest.mark.xfail(reason="SPT-6358:Not honoring file size. Should pyDriver try to check?")
     def test_max_size_attachment_field_too_big(helpers):
-        fileName = '5.74kB.json'
+        fileName = '316kb.jpg'
         theRecord = pytest.app.records.create(**{})
         theFile = pytest.helpers.loadFileStream(fileName)
-        theRecord['Attachment'].add(fileName, theFile)
+        with pytest.raises(exceptions.SwimlaneHTTP400Error) as excinfo:
+            theRecord['Max Size Attachment'].add(fileName, theFile)
+        assert str(excinfo.value) == 'MaxAttachmentSize:3006 (File is too large. Allowed maximum size for this field is 300 KB): Bad Request for url: %s/api/attachment/%s/%s' % (
+            pytest.helpers.url, pytest.app.id, theRecord['Max Size Attachment']._field.id)
         theRecord.save()
         updatedRecord = pytest.app.records.get(id=theRecord.id)
-        assert len(updatedRecord['Attachment']) == 1
-        attachment = updatedRecord['Attachment'][0]
-        assert attachment.filename == fileName
-        assert len(attachment.download().read()) > 0
+        assert len(updatedRecord['Max Size Attachment']) == 0
