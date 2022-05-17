@@ -100,7 +100,7 @@ class ReferenceField(CursorField):
                 value = [value]
 
         # Values come in as a list of record ids or None
-        value = value or []
+        value = value["_v"] if "_v" in value else []
 
         records = SortedDict()
 
