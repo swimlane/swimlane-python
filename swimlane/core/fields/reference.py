@@ -20,23 +20,19 @@ class ReferenceCursor(FieldCursor):
         """Make field's target_app available on cursor"""
         return self._field.target_app
 
-    def _evaluate(self):
-        """Scan for orphaned records and retrieve any records that have not already been grabbed"""
-        retrieved_records = SortedDict()
+    def __iter__(self):
         for record_id, record in six.iteritems(self._elements):
             if record is self._field._unset:
-                # Record has not yet been retrieved, get it
                 try:
-                    record = self.target_app.records.get(id=record_id)
+                    yield self.target_app.records.get(id=record_id)
                 except SwimlaneHTTP400Error:
-                    # Record appears to be orphaned, don't include in set of elements
                     logger.debug("Received 400 response retrieving record '{}', ignoring assumed orphaned record")
-                    continue
+            else:
+                yield record
 
-            retrieved_records[record_id] = record
-
-        self._elements = retrieved_records
-        return self._elements.values()
+    def __getitem__(self, item):
+        record_id, record = self._evaluate()[item]
+        return self.target_app.records.get(id=record_id) if self._field._unset else record
 
     def add(self, record):
         """Add a reference to the provided record"""
@@ -113,6 +109,7 @@ class ReferenceField(CursorField):
 
     def set_python(self, value):
         """Expect list of record instances, convert to a SortedDict for internal representation"""
+
         if not self.multiselect:
             if value and not isinstance(value, list):
                 value = [value]
