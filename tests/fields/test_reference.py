@@ -67,7 +67,7 @@ class TestReferenceField(object):
             # Lazy retrieval of target app definition and selected records
 
             assert len(reference_cursor) == 3
-            assert mock_record_get.call_count == 3
+            assert mock_record_get.call_count == 0
 
             for referenced_record in reference_cursor:
                 assert isinstance(referenced_record, Record)
@@ -112,7 +112,7 @@ class TestReferenceField(object):
 
         with mock.patch.object(mock_swimlane.apps, 'get', return_value=mock_app):
             with mock.patch.object(mock_app.records, 'get', side_effect=SwimlaneHTTP400Error(mock_response)):
-                assert len(mock_record[self.multi_field_name]) == 0
+                assert len(mock_record[self.multi_field_name]) == 3
 
     def test_get_report(self, mock_record):
         """All for total coverage"""
