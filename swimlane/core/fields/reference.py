@@ -23,9 +23,12 @@ class ReferenceCursor(FieldCursor):
     def __getitem__(self, item):
         record_id, record = [kv for kv in self._elements.items()][item]
         if record is self._field._unset:
-            records_get = self.target_app.records.get(id=record_id)
-            self._elements[record_id] = records_get
-            return records_get
+            try:
+                records_get = self.target_app.records.get(id=record_id)
+                self._elements[record_id] = records_get
+                return records_get
+            except SwimlaneHTTP400Error:
+                logger.debug("Received 400 response retrieving record '{}', ignoring assumed orphaned record")
         else:
             return record
 

@@ -65,10 +65,13 @@ class TestReferenceField(object):
             assert mock_record_get.call_count == 0
 
             # Lazy retrieval of target app definition and selected records
+            # is not done at this point
 
             assert len(reference_cursor) == 3
             assert mock_record_get.call_count == 0
 
+            # Lazy retrieval of target app definition is done when reference
+            # field is referred
             for referenced_record in reference_cursor:
                 assert isinstance(referenced_record, Record)
 
@@ -82,7 +85,8 @@ class TestReferenceField(object):
             mock_record[self.multi_field_name].add(mock_record)
             assert len(mock_record[self.multi_field_name]) == 1
 
-            # No new requests should have been necessary, other than the original lookups
+            # new requests should have been necessary on demand as we are
+            # not doing lazy loading unless the reference cursor is iterated
             assert mock_record_get.call_count == 3
 
     def test_target_app_validation(self, mock_swimlane, mock_record, mock_app):
