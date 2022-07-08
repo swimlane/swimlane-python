@@ -116,11 +116,29 @@ class ReferenceField(CursorField):
         return super(ReferenceField, self).set_swimlane(records)
 
     def set_python(self, value):
+        """With changes to Lazy instrumentation _evaluation returns SortedDictionary, unfortunately this
+        is still public method that can be accessed in the old way, therefore it was split in two.
+        """
+        if isinstance(value, SortedDict):
+            self.set_python_raw(value)
+        else:
+            self.set_python_old(value)
+
+    def set_python_old(self, value):
         """Expect list of record instances, convert to a SortedDict for internal representation"""
         if not self.multiselect:
             if value and not isinstance(value, list):
                 value = [value]
-        self._set(value or [])
+
+        value = value or []
+
+        records = SortedDict()
+
+        for record in value:
+            self.validate_value(record)
+            records[record.id] = record
+
+        self._set(records)
         self.record._raw['values'][self.id] = self.get_swimlane()
 
     def get_swimlane(self):
@@ -150,3 +168,7 @@ class ReferenceField(CursorField):
 
     def for_json(self):
         return self.get_swimlane()
+
+    def set_python_raw(self, value):
+        self._set(value)
+        self.record._raw['values'][self.id] = self.get_swimlane()
