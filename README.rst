@@ -59,12 +59,24 @@ Install the required PIP packages with the command
 
     pip install -r requirements.txt
 
-The tests take the following arguments\
 
---url   The url to a running Swimlane Instance. The default is *https://localhost*
---user  This is a user to run the tests as. The user needs Administrator privileges. The default is *admin*
---pass  This is the password for the user provided.
---skipverify    This is for allowing the version of PyDriver to not match the version of Swimlane.
+## Executing
+
+The test suite allows for overriding the target server and user parameters via the following arguments:
+
+--url default="https://localhost"
+--user default="admin"
+--pass This is the password for the user defined above.
+--skipverify This is for allowing the version of PyDriver to not match the version of Swimlane.
+
+To run a specific test and skip the version verification:
+
+pytest driver_tests/test_app_adaptor.py --skipverify
+
+To run all the tests against 10.20.30.40:
+
+pytest --url "https://10.20.30.40"
+
 
 .. NOTE::
     All of the data created for testing purposes is cleaned up.
