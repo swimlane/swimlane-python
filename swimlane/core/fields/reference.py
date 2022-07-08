@@ -37,7 +37,7 @@ class ReferenceCursor(FieldCursor):
             if record is self._field._unset:
                 try:
                     records_get = self.target_app.records.get(id=record_id)
-                    self._elements[record_id]=records_get
+                    self._elements[record_id] = records_get
                     yield records_get
                 except SwimlaneHTTP400Error:
                     logger.debug("Received 400 response retrieving record '{}', ignoring assumed orphaned record")
@@ -48,6 +48,7 @@ class ReferenceCursor(FieldCursor):
         """Add a reference to the provided record"""
         self._field.validate_value(record)
         self._elements[record.id] = record
+        self._sync_field()
 
     def remove(self, record):
         """Remove a reference to the provided record"""
@@ -116,20 +117,10 @@ class ReferenceField(CursorField):
 
     def set_python(self, value):
         """Expect list of record instances, convert to a SortedDict for internal representation"""
-
         if not self.multiselect:
             if value and not isinstance(value, list):
                 value = [value]
-
-        value = value or []
-
-        records = SortedDict()
-
-        for record in value:
-            self.validate_value(record)
-            records[record.id] = record
-
-        self._set(records)
+        self._set(value or [])
         self.record._raw['values'][self.id] = self.get_swimlane()
 
     def get_swimlane(self):
