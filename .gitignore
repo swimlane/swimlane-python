@@ -78,3 +78,7 @@ functional_tests/pydriver-report.html
 
 # docker
 .docker/
+
+# virtual environment
+venv3/
+venv/
