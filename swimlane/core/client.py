@@ -372,7 +372,7 @@ class SwimlaneJwtAuth(SwimlaneResolver):
         token = json_content.pop('token', None)
 
         # Grab token expiration
-        token_data = jwt.decode(token, algorithms=[''], options={'verify_signature': False)
+        token_data = jwt.decode(token, algorithms=[''], options={'verify_signature': False})
         token_expiration = pendulum.from_timestamp(token_data['exp'])
 
         headers = {
