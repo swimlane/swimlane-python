@@ -98,11 +98,6 @@ class ReferenceField(CursorField):
     def set_swimlane(self, value):
         """Store record ids in separate location for later use, but ignore initial value"""
 
-        # Move single record into list to be handled the same by cursor class
-        if not self.multiselect:
-            if value and not isinstance(value, list):
-                value = [value]
-
         # Values come in as a list of record ids or None
         value = value or []
         if isinstance(value, dict):
@@ -146,7 +141,7 @@ class ReferenceField(CursorField):
         value = super(ReferenceField, self).get_swimlane()
         if value:
             ids = list(value.keys())
-            return ids if self.multiselect else ids[0]
+            return ids
 
     def get_item(self):
         """Return cursor if multi-select, direct value if single-select"""

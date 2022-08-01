@@ -38,9 +38,9 @@ class TestReferenceField(object):
             assert mock_record._raw['values'][field.id] is None
 
             field.set_python(mock_record)
-            assert mock_record._raw['values'][field.id] == mock_record.id
+            assert mock_record._raw['values'][field.id] == [mock_record.id]
 
-            field.set_swimlane(mock_record.id)
+            field.set_swimlane([mock_record.id])
             assert mock_record.id in field._value
 
     def test_empty_multi_select(self, mock_record):
