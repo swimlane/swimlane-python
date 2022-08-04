@@ -1,11 +1,12 @@
 # This workflow is responsible for publishing  packages to PyPi
 # and creating offline packages
 
-name: "Release new version"
+name: 'Release new version'
 
 on:
   - workflow_call
   - workflow_dispatch
+  - pull_request
 
 jobs:
   publish:
@@ -27,11 +28,11 @@ jobs:
       - name: Build
         run: python setup.py sdist bdist_wheel
 
-      - name: Publish to PyPi
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: twine upload dist/*
+      # - name: Publish to PyPi
+      #   env:
+      #     TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+      #     TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      #   run: twine upload dist/*
 
       - name: Create Release
         id: create_release
@@ -39,8 +40,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          tag_name: v10.9.0
+          release_name: v10.9.0
           draft: false
           prerelease: false
 
