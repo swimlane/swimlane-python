@@ -35,7 +35,8 @@ class TestRecordAdaptorBulkCreate:
     def test_record_bulk_create_check_TrackingIds(helpers):
         initialEmptyRecords = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', None)))
-        recIds = pytest.app.records.bulk_create({}, {}, {}, {})
+        recIds = pytest.app.records.bulk_create({'Text': 'Happy Joy'}, {'Text': 'Happy Joy'}, {
+                                       'Text': 'Happy Joy'}, {'Text': 'Happy Joy'})
         emptyRecords = pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', None))
         assert len(recIds) == 4
