@@ -38,7 +38,7 @@ class TestRecordAdaptorBulkCreate:
         recIds = pytest.app.records.bulk_create({}, {}, {}, {})
         emptyRecords = pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', None))
-        assert(len(recIds)==4)
+        assert len(recIds) == 4
 
     def test_record_bulk_create_with_values(helpers):
         initalRecords = len(pytest.app.records.search(
