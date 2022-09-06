@@ -210,11 +210,11 @@ class RecordAdapter(AppResolver):
 
             new_records.append(record)
 
-        self._swimlane.request(
+        return self._swimlane.request(
             'post',
             'app/{}/record/batch'.format(self._app.id),
             json=[r._raw for r in new_records]
-        )
+        ).json()
 
     # pylint: disable=too-many-branches
     @requires_swimlane_version('2.17')
