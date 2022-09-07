@@ -32,6 +32,15 @@ class TestRecordAdaptorBulkCreate:
             ('Text', 'equals', None), ('Numeric', 'equals', None))
         assert len(emptyRecords) == 4+initialEmptyRecords
 
+    def test_record_bulk_create_check_TrackingIds(helpers):
+        initialEmptyRecords = len(pytest.app.records.search(
+            ('Text', 'equals', None), ('Numeric', 'equals', None)))
+        recIds = pytest.app.records.bulk_create({'Text': 'Happy Joy'}, {'Text': 'Happy Joy'}, {
+                                       'Text': 'Happy Joy'}, {'Text': 'Happy Joy'})
+        emptyRecords = pytest.app.records.search(
+            ('Text', 'equals', None), ('Numeric', 'equals', None))
+        assert len(recIds) == 4
+
     def test_record_bulk_create_with_values(helpers):
         initalRecords = len(pytest.app.records.search(
             ('Text', 'equals', 'Happy Joy'), ('Numeric', 'equals', None)))
@@ -448,7 +457,7 @@ class TestRecordAdaptorBulkModifyClear:
 
     def test_record_bulk_modify_clear_references(helpers):
         baseText = "Has Reference"
-        pytest.app.records.bulk_create({'Text': baseText}, {'Text': baseText}, {
+        pytest.app.records.bulk_create({'Text': baseText}, {'Text': baseText},{
                                        'Text': baseText}, {'Text': baseText})
         targetApp = pytest.swimlane_instance.apps.get(
             name="PYTHON-Helpers Target App")
