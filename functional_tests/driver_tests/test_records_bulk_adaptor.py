@@ -384,8 +384,7 @@ class TestRecordAdaptorBulkModifyClear:
 
     def test_record_bulk_modify_clear_date_time(helpers):
         baseTime = pendulum.now()
-        pytest.app.records.bulk_create({'Date & Time': baseTime}, {'Date & Time': baseTime}, {
-                                       'Date & Time': baseTime}, {'Date & Time': baseTime})
+        pytest.app.records.bulk_create({'Date & Time': baseTime}, {'Date & Time': baseTime})
         initialRecords = len(pytest.app.records.search(
             ('Date & Time', 'equals', baseTime)))
         emptyNumericRecords = len(pytest.app.records.search(
@@ -393,7 +392,7 @@ class TestRecordAdaptorBulkModifyClear:
         records = pytest.app.records.bulk_modify(
             ('Date & Time', 'equals', baseTime), values={'Date & Time': Clear()})
         pytest.waitOnJobByID(records)
-        assert initialRecords >= 4
+        assert initialRecords >= 2
         print(initialRecords)
         print(emptyNumericRecords)
         assert len(pytest.app.records.search(
