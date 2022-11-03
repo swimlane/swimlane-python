@@ -7,6 +7,7 @@ from swimlane.core.resources.record import Record, record_factory
 from swimlane.core.resources.report import Report
 from swimlane.utils import random_string, one_of_keyword_only
 from swimlane.utils.version import requires_swimlane_version
+from typing import List, Any
 
 
 class RecordAdapter(AppResolver):
@@ -14,7 +15,7 @@ class RecordAdapter(AppResolver):
 
     @check_cache(Record)
     @one_of_keyword_only('id', 'tracking_id')
-    def get(self, key, value):
+    def get(self, key: str, value: str) -> Record: # type: ignore
         """Get a single record by id
 
         Supports resource cache
@@ -39,7 +40,7 @@ class RecordAdapter(AppResolver):
             response = self._swimlane.request('get', "app/{0}/record/tracking/{1}".format(self._app.id, value))
             return Record(self._app, response.json())
 
-    def search(self, *filters, **kwargs):
+    def search(self, *filters: Any, **kwargs: Any) -> List[Record]:
         """Shortcut to generate a new temporary search report using provided filters and return the resulting records
 
         Args:
@@ -116,7 +117,7 @@ class RecordAdapter(AppResolver):
 
         return list(report)
 
-    def create(self, **fields):
+    def create(self, **fields: Any) -> Record:
         """Create and return a new record in associated app and return the newly created Record instance
 
         Args:
@@ -162,7 +163,7 @@ class RecordAdapter(AppResolver):
         return new_record
 
     @requires_swimlane_version('2.15')
-    def bulk_create(self, *records):
+    def bulk_create(self, *records: Any) -> str:
         """Create and validate multiple records in associated app
 
         Args:
@@ -218,7 +219,7 @@ class RecordAdapter(AppResolver):
 
     # pylint: disable=too-many-branches
     @requires_swimlane_version('2.17')
-    def bulk_modify(self, *filters_or_records, **kwargs):
+    def bulk_modify(self, *filters_or_records: Any, **kwargs: Any) -> str:
         """Shortcut to bulk modify records
         
         .. versionadded:: 2.17.0
@@ -332,7 +333,7 @@ class RecordAdapter(AppResolver):
         return response.text
 
     @requires_swimlane_version('2.17')
-    def bulk_delete(self, *filters_or_records):
+    def bulk_delete(self, *filters_or_records: Any) -> str:
         """Shortcut to bulk delete records
         
         .. versionadded:: 2.17.0
@@ -389,7 +390,7 @@ class RecordAdapter(AppResolver):
         return self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict).text
 
 
-def validate_filters_or_records(filters_or_records):
+def validate_filters_or_records(filters_or_records: Any) -> Any:
     """Validation for filters_or_records variable from bulk_modify and bulk_delete"""
     # If filters_or_records is empty, fail
     if not filters_or_records:

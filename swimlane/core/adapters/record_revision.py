@@ -1,15 +1,18 @@
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.record_revision import RecordRevision
+from swimlane.core.resources.app import App
+from swimlane.core.resources.record import Record
+from typing import List
 
 
 class RecordRevisionAdapter(AppResolver):
     """Handles retrieval of Swimlane Record Revision resources"""
 
-    def __init__(self, app, record):
+    def __init__(self, app: App, record: Record) -> None:
         super(RecordRevisionAdapter, self).__init__(app)
         self.record = record
 
-    def get_all(self):
+    def get_all(self) -> List[RecordRevision]:
         """Get all revisions for a single record.
 
         Returns:
@@ -19,7 +22,7 @@ class RecordRevisionAdapter(AppResolver):
                                                'app/{0}/record/{1}/history'.format(self._app.id, self.record.id)).json()
         return [RecordRevision(self._app, raw) for raw in raw_revisions]
 
-    def get(self, revision_number):
+    def get(self, revision_number: float) -> RecordRevision:
         """Gets a specific record revision.
 
         Keyword Args:

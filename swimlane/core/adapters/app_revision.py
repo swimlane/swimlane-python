@@ -2,12 +2,13 @@ from swimlane.core.cache import check_cache
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.app_revision import AppRevision
 from swimlane.utils import one_of_keyword_only
+from typing import List
 
 
 class AppRevisionAdapter(AppResolver):
     """Handles retrieval of Swimlane App Revision resources"""
 
-    def get_all(self):
+    def get_all(self) -> List[AppRevision]:
         """
         Gets all app revisions.
 
@@ -17,7 +18,7 @@ class AppRevisionAdapter(AppResolver):
         raw_revisions = self._swimlane.request('get', 'app/{0}/history'.format(self._app.id)).json()
         return [AppRevision(self._swimlane, raw) for raw in raw_revisions]
 
-    def get(self, revision_number):
+    def get(self, revision_number: float) -> AppRevision:
         """
         Gets a specific app revision.
 
@@ -34,7 +35,7 @@ class AppRevisionAdapter(AppResolver):
 
     @check_cache(AppRevision)
     @one_of_keyword_only('app_id_revision')
-    def __get(self, key, value):
+    def __get(self, key: str, value: str) -> AppRevision:
         """Underlying get method supporting resource cache."""
         app_id, revision_number = AppRevision.parse_unique_id(value)
         app_revision_raw = self._swimlane.request('get', 'app/{0}/history/{1}'.format(app_id, revision_number)).json()

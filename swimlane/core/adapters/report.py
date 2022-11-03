@@ -2,22 +2,24 @@ import weakref
 
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.report import Report, report_factory
+from swimlane.core.resources.app import App
+from typing import List, Any
 
 
 class ReportAdapter(SwimlaneResolver):
     """Handles retrieval and creation of Report resources"""
 
-    def __init__(self, app):
+    def __init__(self, app: App) -> None:
         super(ReportAdapter, self).__init__(app._swimlane)
 
         self.__ref_app = weakref.ref(app)
 
     @property
-    def _app(self):
+    def _app(self) -> App | None:
         """Resolve weak app reference"""
         return self.__ref_app()
 
-    def list(self):
+    def list(self) -> List[Report]:
         """Retrieve all reports for parent app
 
         Returns:
@@ -27,7 +29,7 @@ class ReportAdapter(SwimlaneResolver):
         # Ignore StatsReports for now
         return [Report(self._app, raw_report) for raw_report in raw_reports if raw_report['$type'] == Report._type]
 
-    def get(self, report_id):
+    def get(self, report_id: str) -> Report:
         """Retrieve report by ID
 
         Args:
@@ -41,7 +43,7 @@ class ReportAdapter(SwimlaneResolver):
             self._swimlane.request('get', "reports/{0}".format(report_id)).json()
         )
 
-    def build(self, name, **kwargs):
+    def build(self, name: str, **kwargs: Any) -> Report:
         """Report instance factory for the adapter's App
 
         Args:

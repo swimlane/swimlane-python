@@ -5,19 +5,20 @@ from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.usergroup import Group, User
 from swimlane.utils import one_of_keyword_only
+from typing import Optional, Any, List
 
 
 class GroupListCursor(SwimlaneResolver, PaginatedCursor):
     """Handles retrieval and pagination of group list endpoint"""
 
-    def __init__(self, swimlane, limit=None):
+    def __init__(self, swimlane: Any, limit: Optional[int]=None) -> None:
         SwimlaneResolver.__init__(self, swimlane)
         PaginatedCursor.__init__(self, limit)
 
-    def _parse_raw_element(self, raw_element):
+    def _parse_raw_element(self, raw_element: Any) -> Group:
         return Group(self._swimlane, raw_element)
 
-    def _retrieve_raw_elements(self, page):
+    def _retrieve_raw_elements(self, page: int) -> List[Any]:
         response = self._swimlane.request(
             'get',
             'groups',
@@ -32,7 +33,7 @@ class GroupListCursor(SwimlaneResolver, PaginatedCursor):
 class GroupAdapter(SwimlaneResolver):
     """Handles retrieval of Swimlane Group resources"""
 
-    def list(self, limit=None):
+    def list(self, limit: Optional[int] = None) -> GroupListCursor:
         """Retrieve list of all groups
 
         Returns:
@@ -42,7 +43,7 @@ class GroupAdapter(SwimlaneResolver):
 
     @check_cache(Group)
     @one_of_keyword_only('id', 'name')
-    def get(self, key, value):
+    def get(self, key: str, value: str) -> Group:
         """Retrieve single group record by id or name
 
         Supports resource cache
@@ -76,14 +77,14 @@ class GroupAdapter(SwimlaneResolver):
 class UserListCursor(SwimlaneResolver, PaginatedCursor):
     """Handles retrieval and pagination for user list endpoint"""
 
-    def __init__(self, swimlane, limit=None):
+    def __init__(self, swimlane: Any, limit: Optional[int] = None) -> None:
         SwimlaneResolver.__init__(self, swimlane)
         PaginatedCursor.__init__(self, limit)
 
-    def _parse_raw_element(self, raw_element):
+    def _parse_raw_element(self, raw_element: Any) -> User:
         return User(self._swimlane, raw_element)
 
-    def _retrieve_raw_elements(self, page):
+    def _retrieve_raw_elements(self, page: int) -> Any:
         response = self._swimlane.request(
             'get',
             'user',
@@ -98,7 +99,7 @@ class UserListCursor(SwimlaneResolver, PaginatedCursor):
 class UserAdapter(SwimlaneResolver):
     """Handles retrieval of Swimlane User resources"""
 
-    def list(self, limit=None):
+    def list(self, limit: Optional[int] = None) -> UserListCursor:
         """Retrieve all users
 
         Returns:
@@ -108,7 +109,7 @@ class UserAdapter(SwimlaneResolver):
 
     @check_cache(User)
     @one_of_keyword_only('id', 'display_name')
-    def get(self, arg, value):
+    def get(self, arg: str, value: str) -> User:
         """Retrieve single user record by id or username
 
         Warnings:

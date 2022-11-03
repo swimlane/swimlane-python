@@ -2,14 +2,16 @@ from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.cache import check_cache
 from swimlane.core.resources.task import Task
 from swimlane.utils import one_of_keyword_only
+from typing import Optional, List, Any
+
 
 
 class TaskAdapter(SwimlaneResolver):
     """Handles retreival of Swimlane Task Resources and execution of tasks against records."""
-    
+
     @check_cache(Task)
     @one_of_keyword_only('id', 'name')
-    def get(self, key, value):
+    def get(self, key: str, value: str) -> Optional[Task]:
         """Get a single task by id or name"""
         if key == 'id':
             response = self._swimlane.request('get', 'task/{id}'.format(id=value))
@@ -22,7 +24,7 @@ class TaskAdapter(SwimlaneResolver):
                     return self._get_full(task.get('id'))
             raise ValueError('No task with name "{value}"'.format(value=value))
 
-    def list(self):
+    def list(self) -> List[Task]:
         """Retrieve list of all tasks.
 
         Returns:
@@ -30,10 +32,10 @@ class TaskAdapter(SwimlaneResolver):
         """
         response = self._swimlane.request('get', 'task/light')
         return [self._get_full(item.get('id')) for item in response.json()]
-    
-    def execute(self, task_name, raw_record):
+
+    def execute(self, task_name: str, raw_record) -> Any:
         """Execute job by name.
-        
+
         Returns:
             Response of request from the API endpoint.
         """
@@ -43,8 +45,8 @@ class TaskAdapter(SwimlaneResolver):
             'record': raw_record,
         }
         return self._swimlane.request('post', 'task/execute/record', json=data)
-    
-    def _get_full(self, task_id):
+
+    def _get_full(self, task_id: str) -> Task:
         """Retreived complete task raw json of task from API.
 
         Returns:
