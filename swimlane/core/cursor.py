@@ -3,10 +3,10 @@ import itertools
 
 class Cursor(object):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._elements = []
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(list(self._evaluate()))
 
     def __iter__(self):

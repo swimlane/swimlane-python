@@ -1,4 +1,5 @@
 """Helpers for bulk methods"""
+from typing import Any
 
 
 class _BulkModificationOperation(object):
@@ -21,7 +22,7 @@ class _BulkModificationOperation(object):
 
     type = None
 
-    def __init__(self, value):
+    def __init__(self, value: Any) -> None:
         self.value = value
 
 
@@ -34,7 +35,7 @@ class Clear(_BulkModificationOperation):
     """Bulk modification 'Clear field' operation"""
     type = 'delete'
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(Clear, self).__init__(None)
 
 

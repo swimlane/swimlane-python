@@ -18,6 +18,8 @@ from swimlane.core.resources.usergroup import User
 from swimlane.exceptions import SwimlaneHTTP400Error, InvalidSwimlaneProductVersion
 from swimlane.utils.version import get_package_version, compare_versions
 from swimlane.core.wrappedsession import WrappedSession
+from typing import Optional, Any, Dict
+from requests import Response, Request
 
 # Disable insecure request warnings
 urllib3.disable_warnings()
@@ -84,16 +86,16 @@ class Swimlane(object):
 
     def __init__(
             self,
-            host,
-            username=None,
-            password=None,
-            verify_ssl=True,
-            default_timeout=60,
-            verify_server_version=True,
-            resource_cache_size=0,
-            access_token=None,
-            write_to_read_only=False
-    ):
+            host: str,
+            username: Optional[str]=None,
+            password: Optional[str]=None,
+            verify_ssl: bool=True,
+            default_timeout: int=60,
+            verify_server_version: bool=True,
+            resource_cache_size: int=0,
+            access_token: Optional[str]=None,
+            write_to_read_only: bool=False
+    ) -> None:
         self.__verify_auth_params(username, password, access_token)
 
         self.host = URI(host)
@@ -133,7 +135,11 @@ class Swimlane(object):
             self.__verify_server_version()
 
     @staticmethod
-    def __verify_auth_params(username, password, access_token):
+    def __verify_auth_params(
+            username: Optional[str],
+            password: Optional[str],
+            access_token: Optional[str]
+    ) -> None:
         """Verify that valid authentication parameters were passed to __init__"""
 
         if all(v is not None for v in [username, password, access_token]):
@@ -142,7 +148,7 @@ class Swimlane(object):
         if (username is None or password is None) and access_token is None:
             raise ValueError('Must supply a username/password or access token')
 
-    def __verify_server_version(self):
+    def __verify_server_version(self) -> None:
         """Verify connected to supported server product version
 
         Notes:
@@ -164,7 +170,7 @@ class Swimlane(object):
                 '{}.0'.format(str(int(_lib_major_version) + 1))
             )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<{cls}: {user} @ {host} v{version}>'.format(
             cls=self.__class__.__name__,
             user=self.user,
@@ -172,7 +178,7 @@ class Swimlane(object):
             version=self.version
         )
 
-    def request(self, method, api_endpoint, **kwargs):
+    def request(self, method: str, api_endpoint: str, **kwargs: Any) -> Response:
         """Wrapper for underlying :class:`requests.Session`
 
         Handles generating full API URL, session reuse and auth, request defaults, and invalid response status codes
@@ -230,19 +236,19 @@ class Swimlane(object):
         return response
 
     @property
-    def settings(self):
+    def settings(self) -> Any:
         """Retrieve and cache settings from server"""
         if not self.__settings:
             self.__settings = self.request('get', 'settings').json()
         return self.__settings
 
     @property
-    def version(self):
+    def version(self) -> str:
         """Full Swimlane version, <product_version>+<build_version>+<build_number>"""
         return self.settings['apiVersion']
 
     @property
-    def product_version(self):
+    def product_version(self) -> str:
         """Swimlane product version"""
         version_separator = '+'
         if version_separator in self.version:
@@ -252,7 +258,7 @@ class Swimlane(object):
         return self.version.split('-')[0]
 
     @property
-    def build_version(self):
+    def build_version(self) -> str:
         """Swimlane semantic build version
 
         Falls back to product version in pre-2.18 releases
@@ -267,7 +273,7 @@ class Swimlane(object):
         return self.product_version
 
     @property
-    def build_number(self):
+    def build_number(self) -> str:
         """Swimlane build number"""
         version_separator = '+'
         if version_separator in self.version:
@@ -277,7 +283,7 @@ class Swimlane(object):
         return self.version.split('-')[1]
 
     @property
-    def user(self):
+    def user(self) -> User:
         """User record instance for authenticated user"""
         return self._session.auth.user
 
@@ -288,13 +294,13 @@ class SwimlaneTokenAuth(SwimlaneResolver):
     .. versionadded:: 4.1.0
     """
 
-    def __init__(self, swimlane, access_token):
+    def __init__(self, swimlane: Swimlane, access_token: str):
         super(SwimlaneTokenAuth, self).__init__(swimlane)
 
         self._access_token = access_token
         self.user = None
-    
-    def __call__(self, request):
+
+    def __call__(self, request: Request):
         """Attach necessary headers to all requests"""
 
         headers = {
@@ -328,7 +334,7 @@ class SwimlaneJwtAuth(SwimlaneResolver):
 
     _token_expiration_buffer = pendulum.Duration(minutes=5)
 
-    def __init__(self, swimlane, username, password):
+    def __init__(self, swimlane: Swimlane, username: str, password: str) -> None:
         super(SwimlaneJwtAuth, self).__init__(swimlane)
 
         self._username = username
@@ -338,7 +344,7 @@ class SwimlaneJwtAuth(SwimlaneResolver):
         self._login_headers = {}
         self._token_expiration = pendulum.now()
 
-    def __call__(self, request):
+    def __call__(self, request: Request) -> Request:
         """Attach necessary headers to all requests
 
         Automatically reauthenticate before sending request when nearing token expiration
@@ -352,7 +358,7 @@ class SwimlaneJwtAuth(SwimlaneResolver):
 
         return request
 
-    def authenticate(self):
+    def authenticate(self) -> None:
         """Send login request and update User instance, login headers, and token expiration"""
 
         # Temporarily remove auth from Swimlane session for auth request to avoid recursive loop during login request
@@ -387,7 +393,7 @@ class SwimlaneJwtAuth(SwimlaneResolver):
         self._token_expiration = token_expiration
 
 
-def _user_raw_from_login_content(login_content):
+def _user_raw_from_login_content(login_content: Dict[str, Any]) -> Dict[str, str]:
     """Returns a User instance with appropriate raw data parsed from login response content"""
     matching_keys = [
         'displayName',

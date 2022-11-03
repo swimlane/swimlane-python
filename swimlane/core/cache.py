@@ -12,7 +12,7 @@ from collections import defaultdict
 from cachetools import LFUCache
 
 from swimlane.core.resources.base import APIResource
-
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class ResourcesCache(object):
     primary key automatically
     """
 
-    def __init__(self, per_cache_max_size):
+    def __init__(self, per_cache_max_size) -> None:
         self.__cache_max_size = per_cache_max_size
         self.__caches = defaultdict(self.__cache_factory)
         self.__cache_index_key_map = {}
@@ -32,18 +32,18 @@ class ResourcesCache(object):
         if self.__cache_max_size == 0:
             logger.debug('Cache size set to 0, resource caching disabled')
 
-    def __len__(self):
+    def __len__(self) -> float:
         """Return sum of all cache sizes"""
         return sum(c.currsize for c in self.__caches.values())
 
-    def __contains__(self, item):
+    def __contains__(self, item: Any) -> bool:
         """Check if resource is in cache, expects same 3-length tuple key as __getitem__"""
         index_key = get_cache_index_key(item)
         cache_key = self.__cache_index_key_map.get(index_key)
         target_cache = self.__caches[index_key[0]]
         return cache_key in target_cache
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: Any) -> Any:
         """Get cached resource, expects item to be 3-length tuple of (resource class, target key, target value)"""
         key = get_cache_index_key(item)
         cls = key[0]
@@ -59,15 +59,15 @@ class ResourcesCache(object):
             self.__cache_index_key_map.pop(key, None)
             raise
 
-    def __delitem__(self, resource):
+    def __delitem__(self, resource: Any) -> Any:
         """Remove resource instance from internal cache"""
         self.__caches[type(resource)].pop(resource.get_cache_internal_key(), None)
 
-    def __cache_factory(self):
+    def __cache_factory(self) -> LFUCache[Any, Any]:
         """Build and return a new cache instance"""
         return LFUCache(self.__cache_max_size)
 
-    def cache(self, resource):
+    def cache(self, resource: Any) -> None:
         """Insert a resource instance into appropriate resource cache"""
         if not isinstance(resource, APIResource):
             raise TypeError('Cannot cache `{!r}`, can only cache APIResource instances'.format(resource))
@@ -93,7 +93,7 @@ class ResourcesCache(object):
 
             logger.debug('Cached `{!r}`'.format(resource))
 
-    def clear(self, *resource_types):
+    def clear(self, *resource_types: Any) -> None:
         """Clear cache for each provided APIResource class, or all resources if no classes are provided"""
         resource_types = resource_types or tuple(self.__caches.keys())
 
@@ -103,7 +103,7 @@ class ResourcesCache(object):
             del self.__caches[cls]
 
 
-def get_cache_index_key(resource):
+def get_cache_index_key(resource: Any) -> Any:
     """Return a usable cache lookup key for an already initialized resource
 
     Args:
@@ -127,7 +127,7 @@ def get_cache_index_key(resource):
     return key
 
 
-def check_cache(resource_type):
+def check_cache(resource_type: Any) -> Any:
     """Decorator for adapter methods to check cache for resource before normally sending requests to retrieve data
 
     Only works with single kwargs, almost always used with @one_of_keyword_only decorator
@@ -136,9 +136,9 @@ def check_cache(resource_type):
         resource_type (type(APIResource)): Subclass of APIResource of cache to be checked when called
     """
 
-    def decorator(func):
+    def decorator(func: Any) -> Any:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             try:
                 adapter = args[0]
                 key, val = list(kwargs.items())[0]
