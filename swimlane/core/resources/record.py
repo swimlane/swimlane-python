@@ -8,7 +8,8 @@ from swimlane.core.resources.usergroup import UserGroup, User
 from swimlane.exceptions import SwimlaneException, UnknownField, ValidationError
 import swimlane.core.adapters.task  # avoid circular reference
 import swimlane.core.adapters.helper  # avoid circular reference
-
+from swimlane.core.resources.app import App
+from typing import Any, Generator, Tuple, Dict, List, Optional
 
 
 @total_ordering
@@ -26,7 +27,7 @@ class Record(APIResource):
 
     _type = 'Core.Models.Record.Record, Core'
 
-    def __init__(self, app, raw):
+    def __init__(self, app: App, raw: Any) -> None:
         super(Record, self).__init__(app._swimlane, raw)
 
         self.__app = app
@@ -77,32 +78,32 @@ class Record(APIResource):
         self.revisions = RecordRevisionAdapter(app, self)
 
     @property
-    def app(self):
+    def app(self) -> App:
         return self.__app
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.is_new:
             return '{} - New'.format(self.app.acronym)
 
         return str(self.tracking_id)
 
-    def __setitem__(self, field_name, value):
+    def __setitem__(self, field_name: str, value: Any) -> None:
         self.get_field(field_name).set_python(value)
 
-    def __getitem__(self, field_name):
+    def __getitem__(self, field_name: str) -> Any:
         return self.get_field(field_name).get_item()
 
-    def __delitem__(self, field_name):
+    def __delitem__(self, field_name: str) -> None:
         self[field_name] = None
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[Tuple[Any, Any], None, None]:
         for field_name, field in six.iteritems(self._fields):
             yield field_name, field.get_python()
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.id, self.app))
 
-    def __lt__(self, other):
+    def __lt__(self, other: Any) -> bool:
         if not isinstance(other, self.__class__):
             raise TypeError("Comparisons not supported between instances of '{}' and '{}'".format(
                 other.__class__.__name__,
@@ -114,7 +115,7 @@ class Record(APIResource):
 
         return (self.app.name, tracking_number_self) < (other.app.name, tracking_number_other)
 
-    def __premap_fields(self):
+    def __premap_fields(self) -> None:
         """Build field instances using field definitions in app manifest
 
         Map raw record field data into appropriate field instances with their correct respective types
@@ -131,7 +132,7 @@ class Record(APIResource):
 
             self._fields[field_instance.name] = field_instance
 
-    def get_cache_index_keys(self):
+    def get_cache_index_keys(self) -> Dict[str, str]:
         """Return values available for retrieving records, but only for already existing records"""
         if not (self.id and self.tracking_id):
             raise NotImplementedError
@@ -141,7 +142,7 @@ class Record(APIResource):
             'tracking_id': self.tracking_id
         }
 
-    def get_field(self, field_name):
+    def get_field(self, field_name: str) -> Any:
         """Get field instance used to get, set, and serialize internal field value
 
         Args:
@@ -158,7 +159,7 @@ class Record(APIResource):
         except KeyError:
             raise UnknownField(self.app, field_name, self._fields.keys())
 
-    def validate(self):
+    def validate(self) -> None:
         """Explicitly validate field data
 
         Notes:
@@ -172,7 +173,7 @@ class Record(APIResource):
                 raise ValidationError(
                     self, 'Required field "{}" is not set'.format(field.name))
 
-    def __request_and_reinitialize(self, method, endpoint, data):
+    def __request_and_reinitialize(self, method: str, endpoint: str, data: Any) -> None:
         response = self._swimlane.request(
             method,
             endpoint,
@@ -185,7 +186,7 @@ class Record(APIResource):
         # Manually cache self after save to keep cache updated with latest data
         self._swimlane.resources_cache.cache(self)
 
-    def save(self):
+    def save(self) -> None:
         """Persist record changes on Swimlane server
 
         Updates internal raw data with response content from server to guarantee calculated field values match values on
@@ -216,7 +217,7 @@ class Record(APIResource):
             copy_raw
         )
 
-    def patch(self):
+    def patch(self) -> None:
         """Patch record on Swimlane server
 
         Raises
@@ -255,7 +256,7 @@ class Record(APIResource):
             copy_raw
         )
 
-    def delete(self):
+    def delete(self) -> None:
         """Delete record from Swimlane server
 
         .. versionadded:: 2.16.1
@@ -282,7 +283,7 @@ class Record(APIResource):
 
         self.__init__(self.app, raw)
 
-    def for_json(self, *field_names):
+    def for_json(self, *field_names: Any) -> Dict[Any, Any]:
         """Returns json.dump()-compatible dict representation of the record
 
         .. versionadded:: 4.1
@@ -303,11 +304,11 @@ class Record(APIResource):
         return {field_name: self.get_field(field_name).for_json() for field_name in field_names}
 
     @property
-    def restrictions(self):
+    def restrictions(self) -> List[UserGroup]:
         """Returns cached set of retrieved UserGroups in the record's list of allowed accounts"""
         return [UserGroup(self._swimlane, raw) for raw in self._raw['allowed']]
 
-    def add_restriction(self, *usergroups):
+    def add_restriction(self, *usergroups: List[UserGroup]) -> None:
         """Add UserGroup(s) to list of accounts with access to record
 
         .. versionadded:: 2.16.1
@@ -346,7 +347,7 @@ class Record(APIResource):
 
         self._raw['allowed'] = allowed
 
-    def remove_restriction(self, *usergroups):
+    def remove_restriction(self, *usergroups: List[UserGroup]) -> None:
         """Remove UserGroup(s) from list of accounts with access to record
 
         .. versionadded:: 2.16.1
@@ -387,7 +388,7 @@ class Record(APIResource):
 
         self._raw['allowed'] = allowed
 
-    def lock(self):
+    def lock(self) -> None:
         """
         Lock the record to the Current User.
 
@@ -409,7 +410,7 @@ class Record(APIResource):
         self.locking_user = User(self._swimlane, response['lockingUser'])
         self.locked_date = response['lockedDate']
 
-    def unlock(self):
+    def unlock(self) -> None:
           """
           Unlock the record.
 
@@ -427,11 +428,11 @@ class Record(APIResource):
               'app/{}/record/{}/unlock'.format(
                   self.app.id, self.id)
           ).json()
-          self.locked = False 
+          self.locked = False
           self.locking_user = None
           self.locked_date = None
-    
-    def execute_task(self, task_name, timeout=int(20)):
+
+    def execute_task(self, task_name: str, timeout: int=int(20)) -> None:
         job_info = swimlane.core.adapters.task.TaskAdapter(self.app._swimlane).execute(task_name, self._raw)
         timeout_start = pendulum.now()
         while pendulum.now() < timeout_start.add(seconds=timeout):
@@ -445,9 +446,9 @@ class Record(APIResource):
                     if item.get('status') == 'failed':
                         raise SwimlaneException('Task failed: {}'.format(item.get('message')))
             time.sleep(1)
-        
 
-def record_factory(app, fields=None):
+
+def record_factory(app: App, fields: Optional[Dict[Any, Any]]=None) -> Record:
     """Return a temporary Record instance to be used for field validation and value parsing
 
     Args:

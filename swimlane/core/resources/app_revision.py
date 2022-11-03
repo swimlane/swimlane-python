@@ -1,6 +1,6 @@
 from swimlane.core.resources.app import App
 from swimlane.core.resources.revision_base import RevisionBase
-
+from typing import List, Dict
 
 class AppRevision(RevisionBase):
     """
@@ -20,23 +20,23 @@ class AppRevision(RevisionBase):
     SEPARATOR = ' --- '
 
     @staticmethod
-    def get_unique_id(app_id, revision_number):
+    def get_unique_id(app_id: str, revision_number: str) -> str:
         """Returns the unique identifier for the given AppRevision."""
         return '{0}{1}{2}'.format(app_id, AppRevision.SEPARATOR, revision_number)
 
     @staticmethod
-    def parse_unique_id(unique_id):
+    def parse_unique_id(unique_id: str) -> List[str]:
         """Returns an array containing two items: the app_id and revision number parsed from the given unique_id."""
         return unique_id.split(AppRevision.SEPARATOR)
 
     @property
-    def version(self):
+    def version(self) -> App:
         """Returns an App from the _raw_version info in this app revision. Lazy loaded. Overridden from base class."""
         if not self._version:
             self._version = App(self._swimlane, self._raw_version)
         return self._version
 
-    def get_cache_index_keys(self):
+    def get_cache_index_keys(self) -> Dict[str, str]:
         """Returns cache index keys for this AppRevision."""
         return {
             'app_id_revision': self.get_unique_id(self.version.id, self.revision_number)

@@ -2,6 +2,7 @@ import pendulum
 
 from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.usergroup import UserGroup
+from typing import Any, Dict
 
 
 class RevisionBase(APIResource):
@@ -16,7 +17,7 @@ class RevisionBase(APIResource):
         user: The user that saved this revision.
     """
 
-    def __init__(self, swimlane, raw):
+    def __init__(self, swimlane: Any, raw: Any) -> None:
         super(RevisionBase, self).__init__(swimlane, raw)
 
         self.modified_date = pendulum.parse(self._raw['modifiedDate'])
@@ -29,14 +30,14 @@ class RevisionBase(APIResource):
         self._raw_version = self._raw['version']
         self._version = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '{} ({})'.format(self.version, self.revision_number)
 
     @property
-    def version(self):
+    def version(self) -> str:
         raise NotImplementedError
 
-    def for_json(self):
+    def for_json(self) -> Dict[str, Any]:
         """Return revision metadata"""
         return {
             'modifiedDate': self._raw['modifiedDate'],

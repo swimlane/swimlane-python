@@ -2,6 +2,7 @@ import pendulum
 
 from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.usergroup import UserGroup
+from typing import Dict, Any
 
 
 class Comment(APIResource):
@@ -13,7 +14,7 @@ class Comment(APIResource):
         message (str): Comment message body
     """
 
-    def __init__(self, swimlane, raw):
+    def __init__(self, swimlane: Any, raw: Any) -> None:
         super(Comment, self).__init__(swimlane, raw)
 
         self.user = UserGroup(swimlane, self._raw['createdByUser'])
@@ -21,10 +22,10 @@ class Comment(APIResource):
         self.message = self._raw['message']
         self.is_rich_text = self._raw.get('isRichText', False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message
 
-    def for_json(self):
+    def for_json(self) -> Dict[str, Any]:
         """Called by CommentField.for_json(), returns relevant Comment attributes in JSON-compatible format"""
         return {
             'message': self.message,

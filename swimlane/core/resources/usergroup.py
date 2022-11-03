@@ -3,6 +3,7 @@ from functools import total_ordering
 from swimlane.core.cursor import Cursor
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.base import APIResource
+from typing import Any, Dict, List, Generator, Union
 
 
 # pylint: disable=abstract-method
@@ -21,23 +22,23 @@ class UserGroup(APIResource):
         name (str): User/group name
     """
 
-    def __init__(self, swimlane, raw):
+    def __init__(self, swimlane: Any, raw: Any) -> None:
         super(UserGroup, self).__init__(swimlane, raw)
 
         self.id = self._raw['id']
         self.name = self._raw['name']
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.id, self.name))
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """Override to allow equality comparisons across UserGroup, User, and Group instances"""
         return isinstance(other, UserGroup) and hash(self) == hash(other)
 
-    def __lt__(self, other):
+    def __lt__(self, other: Any) -> bool:
         if not isinstance(other, UserGroup):
             raise TypeError("Comparisons not supported between instances of '{}' and '{}'".format(
                 other.__class__.__name__,
@@ -46,7 +47,7 @@ class UserGroup(APIResource):
 
         return self.name < other.name
 
-    def resolve(self):
+    def resolve(self) -> Union["User", "Group"]:
         """Retrieve and return correct User or Group instance from UserGroup
 
         .. versionadded:: 2.16.1
@@ -64,7 +65,7 @@ class UserGroup(APIResource):
             except ValueError:
                 return self._swimlane.groups.get(id=self.id)
 
-    def as_usergroup_selection(self):
+    def as_usergroup_selection(self) -> Dict[str, Any]:
         """Converts UserGroup to raw UserGroupSelection for populating record
 
         Returns:
@@ -76,7 +77,7 @@ class UserGroup(APIResource):
             'name': self.name
         }
 
-    def for_json(self):
+    def for_json(self) -> Dict[str, Any]:
         """Get JSON-compatible representation"""
         return {
             'id': self.id,
@@ -94,14 +95,14 @@ class Group(UserGroup):
 
     _type = 'Core.Models.Groups.Group, Core'
 
-    def __init__(self, swimlane, raw):
+    def __init__(self, swimlane: Any, raw: Any) -> None:
         super(Group, self).__init__(swimlane, raw)
         self.__user_ids = [item['id'] for item in self._raw.get('users')]
         self.description = self._raw.get('description')
         self.__users = None
 
     @property
-    def users(self):
+    def users(self) -> "GroupUsersCursor":
         """Returns a GroupUsersCursor with list of User instances for this Group
 
         .. versionadded:: 2.16.2
@@ -110,7 +111,7 @@ class Group(UserGroup):
             self.__users = GroupUsersCursor(swimlane=self._swimlane, user_ids=self.__user_ids)
         return self.__users
 
-    def get_cache_index_keys(self):
+    def get_cache_index_keys(self) -> Dict[str, Any]:
         return {
             'id': self.id,
             'name': self.name
@@ -128,14 +129,14 @@ class User(UserGroup):
 
     _type = 'Core.Models.Identity.ApplicationUser, Core'
 
-    def __init__(self, swimlane, raw):
+    def __init__(self, swimlane: Any, raw: Any) -> None:
         super(User, self).__init__(swimlane, raw)
 
         self.username = self._raw.get('userName')
         self.display_name = self._raw.get('displayName')
         self.email = self._raw.get('email')
 
-    def get_cache_index_keys(self):
+    def get_cache_index_keys(self) -> Dict[str, Any]:
         return {
             'id': self.id,
             'username': self.username,
@@ -146,12 +147,12 @@ class User(UserGroup):
 class GroupUsersCursor(SwimlaneResolver, Cursor):
     """Handles retrieval for user endpoint"""
 
-    def __init__(self, swimlane, user_ids):
+    def __init__(self, swimlane: Any, user_ids: List[str]) -> None:
         SwimlaneResolver.__init__(self, swimlane)
         Cursor.__init__(self)
         self.__user_ids = user_ids
 
-    def _evaluate(self):
+    def _evaluate(self) -> Generator[Any, None, None]:
         """Lazily retrieve and build User instances from returned data"""
         if self._elements:
             for element in self._elements:

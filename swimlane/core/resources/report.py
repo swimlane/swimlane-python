@@ -4,6 +4,8 @@ from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ, LT, GT, LTE, GTE, ASC, DESC
+from swimlane.core.resources.app import App
+from typing import Any, List
 
 
 class Report(APIResource, PaginatedCursor):
@@ -66,7 +68,7 @@ class Report(APIResource, PaginatedCursor):
 
     default_limit = 50
 
-    def __init__(self, app, raw, **kwargs):
+    def __init__(self, app: App, raw: Any, **kwargs: Any) -> None:
         APIResource.__init__(self, app._swimlane, raw)
         PaginatedCursor.__init__(self,
                                  limit=kwargs.pop('limit', self.default_limit),
@@ -80,10 +82,10 @@ class Report(APIResource, PaginatedCursor):
         for field_id in self._app._fields_by_id.keys():
             self._raw['columns'].append(field_id)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def _retrieve_raw_elements(self, page):
+    def _retrieve_raw_elements(self, page: int) -> Any:
         body = self._raw.copy()
 
         body['pageSize'] = self.page_size
@@ -93,10 +95,10 @@ class Report(APIResource, PaginatedCursor):
         response = self._swimlane.request('post', 'search', json=body)
         return response.json()['results'].get(self._app.id, [])
 
-    def _parse_raw_element(self, raw_element):
+    def _parse_raw_element(self, raw_element: Any) -> Record:
         return Record(self._app, raw_element)
 
-    def filter(self, field_name, operand, value):
+    def filter(self, field_name: str, operand: str, value: Any) -> None:
         """Adds a filter to report
 
         Notes:
@@ -118,7 +120,7 @@ class Report(APIResource, PaginatedCursor):
             "value": field.get_report(value)
         })
 
-    def sort(self, field_name, order):
+    def sort(self, field_name: str, order: str) -> None:
         """Adds a sort to report
 
         Args:
@@ -132,7 +134,7 @@ class Report(APIResource, PaginatedCursor):
 
         self._raw['sorts'][field.id] = order
 
-    def set_columns(self, *field_names):
+    def set_columns(self, *field_names: List[str]) -> None:
         """Set specified columns for report
 
         Notes:
@@ -150,12 +152,12 @@ class Report(APIResource, PaginatedCursor):
         if self._app.tracking_id not in self._raw['columns']:
             self._raw['columns'].append(self._app.tracking_id)
 
-    def _get_stub_field(self, field_name):
+    def _get_stub_field(self, field_name: str) -> Any:
         # Use temp Record instance for target app to translate values into expected API format
         record_stub = record_factory(self._app)
         return record_stub.get_field(field_name)
 
-def report_factory(app, report_name, **kwargs):
+def report_factory(app: App, report_name: str, **kwargs: Any) -> Report:
     """Report instance factory populating boilerplate raw data
 
     Args:

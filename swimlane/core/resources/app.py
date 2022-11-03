@@ -4,6 +4,7 @@ import six
 
 from swimlane.exceptions import UnknownField
 from .base import APIResource
+from typing import Dict, Any, Optional
 
 
 @total_ordering
@@ -24,7 +25,7 @@ class App(APIResource):
 
     _type = 'Core.Models.Application.Application, Core'
 
-    def __init__(self, swimlane, raw):
+    def __init__(self, swimlane: Any, raw: Dict[str, Any]) -> None:
         super(App, self).__init__(swimlane, raw)
 
         self.acronym = self._raw['acronym']
@@ -66,13 +67,13 @@ class App(APIResource):
         self.reports = ReportAdapter(self)
         self.revisions = AppRevisionAdapter(self)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '{self.name} ({self.acronym})'.format(self=self)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.id, self.name))
 
-    def __lt__(self, other):
+    def __lt__(self, other: Any) -> bool:
         if not isinstance(other, self.__class__):
             raise TypeError("Comparisons not supported between instances of '{}' and '{}'".format(
                 other.__class__.__name__,
@@ -81,7 +82,7 @@ class App(APIResource):
 
         return self.name < other.name
 
-    def get_cache_index_keys(self):
+    def get_cache_index_keys(self) -> Dict[str, Any]:
         """Return all fields available when retrieving apps"""
         return {
             'id': self.id,
@@ -89,11 +90,11 @@ class App(APIResource):
             'acroynm': self.acronym
         }
 
-    def resolve_field_name(self, field_key):
+    def resolve_field_name(self, field_key: str) -> Optional[str]:
         """Return the field name matching the given key or None. Searches field keys first, falls back to field names"""
         return self._keys_to_field_names.get(field_key)
 
-    def get_field_definition_by_name(self, field_name):
+    def get_field_definition_by_name(self, field_name: str) -> Dict[Any, Any]:
         """Get JSON field definition for field matching provided name or key
 
         .. versionchanged:: 4.1.0
@@ -113,7 +114,7 @@ class App(APIResource):
         except KeyError:
             raise UnknownField(self, field_name, self._fields_by_name.keys())
 
-    def get_field_definition_by_id(self, field_id):
+    def get_field_definition_by_id(self, field_id: str) -> Dict[Any, Any]:
         """Get JSON field definition for field matching provided id
 
         Args:
