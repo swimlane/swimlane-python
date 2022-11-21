@@ -4,7 +4,7 @@ from swimlane.exceptions import SwimlaneException
 @pytest.fixture(autouse=True, name='app', scope='module')
 def my_fixture(helpers):
     # setup stuff
-    helpers.import_content('basic_task_app.ssp')
+    helpers.import_content('basic_task_app.ssp', ['aFgmZM_gL89BGPKaZ', 'aF_jCzUS1zxgyDV8p', 'aGJfrazDjqlBf1fi4', 'aGdcVCS_QhYhLqqGK', 'aGxZ8oxm7YMC2e_pa', 'aHGVnQRXpP9hkTANq'])
     yield helpers.swimlane_instance.apps.get(name='Basic Task App')
     # teardown stuff
     helpers.cleanupData()
