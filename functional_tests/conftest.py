@@ -7,6 +7,7 @@ import sys
 from swimlane import Swimlane
 from faker import Faker
 from io import BytesIO
+from zipfile import ZipFile
 
 try:
     from pathlib import Path
@@ -135,14 +136,19 @@ class Helpers:
                 return app, appId
 
     def import_content(self, file_name):
-        with open('{file_path}/content/{file_name}'.format(file_name=file_name, file_path=file_path), 'rb') as file_handle:
+        full_file_path = '{file_path}/content/{file_name}'.format(file_name=file_name, file_path=file_path)
+        with open(full_file_path, 'rb') as file_handle:
             file_stream = file_handle.read()
+        with ZipFile(full_file_path) as ssp_zip:
+            with ssp_zip.open('Meta/IdMapping.json') as id_mapping:
+                entity_ids = json.load(id_mapping)['mapping'].values()
         bytes_stream = BytesIO(file_stream)
         file = {
             'file': (file_name, bytes_stream, 'application/octet-stream')
         }
         data = {
-            'runInBackground': False
+            'runInBackground': False,
+            'entityIds': entity_ids
         }
         tracking_id = self.swimlane_instance.request(
             'post', 'content/import', files=file, data=data).text
