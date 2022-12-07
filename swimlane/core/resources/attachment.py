@@ -12,16 +12,20 @@ class Attachment(APIResource):
         file_id (str): Full file ID used in download request URL
         filename (str): Attachment filename
         upload_date (pendulum.DateTime): Pendulum datetime when attachment was uploaded
+        record_id (str): Associated record ID used in download request URL
+        field_id (str): Assocated field ID used in download request URL
     """
 
     _type = 'Core.Models.Record.Attachment, Core'
 
-    def __init__(self, swimlane, raw):
+    def __init__(self, swimlane, raw, record_id, field_id):
         super(Attachment, self).__init__(swimlane, raw)
 
         self.file_id = self._raw['fileId']
         self.filename = self._raw['filename']
         self.upload_date = pendulum.parse(self._raw['uploadDate'])
+        self.record_id = record_id
+        self.field_id = field_id
 
     def __str__(self):
         return str(self.filename)
@@ -42,7 +46,7 @@ class Attachment(APIResource):
 
         response = self._swimlane.request(
             'get',
-            'attachment/download/{}'.format(self.file_id),
+            'attachment/{}/{}/{}'.format(self.record_id, self.field_id, self.file_id),
             stream=True
         )
 

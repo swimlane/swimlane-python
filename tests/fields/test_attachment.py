@@ -75,7 +75,7 @@ def test_set_attachments_validation(mock_swimlane, mock_record):
         'fileId': '1234',
         'filename': 'filename.txt',
         'uploadDate': '2017-04-10T16:26:17.017Z'
-    })
+    }, mock_record.id, "aep2e")
 
     field_name = 'PCAP Attachment'
     mock_record[field_name] = [attachment]

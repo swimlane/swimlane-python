@@ -28,7 +28,7 @@ class AttachmentCursor(FieldCursor):
         # Returns raw attachment data as list with single element
         raw_attachment_data = response.json()[0]
 
-        attachment = Attachment(self._record._swimlane, raw_attachment_data)
+        attachment = Attachment(self._record._swimlane, raw_attachment_data, self._record.id, self._field.id)
         self._elements.append(attachment)
 
         self._sync_field()
@@ -66,7 +66,7 @@ class AttachmentsField(MultiSelectField):
         self._cursor = None
 
     def cast_to_python(self, value):
-        return Attachment(self._swimlane, value)
+        return Attachment(self._swimlane, value, self.record.id, self.id)
 
     def cast_to_swimlane(self, value):
         return value._raw
