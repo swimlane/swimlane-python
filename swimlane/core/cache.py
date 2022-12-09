@@ -7,7 +7,10 @@ A ResourcesCache instance is provided on all Swimlane client instances automatic
 import copy
 import functools
 import logging
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 
 from cachetools import LFUCache
 
