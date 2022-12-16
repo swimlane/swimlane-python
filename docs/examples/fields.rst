@@ -27,7 +27,7 @@ TextField
 
 Supports automatic :class:`str` type coercion for non-string types
 
-Not all the types are supported, here is a list of examples of valid values:
+Not all types are supported. Here are some examples of valid values:
 
 - Number: "24352435234", 2343
 - Text: "24352435234", "Henry"
