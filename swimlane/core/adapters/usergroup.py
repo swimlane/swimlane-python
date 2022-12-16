@@ -41,7 +41,7 @@ class GroupAdapter(SwimlaneResolver):
             ValueError: If limit is not of type integer or None
         """
 
-        if type(limit) is int or limit is None:
+        if isinstance(limit, int) or limit is None:
             return GroupListCursor(swimlane=self._swimlane, limit=limit)
 
         raise ValueError('Limit should be a whole number')
@@ -114,7 +114,7 @@ class UserAdapter(SwimlaneResolver):
             ValueError: If limit is not of type integer or None
         """
 
-        if type(limit) is int or limit is None:
+        if isinstance(limit, int) or limit is None:
             return UserListCursor(swimlane=self._swimlane, limit=limit)
 
         raise ValueError('Limit should be a whole number')

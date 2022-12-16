@@ -26,17 +26,23 @@ class TestUserAdaptor:
         swimUsers = pytest.swimlane_instance.users.list(limit=maxUsers)
         assert len(swimUsers) == maxUsers
 
-    @pytest.mark.xfail(reason="SPT-6031: Sending a string for the max count should throw an error.")
     def test_users_list_count_limit_not_valid_string(helpers):
-        invalidMaxUsers = 'Hello'
-        swimUsers = pytest.swimlane_instance.users.list(limit=invalidMaxUsers)
-        assert len(swimUsers) == invalidMaxUsers
+        stringLimit = 'Hello'
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.list(limit=stringLimit)
+        assert str(excinfo.value) == 'Limit should be a whole number'
 
-    @pytest.mark.xfail(reason="SPT-6031: Sending a floating point for the max count should throw an error.")
+    def test_users_list_count_limit_not_valid_empty_string(helpers):
+        stringLimit = ''
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.list(limit=stringLimit)
+        assert str(excinfo.value) == 'Limit should be a whole number'
+
     def test_users_list_count_limit_not_valid_float(helpers):
-        floatMaxUsers = 1.75
-        swimUsers = pytest.swimlane_instance.users.list(limit=floatMaxUsers)
-        assert len(swimUsers) == floatMaxUsers
+        floatLimit = 5.5
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.list(limit=floatLimit)
+        assert str(excinfo.value) == 'Limit should be a whole number'
 
     def test_users_get_by_id(helpers):
         swimUser = pytest.swimlane_instance.users.get(id=pytest.tempUser['id'])
@@ -115,18 +121,23 @@ class TestGroupAdaptor:
         swimGroups = pytest.swimlane_instance.groups.list(limit=maxGroups)
         assert len(swimGroups) == maxGroups
 
-    @pytest.mark.xfail(reason="SPT-6031: Sending a string for the max count should throw an error.")
     def test_groups_list_count_limit_not_valid_string(helpers):
-        invalidMaxGroups = 'Hello'
-        swimGroups = pytest.swimlane_instance.users.list(
-            limit=invalidMaxGroups)
-        assert len(swimGroups) == invalidMaxGroups
+        stringLimit = 'Hello'
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.groups.list(limit=stringLimit)
+        assert str(excinfo.value) == 'Limit should be a whole number'
 
-    @pytest.mark.xfail(reason="SPT-6031: Sending a floating point for the max count should throw an error.")
+    def test_groups_list_count_limit_not_valid_empty_string(helpers):
+        stringLimit = ''
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.groups.list(limit=stringLimit)
+        assert str(excinfo.value) == 'Limit should be a whole number'
+
     def test_groups_list_count_limit_not_valid_float(helpers):
-        floatMaxGroups = 1.75
-        swimGroups = pytest.swimlane_instance.users.list(limit=floatMaxGroups)
-        assert len(swimGroups) == floatMaxGroups
+        floatLimit = 5.5
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.groups.list(limit=floatLimit)
+        assert str(excinfo.value) == 'Limit should be a whole number'
 
     def test_grouprs_get_by_id(helpers):
         swimGroup = pytest.swimlane_instance.groups.get(
