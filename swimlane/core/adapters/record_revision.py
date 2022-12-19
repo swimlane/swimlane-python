@@ -27,7 +27,11 @@ class RecordRevisionAdapter(AppResolver):
 
         Returns:
             RecordRevision: The RecordRevision for the given revision number.
+            Raises: When revision is not an integer or is less than 1
         """
+        if not isinstance(revision_number, int) or revision_number < 1:
+            raise ValueError('The revision number must be a positive whole number greater than 0')
+
         record_revision_raw = self._swimlane.request('get',
                                                      'app/{0}/record/{1}/history/{2}'.format(self._app.id,
                                                                                              self.record.id,

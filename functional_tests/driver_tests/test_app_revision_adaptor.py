@@ -32,7 +32,7 @@ class TestAppRevisionAdaptor:
         theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
         with pytest.raises(ValueError) as excinfo:
             theapp.revisions.get(-2)
-        assert str(excinfo.value) == pytest.py_ver_no_json()
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'
 
     def test_app_get_too_large_number_revision(helpers):
         theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
@@ -40,31 +40,32 @@ class TestAppRevisionAdaptor:
             theapp.revisions.get(99)
         assert str(excinfo.value) == pytest.py_ver_no_json()
 
-    @pytest.mark.xfail(reason="SPT-6038: URL is being made with the string, throwing errors")
-    def test_app_get_invalid_revision(helpers):
+    def test_app_get_invalid_string_revision(helpers):
         theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
         with pytest.raises(ValueError) as excinfo:
             theapp.revisions.get('garbage')
-        assert str(excinfo.value) == pytest.py_ver_no_json()
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'
 
-    # This grabs the newest version... not 2 or 3... or errors?
-    @pytest.mark.xfail(reason="SPT-6038:Grabbs latest versioninstead of throwing an error")
     def test_app_get_float_revision(helpers):
         theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
         with pytest.raises(ValueError) as excinfo:
             theapp.revisions.get(2.5)
-        assert str(excinfo.value) == 'No JSON object could be decoded'
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'
 
-    @pytest.mark.xfail(reason="SPT-6038?: Attribute error 'list' object has no attribute 'get'")
     def test_app_get_empty_revision(helpers):
         theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
         with pytest.raises(ValueError) as excinfo:
             theapp.revisions.get('')
-        assert str(excinfo.value) == pytest.py_ver_no_json()
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'
 
-    @pytest.mark.xfail(reason="SPT-6038: URL is being made with the None, throwing errors")
     def test_app_get_none_revision(helpers):
         theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
         with pytest.raises(ValueError) as excinfo:
             theapp.revisions.get(None)
-        assert str(excinfo.value) == pytest.py_ver_no_json()
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'
+
+    def test_app_get_zero_revision(helpers):
+        theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
+        with pytest.raises(ValueError) as excinfo:
+            theapp.revisions.get(0)
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'

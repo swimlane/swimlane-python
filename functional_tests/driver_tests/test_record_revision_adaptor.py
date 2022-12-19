@@ -1,4 +1,5 @@
 import pytest
+from requests import HTTPError
 
 
 @pytest.fixture(autouse=True, scope='module')
@@ -34,47 +35,51 @@ class TestRecordRevisionAdaptor:
         therecord = pytest.app.records.get(id=pytest.baseRecord.id)
         record_rev = therecord.revisions.get(2)
         assert record_rev.revision_number == 2
-        assert record_rev.version.for_json() == pytest.record2
 
-    @pytest.mark.xfail(reason="SPT-6038: URL is being made with the negative number, throwing errors")
     def test_record_get_negative_number_revision(helpers):
         therecord = pytest.app.records.get(id=pytest.baseRecord.id)
         with pytest.raises(ValueError) as excinfo:
             therecord.revisions.get(-2)
-        assert str(excinfo.value) == 'No JSON object could be decoded'
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'
 
-    @pytest.mark.xfail(reason="SPT-6038: URL is being made with the large number, throwing errors")
     def test_record_get_too_large_number_revision(helpers):
         therecord = pytest.app.records.get(id=pytest.baseRecord.id)
-        with pytest.raises(ValueError) as excinfo:
+        with pytest.raises(HTTPError) as excinfo:
             therecord.revisions.get(99)
-        assert str(excinfo.value) == 'No JSON object could be decoded'
+        assert '404 Client Error: Not Found for url' in str(excinfo.value)
 
-    @pytest.mark.xfail(reason="SPT-6038: URL is being made with the garbage test, throwing errors")
-    def test_record_get_invalid_revision(helpers):
+    def test_app_get_too_large_number_revision(helpers):
+        theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
+        with pytest.raises(ValueError) as excinfo:
+            theapp.revisions.get(99)
+        assert str(excinfo.value) == pytest.py_ver_no_json()
+
+    def test_record_get_string_revision(helpers):
         therecord = pytest.app.records.get(id=pytest.baseRecord.id)
         with pytest.raises(ValueError) as excinfo:
             therecord.revisions.get('garbage')
-        assert str(excinfo.value) == 'No JSON object could be decoded'
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'
 
-    # This grabs the newest version... not 2 or 3... or errors?
-    @pytest.mark.xfail(reason="SPT-6038:Grabbs latest versioninstead of throwing an error")
     def test_record_get_float_revision(helpers):
         therecord = pytest.app.records.get(id=pytest.baseRecord.id)
         with pytest.raises(ValueError) as excinfo:
             therecord.revisions.get(2.5)
-        assert str(excinfo.value) == 'No JSON object could be decoded'
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'
 
-    @pytest.mark.xfail(reason="SPT-6038: Attribute error 'list' object has no attribute 'get'")
     def test_record_get_empty_revision(helpers):
         therecord = pytest.app.records.get(id=pytest.baseRecord.id)
         with pytest.raises(ValueError) as excinfo:
             therecord.revisions.get('')
-        assert str(excinfo.value) == 'No JSON object could be decoded'
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'
 
-    @pytest.mark.xfail(reason="SPT-6038: URL is being made with the None, throwing errors")
     def test_record_get_none_revision(helpers):
         therecord = pytest.app.records.get(id=pytest.baseRecord.id)
         with pytest.raises(ValueError) as excinfo:
             therecord.revisions.get(None)
-        assert str(excinfo.value) == 'No JSON object could be decoded'
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'
+
+    def test_record_get_zero_revision(helpers):
+        therecord = pytest.app.records.get(id=pytest.baseRecord.id)
+        with pytest.raises(ValueError) as excinfo:
+            therecord.revisions.get(0)
+        assert str(excinfo.value) == 'The revision number must be a positive whole number greater than 0'

@@ -28,7 +28,12 @@ class AppRevisionAdapter(AppResolver):
 
         Returns:
             AppRevision: The AppRevision for the given revision number.
+            Raises: When revision is not an integer or is less than 1
         """
+
+        if not isinstance(revision_number, int) or revision_number < 1:
+            raise ValueError('The revision number must be a positive whole number greater than 0')
+
         key_value = AppRevision.get_unique_id(self._app.id, revision_number)
         return self.__get(app_id_revision=key_value)
 
