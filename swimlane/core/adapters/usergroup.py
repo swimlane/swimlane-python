@@ -60,10 +60,14 @@ class GroupAdapter(SwimlaneResolver):
         Raises:
             TypeError: Unexpected or more than one keyword argument provided
             ValueError: No matching group found based on provided inputs
+            ValueError: The lookup value is empty or None
 
         Returns:
             Group: Group instance matching provided inputs
         """
+        if value == '' or value == None:
+            raise ValueError('The lookup value can not be empty or None')
+
         if key == 'id':
             response = self._swimlane.request('get', 'groups/{}'.format(value))
             return Group(self._swimlane, response.json())
@@ -138,7 +142,11 @@ class UserAdapter(SwimlaneResolver):
         Raises:
             TypeError: Unexpected or more than one keyword argument provided
             ValueError: No matching user found based on provided inputs, or multiple Users with same display name
+            ValueError: The lookup value is empty or None
         """
+        if value == '' or value == None:
+            raise ValueError('The lookup value can not be empty or None')
+
         if arg == 'id':
             response = self._swimlane.request('get', 'user/{}'.format(value))
 
