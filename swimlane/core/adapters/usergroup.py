@@ -37,8 +37,14 @@ class GroupAdapter(SwimlaneResolver):
 
         Returns:
             :class:`list` of :class:`~swimlane.core.resources.usergroup.Group`: List of all Groups
+        Raises:
+            ValueError: If limit is not of type integer or None
         """
-        return GroupListCursor(self._swimlane, limit=limit)
+
+        if (isinstance(limit, int) and limit > 0) or limit is None:
+            return GroupListCursor(swimlane=self._swimlane, limit=limit)
+
+        raise ValueError('Limit should be a positive whole number greater than 0')
 
     @check_cache(Group)
     @one_of_keyword_only('id', 'name')
@@ -103,8 +109,15 @@ class UserAdapter(SwimlaneResolver):
 
         Returns:
             :class:`UserListCursor`: Paginated cursor yielding :class:`User` instances
+
+        Raises:
+            ValueError: If limit is not of type integer or None
         """
-        return UserListCursor(swimlane=self._swimlane, limit=limit)
+
+        if (isinstance(limit, int) and limit > 0) or limit is None:
+            return UserListCursor(swimlane=self._swimlane, limit=limit)
+
+        raise ValueError('Limit should be a positive whole number greater than 0')
 
     @check_cache(User)
     @one_of_keyword_only('id', 'display_name')
