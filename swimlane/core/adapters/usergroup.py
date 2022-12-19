@@ -41,10 +41,10 @@ class GroupAdapter(SwimlaneResolver):
             ValueError: If limit is not of type integer or None
         """
 
-        if isinstance(limit, int) or limit is None:
+        if (isinstance(limit, int) and limit > 0) or limit is None:
             return GroupListCursor(swimlane=self._swimlane, limit=limit)
 
-        raise ValueError('Limit should be a whole number')
+        raise ValueError('Limit should be a positive whole number greater than 0')
 
     @check_cache(Group)
     @one_of_keyword_only('id', 'name')
@@ -114,10 +114,10 @@ class UserAdapter(SwimlaneResolver):
             ValueError: If limit is not of type integer or None
         """
 
-        if isinstance(limit, int) or limit is None:
+        if (isinstance(limit, int) and limit > 0) or limit is None:
             return UserListCursor(swimlane=self._swimlane, limit=limit)
 
-        raise ValueError('Limit should be a whole number')
+        raise ValueError('Limit should be a positive whole number greater than 0')
 
     @check_cache(User)
     @one_of_keyword_only('id', 'display_name')

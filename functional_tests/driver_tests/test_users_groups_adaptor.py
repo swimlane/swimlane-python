@@ -30,19 +30,31 @@ class TestUserAdaptor:
         stringLimit = 'Hello'
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.list(limit=stringLimit)
-        assert str(excinfo.value) == 'Limit should be a whole number'
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
 
     def test_users_list_count_limit_not_valid_empty_string(helpers):
         stringLimit = ''
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.list(limit=stringLimit)
-        assert str(excinfo.value) == 'Limit should be a whole number'
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
 
     def test_users_list_count_limit_not_valid_float(helpers):
         floatLimit = 5.5
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.list(limit=floatLimit)
-        assert str(excinfo.value) == 'Limit should be a whole number'
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
+
+    def test_users_list_count_limit_not_valid_negative_int(helpers):
+        negativeIntLimit = -3
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.list(limit=negativeIntLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
+
+    def test_users_list_count_limit_not_valid_zero(helpers):
+        zeroLimit = 0
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.list(limit=zeroLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
 
     def test_users_get_by_id(helpers):
         swimUser = pytest.swimlane_instance.users.get(id=pytest.tempUser['id'])
@@ -125,19 +137,31 @@ class TestGroupAdaptor:
         stringLimit = 'Hello'
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.list(limit=stringLimit)
-        assert str(excinfo.value) == 'Limit should be a whole number'
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
 
     def test_groups_list_count_limit_not_valid_empty_string(helpers):
         stringLimit = ''
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.list(limit=stringLimit)
-        assert str(excinfo.value) == 'Limit should be a whole number'
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
 
     def test_groups_list_count_limit_not_valid_float(helpers):
         floatLimit = 5.5
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.list(limit=floatLimit)
-        assert str(excinfo.value) == 'Limit should be a whole number'
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
+
+    def test_groups_list_count_limit_not_valid_zero(helpers):
+        zeroLimit = 0
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.groups.list(limit=zeroLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
+
+    def test_groups_list_count_limit_not_valid_negative_int(helpers):
+        negativeIntLimit = -3
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.groups.list(limit=negativeIntLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
 
     def test_grouprs_get_by_id(helpers):
         swimGroup = pytest.swimlane_instance.groups.get(
