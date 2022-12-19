@@ -240,7 +240,7 @@ class Record(APIResource):
             if self.app.get_field_definition_by_id(field_id)['fieldType'] == 'attachment':
                 raise ValueError('Can not patch new attachments')
             # Use None for empty arrays to ensure field is removed from Record on PATCH
-            if not value:
+            if not value and value != 0:
                 patch_values[field_id] = None
 
         # $type needed here for dotnet to deserialize correctly
