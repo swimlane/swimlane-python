@@ -27,6 +27,13 @@ TextField
 
 Supports automatic :class:`str` type coercion for non-string types
 
+Not all types are supported. Here are some examples of valid values:
+
+- Number: "24352435234", 2343
+- Text: "24352435234", "Henry"
+- Date: "24352435234" as a DateTime ONLY
+- Tracking Id: "23452435234", "SW-132"
+
 Assume the example below has a record with a text field "Severity" with the value "7":
 
 .. code-block:: python
