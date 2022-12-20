@@ -27,7 +27,7 @@ class AppAdapter(SwimlaneResolver):
             ValueError: The lookup value is empty or None
         """
         if not value:
-            raise ValueError('No {} provided'.format(key))
+            raise ValueError('The value provided for the key "{0}" cannot be empty or None'.format(key))
 
         if key == 'id':
             # Server returns 204 instead of 404 for a non-existent app id

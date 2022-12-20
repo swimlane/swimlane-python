@@ -35,7 +35,7 @@ class RecordAdapter(AppResolver):
         """
 
         if not value:
-            raise ValueError('No {} provided'.format(key))
+            raise ValueError('The value provided for the key "{0}" cannot be empty or None'.format(key))
 
         if key == 'id':
             response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.id, value))

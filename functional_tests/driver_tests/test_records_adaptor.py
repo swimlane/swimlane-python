@@ -94,13 +94,13 @@ class TestRecordAdaptorGet:
         emptyID = ''
         with pytest.raises(ValueError) as excinfo:
             pytest.app.records.get(id=emptyID)
-        assert str(excinfo.value) == 'No id provided'
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_record_get_by_null_id(helpers):
         noneID = None
         with pytest.raises(ValueError) as excinfo:
             pytest.app.records.get(id=noneID)
-        assert str(excinfo.value) == 'No id provided'
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_record_get_by_random_tracking_id(helpers):
         randomID = pytest.fake.random_int()
@@ -113,13 +113,13 @@ class TestRecordAdaptorGet:
         emptyTrackingID = ''
         with pytest.raises(ValueError) as excinfo:
             pytest.app.records.get(tracking_id=emptyTrackingID)
-        assert str(excinfo.value) == 'No tracking_id provided'
+        assert str(excinfo.value) == 'The value provided for the key "tracking_id" cannot be empty or None'
 
     def test_record_get_by_null_trackingId(helpers):
         noneTrackingID = None
         with pytest.raises(ValueError) as excinfo:
             pytest.app.records.get(tracking_id=noneTrackingID)
-        assert str(excinfo.value) == 'No tracking_id provided'
+        assert str(excinfo.value) == 'The value provided for the key "tracking_id" cannot be empty or None'
 
 class TestRecordAdaptorSearch:
     def test_record_search(helpers):

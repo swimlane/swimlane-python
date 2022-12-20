@@ -66,7 +66,7 @@ class GroupAdapter(SwimlaneResolver):
             Group: Group instance matching provided inputs
         """
         if not value:
-            raise ValueError('No {} provided'.format(key))
+            raise ValueError('The value provided for the key "{0}" cannot be empty or None'.format(key))
 
         if key == 'id':
             response = self._swimlane.request('get', 'groups/{}'.format(value))
@@ -145,7 +145,7 @@ class UserAdapter(SwimlaneResolver):
             ValueError: The lookup value is empty or None
         """
         if not value:
-            raise ValueError('No {} provided'.format(arg))
+            raise ValueError('The value provided for the key "{0}" cannot be empty or None'.format(arg))
 
         if arg == 'id':
             response = self._swimlane.request('get', 'user/{}'.format(value))

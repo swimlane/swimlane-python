@@ -70,13 +70,13 @@ class TestUserAdaptor:
         emptyID = ''
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.get(id=emptyID)
-        assert str(excinfo.value) == 'No id provided'
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_users_get_by_null_id(helpers):
         noneID = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.get(id=noneID)
-        assert str(excinfo.value) == 'No id provided'
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_users_get_by_display_name(helpers):
         swimUser = pytest.swimlane_instance.users.get(
@@ -95,14 +95,14 @@ class TestUserAdaptor:
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.get(display_name=emptyDisplayName)
         assert str(
-            excinfo.value) == 'No display_name provided'
+            excinfo.value) == 'The value provided for the key "display_name" cannot be empty or None'
 
     def test_users_get_by_null_display_name(helpers):
         noneDisplayName = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.get(display_name=noneDisplayName)
         assert str(
-            excinfo.value) == 'No display_name provided'
+            excinfo.value) == 'The value provided for the key "display_name" cannot be empty or None'
 
     def test_users_get_no_params(helpers):
         with pytest.raises(TypeError) as excinfo:
@@ -170,13 +170,13 @@ class TestGroupAdaptor:
         emptyID = ''
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(id=emptyID)
-        assert str(excinfo.value) == 'No id provided'
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_groups_get_by_null_id(helpers):
         noneID = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(id=noneID)
-        assert str(excinfo.value) == 'No id provided'
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_groups_get_by_name(helpers):
         swimGroup = pytest.swimlane_instance.groups.get(
@@ -195,14 +195,14 @@ class TestGroupAdaptor:
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(name=emptyName)
         assert str(
-            excinfo.value) == 'No name provided'
+            excinfo.value) == 'The value provided for the key "name" cannot be empty or None'
 
     def test_groups_get_by_null_name(helpers):
         noneName = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(name=noneName)
         assert str(
-            excinfo.value) == 'No name provided'
+            excinfo.value) == 'The value provided for the key "name" cannot be empty or None'
 
     def test_groups_get_no_params(helpers):
         with pytest.raises(TypeError) as excinfo:
