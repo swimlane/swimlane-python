@@ -66,19 +66,17 @@ class TestUserAdaptor:
             pytest.swimlane_instance.users.get(id=randomID)
         assert str(excinfo.value) == 'Unable to find user with ID "%s"' % randomID
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for randomID as empty does not give formal response (attributeError)")
     def test_users_get_by_empty_id(helpers):
         emptyID = ''
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.get(id=emptyID)
-        assert str(excinfo.value) == 'Unable to find user with ID "%s"' % emptyID
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for display_Name as None givesValueError: Unable to find user with ID \"None\"")
     def test_users_get_by_null_id(helpers):
         noneID = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.get(id=noneID)
-        assert str(excinfo.value) == 'Unable to find user with ID "%s"' % noneID
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_users_get_by_display_name(helpers):
         swimUser = pytest.swimlane_instance.users.get(
@@ -92,19 +90,19 @@ class TestUserAdaptor:
         assert str(
             excinfo.value) == 'Unable to find user with display name "%s"' % randomDisplayName
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for display_Name as an empty string should fail")
     def test_users_get_by_empty_display_name(helpers):
         emptyDisplayName = ""
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.get(display_name=emptyDisplayName)
         assert str(
-            excinfo.value) == 'Unable to find user with display name "%s"' % emptyDisplayName
+            excinfo.value) == 'The value provided for the key "display_name" cannot be empty or None'
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for display_Name as None gives  TypeError: argument of type 'NoneType' is not iterable")
     def test_users_get_by_null_display_name(helpers):
-        randomDisplayName = None
-        # we should be catchiong an exception for the display_name being an invalid type.
-        pytest.swimlane_instance.users.get(display_name=randomDisplayName)
+        noneDisplayName = None
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.get(display_name=noneDisplayName)
+        assert str(
+            excinfo.value) == 'The value provided for the key "display_name" cannot be empty or None'
 
     def test_users_get_no_params(helpers):
         with pytest.raises(TypeError) as excinfo:
@@ -168,19 +166,17 @@ class TestGroupAdaptor:
             id=pytest.tempGroup['id'])
         assert swimGroup.for_json()["name"] == pytest.tempGroup['name']
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for randomID as empty does not give formal response (attributeError)")
     def test_groups_get_by_empty_id(helpers):
         emptyID = ''
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(id=emptyID)
-        assert str(excinfo.value) == 'Unable to find group with ID "%s"' % emptyID
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for ID as None givesValueError: Unable to find group with ID \"None\"")
     def test_groups_get_by_null_id(helpers):
         noneID = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(id=noneID)
-        assert str(excinfo.value) == 'Unable to find group with ID "%s"' % noneID
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_groups_get_by_name(helpers):
         swimGroup = pytest.swimlane_instance.groups.get(
@@ -194,21 +190,19 @@ class TestGroupAdaptor:
         assert str(
             excinfo.value) == 'Unable to find group with name "%s"' % randomName
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for name as empty string does error out")
     def test_groups_get_by_empty_name(helpers):
         emptyName = ""
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(name=emptyName)
         assert str(
-            excinfo.value) == 'Unable to find group with name "%s"' % emptyName
+            excinfo.value) == 'The value provided for the key "name" cannot be empty or None'
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for Name as None gives  TypeError: argument of type 'NoneType' is not iterable")
     def test_groups_get_by_null_name(helpers):
         noneName = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(name=noneName)
         assert str(
-            excinfo.value) == 'Unable to find group with name "%s"' % noneName
+            excinfo.value) == 'The value provided for the key "name" cannot be empty or None'
 
     def test_groups_get_no_params(helpers):
         with pytest.raises(TypeError) as excinfo:

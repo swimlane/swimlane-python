@@ -31,7 +31,12 @@ class RecordAdapter(AppResolver):
 
         Raises:
             TypeError: No id argument provided
+            ValueError: The lookup value is empty or None
         """
+
+        if not value:
+            raise ValueError('The value provided for the key "{0}" cannot be empty or None'.format(key))
+
         if key == 'id':
             response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.id, value))
             return Record(self._app, response.json())
