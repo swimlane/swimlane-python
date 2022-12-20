@@ -36,25 +36,25 @@ class TestAppsAdaptor:
         emptyID = ""
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.apps.get(id=emptyID)
-        assert str(excinfo.value) == 'The lookup value can not be empty or None'
+        assert str(excinfo.value) == 'No id provided'
     
     def test_get_by_null_id(helpers):
         noneID = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.apps.get(id=noneID)
-        assert str(excinfo.value) == 'The lookup value can not be empty or None'
+        assert str(excinfo.value) == 'No id provided'
 
     def test_get_by_empty_name(helpers):
         emptyName = ""
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.apps.get(name=emptyName)
-        assert str(excinfo.value) == 'The lookup value can not be empty or None'
+        assert str(excinfo.value) == 'No name provided'
     
     def test_get_by_null_name(helpers):
         noneName = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.apps.get(name=noneName)
-        assert str(excinfo.value) == 'The lookup value can not be empty or None'
+        assert str(excinfo.value) == 'No name provided'
 
     def test_get_by_fake_name(helpers):
         randomName = pytest.fake.sentence()

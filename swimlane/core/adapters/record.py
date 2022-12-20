@@ -34,8 +34,8 @@ class RecordAdapter(AppResolver):
             ValueError: The lookup value is empty or None
         """
 
-        if value == '' or value == None:
-            raise ValueError('The lookup value can not be empty or None')
+        if not value:
+            raise ValueError('No {} provided'.format(key))
 
         if key == 'id':
             response = self._swimlane.request('get', "app/{0}/record/{1}".format(self._app.id, value))
