@@ -32,19 +32,29 @@ class TestAppsAdaptor:
             pytest.swimlane_instance.apps.get(id=randomID)
         assert str(excinfo.value) == 'No app with id "%s"' % randomID
 
-    @pytest.mark.xfail(reason="SPT-5944: Testing for randomID as empty does not give formal response (attributeError)")
     def test_get_by_empty_id(helpers):
-        randomID = ""
+        emptyID = ""
         with pytest.raises(ValueError) as excinfo:
-            pytest.swimlane_instance.apps.get(id=randomID)
-        assert str(excinfo.value) == 'No app with id "%s"' % randomID
+            pytest.swimlane_instance.apps.get(id=emptyID)
+        assert str(excinfo.value) == 'The lookup value can not be empty or None'
+    
+    def test_get_by_null_id(helpers):
+        noneID = None
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.apps.get(id=noneID)
+        assert str(excinfo.value) == 'The lookup value can not be empty or None'
 
-    @pytest.mark.xfail(reason="SPT-5944: Testing for randomName as empty should check on value is empty")
     def test_get_by_empty_name(helpers):
-        randomName = ""
+        emptyName = ""
         with pytest.raises(ValueError) as excinfo:
-            pytest.swimlane_instance.apps.get(name=randomName)
-        assert str(excinfo.value) == 'No app with name "%s"' % randomName
+            pytest.swimlane_instance.apps.get(name=emptyName)
+        assert str(excinfo.value) == 'The lookup value can not be empty or None'
+    
+    def test_get_by_null_name(helpers):
+        noneName = None
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.apps.get(name=noneName)
+        assert str(excinfo.value) == 'The lookup value can not be empty or None'
 
     def test_get_by_fake_name(helpers):
         randomName = pytest.fake.sentence()
