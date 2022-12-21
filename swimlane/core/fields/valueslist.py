@@ -39,14 +39,17 @@ class ValuesListField(MultiSelectField):
     def cast_to_python(self, value):
         """Store actual value as internal representation"""
         if value is not None:
-            value = value['value']
+            if value['value'] in self.selection_to_id_map:
+                return value['value']
 
-        return value
+        return None
 
     def cast_to_swimlane(self, value):
         """Rehydrate value back as full JSON representation"""
         if value is None:
             return value
+        if value not in self.selection_to_id_map:
+            return None
 
         return {
             '$type': 'Core.Models.Record.ValueSelection, Core',
