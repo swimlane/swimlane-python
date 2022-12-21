@@ -43,6 +43,16 @@ class HelperAdapter(SwimlaneResolver):
             message (str): New comment message body
             rich_text (bool): Declare the message as being rich text, default is False
         """
+        self.validate_str(app_id, 'app_id')
+        self.validate_str(record_id, 'record_id')
+        self.validate_str(field_id, 'field_id')
+        self.validate_str(message, 'message')
+        
+        self.validate_str_emptiness(app_id, 'app_id')
+        self.validate_str_emptiness(record_id, 'record_id')
+        self.validate_str_emptiness(field_id, 'field_id')
+        self.validate_str_emptiness(message, 'message')
+        
         if not isinstance(rich_text, bool):
             raise ValueError("rich_text must be a boolean value.")
 
@@ -72,3 +82,11 @@ class HelperAdapter(SwimlaneResolver):
         """
 
         return self._swimlane.request('get', "logging/job/{0}".format(job_id)).json()
+
+    def validate_str(self, value, key):
+        if not isinstance(value, str):
+            raise ValueError('{} must be a string value.'.format(key))
+
+    def validate_str_emptiness(self, value, key):
+        if value.strip() == '':
+            raise ValueError('{} must not be an empty string value.'.format(key))
