@@ -28,6 +28,12 @@ class TestAppRevisionAdaptor:
         assert app_rev.revision_number == 2
         assert app_rev.version.description == pytest.app2.description
 
+    def test_app_get_specific_revision_float_only_zeros_after_decimal(helpers):
+        theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
+        app_rev = theapp.revisions.get(2.0)
+        assert app_rev.revision_number == 2.0
+        assert app_rev.version.description == pytest.app2.description
+
     def test_app_get_negative_number_revision(helpers):
         theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
         with pytest.raises(ValueError) as excinfo:

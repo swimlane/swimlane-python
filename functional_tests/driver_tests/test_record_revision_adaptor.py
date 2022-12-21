@@ -35,6 +35,10 @@ class TestRecordRevisionAdaptor:
         therecord = pytest.app.records.get(id=pytest.baseRecord.id)
         record_rev = therecord.revisions.get(2)
         assert record_rev.revision_number == 2
+    def test_record_get_specific_revision_float_only_zeros_after_decimal(helpers):
+        therecord = pytest.app.records.get(id=pytest.baseRecord.id)
+        record_rev = therecord.revisions.get(2.0)
+        assert record_rev.revision_number == 2.0
 
     def test_record_get_negative_number_revision(helpers):
         therecord = pytest.app.records.get(id=pytest.baseRecord.id)
@@ -47,12 +51,6 @@ class TestRecordRevisionAdaptor:
         with pytest.raises(HTTPError) as excinfo:
             therecord.revisions.get(99)
         assert '404 Client Error: Not Found for url' in str(excinfo.value)
-
-    def test_app_get_too_large_number_revision(helpers):
-        theapp = pytest.swimlane_instance.apps.get(id=pytest.appid)
-        with pytest.raises(ValueError) as excinfo:
-            theapp.revisions.get(99)
-        assert str(excinfo.value) == pytest.py_ver_no_json()
 
     def test_record_get_string_revision(helpers):
         therecord = pytest.app.records.get(id=pytest.baseRecord.id)

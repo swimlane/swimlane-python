@@ -1,3 +1,5 @@
+import math
+
 from swimlane.core.cache import check_cache
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.app_revision import AppRevision
@@ -28,14 +30,15 @@ class AppRevisionAdapter(AppResolver):
 
         Returns:
             AppRevision: The AppRevision for the given revision number.
-            Raises: When revision is not an integer or is less than 1
+            Raises: When revision is not an integer, a float NOT ending in ".0", or is less than 1
         """
 
-        if not isinstance(revision_number, int) or revision_number < 1:
-            raise ValueError('The revision number must be a positive whole number greater than 0')
+        if isinstance(revision_number, (int, float)):
+            if revision_number > 0 and revision_number % math.floor(revision_number) == 0:
+                key_value = AppRevision.get_unique_id(self._app.id, revision_number)
+                return self.__get(app_id_revision=key_value)
 
-        key_value = AppRevision.get_unique_id(self._app.id, revision_number)
-        return self.__get(app_id_revision=key_value)
+        raise ValueError('The revision number must be a positive whole number greater than 0')
 
     @check_cache(AppRevision)
     @one_of_keyword_only('app_id_revision')
