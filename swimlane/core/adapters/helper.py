@@ -2,6 +2,7 @@ import pendulum
 
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.utils.version import requires_swimlane_version
+from swimlane.utils.list_validator import validate_str_list
 
 
 class HelperAdapter(SwimlaneResolver):
@@ -20,6 +21,7 @@ class HelperAdapter(SwimlaneResolver):
             field_id (str): Full field ID to target reference field on parent Record string
             target_record_ids (List(str)): List of full target reference Record ID strings
         """
+        validate_str_list(target_record_ids, "target_record_ids")
 
         self._swimlane.request(
             'post',
