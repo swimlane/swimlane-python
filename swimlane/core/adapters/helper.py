@@ -76,5 +76,7 @@ class HelperAdapter(SwimlaneResolver):
             :class:`list` of :class:`dict`: List of dictionaries containing job history
 
         """
+        
+        validate_str(job_id, 'job_id')
 
         return self._swimlane.request('get', "logging/job/{0}".format(job_id)).json()
