@@ -45,9 +45,9 @@ class AttachmentCursor(FieldCursor):
 
     def validate_stream(self, stream, key):
         print(type(stream))
-        if not isinstance(stream, io.BytesIO):
+        if not isinstance(stream, io.IOBase):
             raise ValueError('{} must be a stream value.'.format(key))
-        if stream.getbuffer().nbytes == 0:
+        if not stream.getvalue():
             raise ValueError('{} must not be an empty stream value.'.format(key))
 
 
