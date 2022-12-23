@@ -314,7 +314,7 @@ class TestHelpersBulkJobStatusAdaptor:
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.helpers.check_bulk_job_status(
                 bulkJobID)
-            assert str(excinfo.value) == "job_id must be a string value."
+        assert str(excinfo.value) == "job_id must be a string value."
 
     @pytest.mark.xfail(reason="SPT-6233: Should verify the bulkJobID is a non-empty string.")
     def test_check_bulk_status_empty_id(helpers):
@@ -342,11 +342,11 @@ class TestHelpersBulkJobStatusAdaptor:
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.helpers.check_bulk_job_status(
                 bulkJobID)
-            assert str(excinfo.value) == "job_id must be a string value."
+        assert str(excinfo.value) == "job_id must be a string value."
 
     def test_check_bulk_status_object_id(helpers):
         bulkJobID = {'name': 'bob'}
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.helpers.check_bulk_job_status(
                 bulkJobID)
-            assert str(excinfo.value) == "job_id must be a string value."
+        assert str(excinfo.value) == "job_id must be a string value."
