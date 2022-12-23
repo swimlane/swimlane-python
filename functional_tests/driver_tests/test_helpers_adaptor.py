@@ -322,7 +322,7 @@ class TestHelpersBulkJobStatusAdaptor:
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.helpers.check_bulk_job_status(
                 bulkJobID)
-            assert str(excinfo.value) == "job_id must not be an empty string value."
+        assert str(excinfo.value) == "job_id must not be an empty string value."
 
     def test_check_bulk_status_no_params(helpers):
         with pytest.raises(TypeError) as excinfo:
