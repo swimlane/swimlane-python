@@ -1,6 +1,6 @@
 import io
 import mimetypes
-import re
+import typing
 
 from swimlane.core.fields.base import MultiSelectField, FieldCursor
 from swimlane.core.resources.attachment import Attachment
@@ -44,13 +44,25 @@ class AttachmentCursor(FieldCursor):
 
 
     def validate_stream(self, stream, key):
-        print(type(stream))
         if not isinstance(stream, io.IOBase):
             raise ValueError('{} must be a stream value.'.format(key))
-        if not stream.getvalue():
+
+        data = self.get_data(stream)
+
+        if not data or not data.strip() :
             raise ValueError('{} must not be an empty stream value.'.format(key))
 
+    def get_data(self, stream):
+        if(isinstance(stream, typing.BinaryIO)):
+            return stream.read()
+        elif(isinstance(stream, io.FileIO) or isinstance(stream, io.BufferedRandom)):
+            return stream.read().decode("utf-8")
+        elif(isinstance(stream,io.TextIOWrapper)):
+            return stream.buffer
+        else:
+            return stream.getvalue()
 
+a
 class AttachmentsField(MultiSelectField):
 
     field_type = (
