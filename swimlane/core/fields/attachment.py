@@ -62,7 +62,7 @@ class AttachmentCursor(FieldCursor):
         else:
             return stream.getvalue()
 
-a
+
 class AttachmentsField(MultiSelectField):
 
     field_type = (
