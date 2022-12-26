@@ -151,6 +151,9 @@ class Report(APIResource, PaginatedCursor):
             self._raw['columns'].append(self._app.tracking_id)
 
     def _get_stub_field(self, field_name):
+        if not field_name or not isinstance(field_name, str):
+            raise ValueError('field_name is of an invalid format, expected non-empty string')
+
         # Use temp Record instance for target app to translate values into expected API format
         record_stub = record_factory(self._app)
         return record_stub.get_field(field_name)
