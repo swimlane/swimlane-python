@@ -9,7 +9,6 @@ from swimlane.utils.str_validator import validate_str
 
 class AttachmentCursor(FieldCursor):
     """Allows creation and iteration of attachments"""
-    pattern = r"^[\w,\s-]+\.[A-Za-z]"
 
     def add(self, filename, stream, content_type=None):
         """Upload a new attachment, and add it to current fields raw data to be persisted on save
