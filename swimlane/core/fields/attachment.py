@@ -58,7 +58,7 @@ class AttachmentCursor(FieldCursor):
         elif(isinstance(stream, io.FileIO) or isinstance(stream, io.BufferedRandom)):
             return stream.read().decode("utf-8")
         elif(isinstance(stream,io.TextIOWrapper)):
-            return stream.buffer
+            return stream.buffer.read().decode("utf-8")
         else:
             return stream.getvalue()
 
