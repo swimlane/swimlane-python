@@ -8,7 +8,7 @@ from swimlane.core.resources.usergroup import UserGroup, User
 from swimlane.exceptions import SwimlaneException, UnknownField, ValidationError
 import swimlane.core.adapters.task  # avoid circular reference
 import swimlane.core.adapters.helper  # avoid circular reference
-
+from swimlane.utils.text_field_subtype_validator import validate_text_field_subtype
 
 
 @total_ordering
@@ -167,10 +167,16 @@ class Record(APIResource):
         Raises:
              ValidationError: If any fields fail validation
         """
-        for field in (_field for _field in six.itervalues(self._fields) if _field.required):
-            if field.get_swimlane() is None:
-                raise ValidationError(
-                    self, 'Required field "{}" is not set'.format(field.name))
+
+        fieldErrors = []
+        for field in six.itervalues(self._fields):
+            validationResult = validate_text_field_subtype(field)
+            if isinstance(validationResult, str):
+                fieldErrors.append(validationResult)
+
+        if len(fieldErrors) > 0:
+            raise ValidationError(self, "The following fields contain errors: {}".format(fieldErrors))
+
 
     def __request_and_reinitialize(self, method, endpoint, data):
         response = self._swimlane.request(
