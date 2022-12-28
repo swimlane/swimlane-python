@@ -175,7 +175,7 @@ class Record(APIResource):
                 fieldErrors.append(validationResult)
 
         if len(fieldErrors) > 0:
-            raise ValidationError(self, "The following fields contain errors: {}".format(fieldErrors))
+            raise ValidationError(self, "The following fields contain errors: [{}]".format(', '.join(map(str, fieldErrors))))
 
 
     def __request_and_reinitialize(self, method, endpoint, data):
