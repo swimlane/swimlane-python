@@ -178,7 +178,7 @@ class Report(APIResource, PaginatedCursor):
         if field_type == 'text':
             return str
         elif field_type == 'numeric':
-            return (int, float, complex)
+            return (int, float)
 
 def report_factory(app, report_name, **kwargs):
     """Report instance factory populating boilerplate raw data
