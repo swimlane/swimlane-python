@@ -114,7 +114,7 @@ class Report(APIResource, PaginatedCursor):
 
         field = self._get_stub_field(field_name)
         
-        validate_types(field, value)
+        validate_type(field, value)
 
         self._raw['filters'].append({
             "fieldId": field.id,
