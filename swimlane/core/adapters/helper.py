@@ -3,6 +3,7 @@ import pendulum
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.utils.version import requires_swimlane_version
 from swimlane.utils.list_validator import validate_str_list
+from swimlane.utils.str_validator import validate_str
 
 
 class HelperAdapter(SwimlaneResolver):
@@ -45,6 +46,11 @@ class HelperAdapter(SwimlaneResolver):
             message (str): New comment message body
             rich_text (bool): Declare the message as being rich text, default is False
         """
+        validate_str(app_id, 'app_id')
+        validate_str(record_id, 'record_id')
+        validate_str(field_id, 'field_id')
+        validate_str(message, 'message')
+        
         if not isinstance(rich_text, bool):
             raise ValueError("rich_text must be a boolean value.")
 
