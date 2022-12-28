@@ -292,6 +292,10 @@ class RecordAdapter(AppResolver):
             filters = []
             for filter_tuples in filters_or_records:
                 field_name = record_stub.get_field(filter_tuples[0])
+
+                value = filter_tuples[2]
+                validate_type(field_name, value)
+
                 filters.append({
                     "fieldId": field_name.id,
                     "filterType": filter_tuples[1],
@@ -384,6 +388,10 @@ class RecordAdapter(AppResolver):
             record_stub = record_factory(self._app)
             for filter_tuples in filters_or_records:
                 field = record_stub.get_field(filter_tuples[0])
+
+                value = filter_tuples[2]
+                validate_type(field, value)
+
                 filters.append({
                     "fieldId": field.id,
                     "filterType": filter_tuples[1],
@@ -409,3 +417,17 @@ def validate_filters_or_records(filters_or_records):
             raise ValueError("Expected filter tuple or Record, received {0}".format(item))
 
     return _type
+
+def validate_type(field, value):
+    """Type validation for filters and fields from bulk_modify, bulk_delete and filter"""
+    accepted_values_to_check = (int, str, float, list, bool, tuple)
+    should_check_value_type = not value == None and type(value) in accepted_values_to_check
+    if should_check_value_type:
+        value_list = value if isinstance(value, list) else [value]
+        for v in value_list:
+            wrong_type = not any(
+                    [isinstance(v, field_type) for field_type in field.supported_types]
+            ) if len(field.supported_types) > 0 else False
+
+            if wrong_type:
+                raise ValueError("Value must be one of {}".format(", ".join([str(f) for f in field.supported_types])))
