@@ -100,7 +100,8 @@ class Report(APIResource, PaginatedCursor):
         """Adds a filter to report
 
         Notes:
-            All filters are currently AND'ed together
+            1. All filters are currently AND'ed together.
+            2. None values work like a wildcard and will skip type verification.
 
         Args:
             field_name (str): Target field name to filter on
@@ -111,6 +112,18 @@ class Report(APIResource, PaginatedCursor):
             raise ValueError('Operand must be one of {}'.format(', '.join(self._FILTER_OPERANDS)))
 
         field = self._get_stub_field(field_name)
+        
+        accepted_values_to_check = (int, str, float, list, bool, tuple)
+        should_check_value_type = not value == None and type(value) in accepted_values_to_check
+        if should_check_value_type:
+            value_list = value if isinstance(value, list) else [value]
+            for v in value_list:
+                wrong_type = not any(
+                        [isinstance(v, field_type) for field_type in field.supported_types]
+                ) if len(field.supported_types) > 0 else False
+
+                if wrong_type:
+                    raise ValueError("Value must be one of {}".format(", ".join([str(f) for f in field.supported_types])))
 
         self._raw['filters'].append({
             "fieldId": field.id,
