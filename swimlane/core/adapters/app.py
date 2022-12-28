@@ -24,7 +24,11 @@ class AppAdapter(SwimlaneResolver):
         Raises:
             TypeError: No or multiple keyword arguments provided
             ValueError: No matching app found on server
+            ValueError: The lookup value is empty or None
         """
+        if not value:
+            raise ValueError('The value provided for the key "{0}" cannot be empty or None'.format(key))
+
         if key == 'id':
             # Server returns 204 instead of 404 for a non-existent app id
             response = self._swimlane.request('get', 'app/{}'.format(value))
