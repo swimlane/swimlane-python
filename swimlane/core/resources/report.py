@@ -4,6 +4,7 @@ from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ, LT, GT, LTE, GTE, ASC, DESC
+from swimlane.utils import validate_type
 
 
 class Report(APIResource, PaginatedCursor):
@@ -113,17 +114,7 @@ class Report(APIResource, PaginatedCursor):
 
         field = self._get_stub_field(field_name)
         
-        accepted_values_to_check = (int, str, float, list, bool, tuple)
-        should_check_value_type = not value == None and type(value) in accepted_values_to_check
-        if should_check_value_type:
-            value_list = value if isinstance(value, list) else [value]
-            for v in value_list:
-                wrong_type = not any(
-                        [isinstance(v, field_type) for field_type in field.supported_types]
-                ) if len(field.supported_types) > 0 else False
-
-                if wrong_type:
-                    raise ValueError("Value must be one of {}".format(", ".join([str(f) for f in field.supported_types])))
+        validate_types(field, value)
 
         self._raw['filters'].append({
             "fieldId": field.id,
