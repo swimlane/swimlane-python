@@ -12,6 +12,7 @@ class MultiSelectCursor(FieldCursor):
     def __init__(self, *args, **kwargs):
         super(MultiSelectCursor, self).__init__(*args, **kwargs)
 
+        self._elements = filter(lambda e: e is not None, self._elements)
         self._elements = SortedSet(self._elements)
 
     def select(self, element):
@@ -51,8 +52,7 @@ class MultiSelectField(CursorField):
             children = []
             if value:
                 for child in value:
-                    children.append(self.cast_to_swimlane(child))
-
+                        children.append(self.cast_to_swimlane(child))
                 return children
             return None
         return super(MultiSelectField, self).get_swimlane()

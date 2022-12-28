@@ -90,13 +90,17 @@ class TestRecordAdaptorGet:
         assert str(excinfo.value) == 'RecordNotFound:3002: Bad Request for url: %s/api/app/%s/record/%s' % (
             pytest.swimlane_instance.host, pytest.appid, randomID)
 
-    @pytest.mark.xfail(reason="SPT-6030: Fail when the lookup value is empty or None")
     def test_record_get_by_empty_id(helpers):
         emptyID = ''
-        with pytest.raises(exceptions.HTTPError) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             pytest.app.records.get(id=emptyID)
-        assert str(excinfo.value) == 'RecordNotFound:3002: Bad Request for url: %s/api/app/%s/record/tracking/%s' % (
-            pytest.swimlane_instance.host, pytest.appid, emptyID)
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
+
+    def test_record_get_by_null_id(helpers):
+        noneID = None
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.records.get(id=noneID)
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_record_get_by_random_tracking_id(helpers):
         randomID = pytest.fake.random_int()
@@ -105,14 +109,17 @@ class TestRecordAdaptorGet:
         assert str(excinfo.value) == 'RecordNotFound:3002: Bad Request for url: %s/api/app/%s/record/tracking/%s' % (
             pytest.swimlane_instance.host, pytest.appid, randomID)
 
-    @pytest.mark.xfail(reason="SPT-6030: Fail when the lookup value is empty or None")
     def test_record_get_by_empty_trackingId(helpers):
-        emptyID = ''
-        with pytest.raises(exceptions.HTTPError) as excinfo:
-            pytest.app.records.get(tracking_id=emptyID)
-        assert str(excinfo.value) == 'RecordNotFound:3002: Bad Request for url: %s/api/app/%s/record/tracking/%s' % (
-            pytest.swimlane_instance.host, pytest.appid, emptyID)
+        emptyTrackingID = ''
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.records.get(tracking_id=emptyTrackingID)
+        assert str(excinfo.value) == 'The value provided for the key "tracking_id" cannot be empty or None'
 
+    def test_record_get_by_null_trackingId(helpers):
+        noneTrackingID = None
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.records.get(tracking_id=noneTrackingID)
+        assert str(excinfo.value) == 'The value provided for the key "tracking_id" cannot be empty or None'
 
 class TestRecordAdaptorSearch:
     def test_record_search(helpers):
