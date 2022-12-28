@@ -159,8 +159,8 @@ class TestReportFilteringAdaptor:
     def test_reporting_filter_bad_value_type(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
-        report.filter('Numeric', 'equals', 'Hello')
-        assert len(report) == 0
+        with pytest.raises(ValueError) as excinfo:
+            report.filter('Numeric', 'equals', 'Hello')
 
     @pytest.mark.xfail(reason="SPT-6305: Pydriver should verify that the filedName should be a valid value")
     def test_reporting_invalid_field_name_type(helpers):
