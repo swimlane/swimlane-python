@@ -5,7 +5,7 @@ from .cursor import CursorField, FieldCursor
 
 class MultiSelectCursor(FieldCursor):
     """Cursor allowing setting and unsetting values on a MultiSelectField
-    
+
     Respects parent field's validation
     """
 
@@ -16,7 +16,7 @@ class MultiSelectCursor(FieldCursor):
 
     def select(self, element):
         """Add an element to the set of selected elements
-        
+
         Proxy to internal set.add and sync field
         """
         self._field.validate_value(element)
@@ -25,7 +25,7 @@ class MultiSelectCursor(FieldCursor):
 
     def deselect(self, element):
         """Remove an element from the set of selected elements
-        
+
         Proxy to internal set.remove and sync field
         """
         self._elements.remove(element)
@@ -66,6 +66,9 @@ class MultiSelectField(CursorField):
         if self.multiselect:
             value = value or []
             elements = []
+
+            if not isinstance(value, (list, MultiSelectCursor, SortedSet)):
+                value = [value]
 
             for element in value:
                 self.validate_value(element)

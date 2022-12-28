@@ -68,14 +68,11 @@ def test_values_list_multi_select_field(mock_record):
     mock_record['Values List'] = vl_original_values
     assert len(mock_record['Values List']) == 2
 
-    # Attempt to directly set to a non-iterable value
+def test_set_not_iterable_value(mock_record):
     try:
         mock_record['Values List'] = 'Option 1'
-    except ValueError:
-        pass
-    else:
-        raise RuntimeError
-
+    except Exception as E:
+        raise E
 
 def test_cursor_repr(mock_record):
     assert repr(mock_record['Values List']) == '<MultiSelectCursor: <Record: RA-7>["Values List"] (2)>'
