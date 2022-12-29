@@ -37,8 +37,14 @@ class GroupAdapter(SwimlaneResolver):
 
         Returns:
             :class:`list` of :class:`~swimlane.core.resources.usergroup.Group`: List of all Groups
+        Raises:
+            ValueError: If limit is not of type integer or None
         """
-        return GroupListCursor(self._swimlane, limit=limit)
+
+        if (isinstance(limit, int) and limit > 0) or limit is None:
+            return GroupListCursor(swimlane=self._swimlane, limit=limit)
+
+        raise ValueError('Limit should be a positive whole number greater than 0')
 
     @check_cache(Group)
     @one_of_keyword_only('id', 'name')
@@ -54,10 +60,14 @@ class GroupAdapter(SwimlaneResolver):
         Raises:
             TypeError: Unexpected or more than one keyword argument provided
             ValueError: No matching group found based on provided inputs
+            ValueError: The lookup value is empty or None
 
         Returns:
             Group: Group instance matching provided inputs
         """
+        if not value:
+            raise ValueError('The value provided for the key "{0}" cannot be empty or None'.format(key))
+
         if key == 'id':
             response = self._swimlane.request('get', 'groups/{}'.format(value))
             return Group(self._swimlane, response.json())
@@ -103,8 +113,15 @@ class UserAdapter(SwimlaneResolver):
 
         Returns:
             :class:`UserListCursor`: Paginated cursor yielding :class:`User` instances
+
+        Raises:
+            ValueError: If limit is not of type integer or None
         """
-        return UserListCursor(swimlane=self._swimlane, limit=limit)
+
+        if (isinstance(limit, int) and limit > 0) or limit is None:
+            return UserListCursor(swimlane=self._swimlane, limit=limit)
+
+        raise ValueError('Limit should be a positive whole number greater than 0')
 
     @check_cache(User)
     @one_of_keyword_only('id', 'display_name')
@@ -125,7 +142,11 @@ class UserAdapter(SwimlaneResolver):
         Raises:
             TypeError: Unexpected or more than one keyword argument provided
             ValueError: No matching user found based on provided inputs, or multiple Users with same display name
+            ValueError: The lookup value is empty or None
         """
+        if not value:
+            raise ValueError('The value provided for the key "{0}" cannot be empty or None'.format(arg))
+
         if arg == 'id':
             response = self._swimlane.request('get', 'user/{}'.format(value))
 
