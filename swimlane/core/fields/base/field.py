@@ -107,6 +107,9 @@ class Field(SwimlaneResolver):
         return self.cast_to_report(value)
 
     def validate_value(self, value):
+        """Validate that the field is editable during set_python operation"""
+        self.validate_editable_field()
+
         """Validate value is an acceptable type during set_python operation"""
         if self.readonly and not self._swimlane._write_to_read_only:
             raise ValidationError(self.record, "Cannot set readonly field '{}'".format(self.name))
@@ -117,6 +120,11 @@ class Field(SwimlaneResolver):
                     ', '.join([repr(t.__name__) for t in self.supported_types]),
                     type(value).__name__)
                 )
+    
+    def validate_editable_field(self):
+        not_editable_input_types = ['firstCreated', 'lastUpdated', 'createdBy', 'lastUpdatedBy']
+        if self.input_type in not_editable_input_types:
+            raise ValueError('Input type "{}" is not editable'.format(self.input_type))
 
     def _set(self, value):
         """Default setter used for both representations unless overridden"""
