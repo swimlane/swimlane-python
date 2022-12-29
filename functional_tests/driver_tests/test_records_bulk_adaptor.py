@@ -396,49 +396,41 @@ class TestRecordAdaptorBulkModifyClear:
         baseTime = pendulum.now()
         pytest.app.records.bulk_create({'Date & Time': baseTime}, {'Date & Time': baseTime}, {
                                        'Date & Time': baseTime}, {'Date & Time': baseTime})
-        emptyNumericRecords = len(pytest.app.records.search(
-            ('First Created', 'equals', None)))
-        records = pytest.app.records.bulk_modify(
-            ('Date & Time', 'equals', baseTime), values={'First Created': Clear()})
-        pytest.waitOnJobByID(records)
-        assert len(pytest.app.records.search(
-            ('First Created', 'equals', None))) == emptyNumericRecords
+        with pytest.raises(ValueError) as excinfo:
+            records = pytest.app.records.bulk_modify(
+                ('Date & Time', 'equals', baseTime), values={'First Created': Clear()})
+            pytest.waitOnJobByID(records)
+        assert str(excinfo.value) == 'Input type "firstCreated" is not editable'
 
     def test_record_bulk_modify_clear_last_updated(helpers):
         baseTime = pendulum.now()
         pytest.app.records.bulk_create({'Date & Time': baseTime}, {'Date & Time': baseTime}, {
                                        'Date & Time': baseTime}, {'Date & Time': baseTime})
-        emptyNumericRecords = len(pytest.app.records.search(
-            ('Last Updated', 'equals', None)))
-        records = pytest.app.records.bulk_modify(
-            ('Date & Time', 'equals', baseTime), values={'Last Updated': Clear()})
-        pytest.waitOnJobByID(records)
-        assert len(pytest.app.records.search(
-            ('Last Updated', 'equals', None))) == emptyNumericRecords
+        with pytest.raises(ValueError) as excinfo:
+            records = pytest.app.records.bulk_modify(
+                ('Date & Time', 'equals', baseTime), values={'Last Updated': Clear()})
+            pytest.waitOnJobByID(records)
+        assert str(excinfo.value) == 'Input type "lastUpdated" is not editable'
 
     def test_record_bulk_modify_clear_created_by(helpers):
         baseTime = pendulum.now()
         pytest.app.records.bulk_create({'Date & Time': baseTime}, {'Date & Time': baseTime}, {
                                        'Date & Time': baseTime}, {'Date & Time': baseTime})
-        emptyNumericRecords = len(
-            pytest.app.records.search(('Created by', 'equals', None)))
-        records = pytest.app.records.bulk_modify(
-            ('Date & Time', 'equals', baseTime), values={'Created by': Clear()})
-        pytest.waitOnJobByID(records)
-        assert len(pytest.app.records.search(
-            ('Created by', 'equals', None))) == emptyNumericRecords
+        with pytest.raises(ValueError) as excinfo:
+            records = pytest.app.records.bulk_modify(
+                ('Date & Time', 'equals', baseTime), values={'Created by': Clear()})
+            pytest.waitOnJobByID(records)
+        assert str(excinfo.value) == 'Input type "createdBy" is not editable'
 
     def test_record_bulk_modify_clear_last_updated_by(helpers):
         baseTime = pendulum.now()
         pytest.app.records.bulk_create({'Date & Time': baseTime}, {'Date & Time': baseTime}, {
                                        'Date & Time': baseTime}, {'Date & Time': baseTime})
-        emptyNumericRecords = len(pytest.app.records.search(
-            ('Last updated by', 'equals', None)))
-        records = pytest.app.records.bulk_modify(
-            ('Date & Time', 'equals', baseTime), values={'Last updated by': Clear()})
-        pytest.waitOnJobByID(records)
-        assert len(pytest.app.records.search(
-            ('Last updated by', 'equals', None))) == emptyNumericRecords
+        with pytest.raises(ValueError) as excinfo:
+            records = pytest.app.records.bulk_modify(
+                ('Date & Time', 'equals', baseTime), values={'Last updated by': Clear()})
+            pytest.waitOnJobByID(records)
+        assert str(excinfo.value) == 'Input type "lastUpdatedBy" is not editable'
 
     def test_record_bulk_modify_clear_attachment(helpers):
         baseText = "Has Attachment"
