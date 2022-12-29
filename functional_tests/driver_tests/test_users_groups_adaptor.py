@@ -26,17 +26,35 @@ class TestUserAdaptor:
         swimUsers = pytest.swimlane_instance.users.list(limit=maxUsers)
         assert len(swimUsers) == maxUsers
 
-    @pytest.mark.xfail(reason="SPT-6031: Sending a string for the max count should throw an error.")
     def test_users_list_count_limit_not_valid_string(helpers):
-        invalidMaxUsers = 'Hello'
-        swimUsers = pytest.swimlane_instance.users.list(limit=invalidMaxUsers)
-        assert len(swimUsers) == invalidMaxUsers
+        stringLimit = 'Hello'
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.list(limit=stringLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
 
-    @pytest.mark.xfail(reason="SPT-6031: Sending a floating point for the max count should throw an error.")
+    def test_users_list_count_limit_not_valid_empty_string(helpers):
+        stringLimit = ''
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.list(limit=stringLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
+
     def test_users_list_count_limit_not_valid_float(helpers):
-        floatMaxUsers = 1.75
-        swimUsers = pytest.swimlane_instance.users.list(limit=floatMaxUsers)
-        assert len(swimUsers) == floatMaxUsers
+        floatLimit = 5.5
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.list(limit=floatLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
+
+    def test_users_list_count_limit_not_valid_negative_int(helpers):
+        negativeIntLimit = -3
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.list(limit=negativeIntLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
+
+    def test_users_list_count_limit_not_valid_zero(helpers):
+        zeroLimit = 0
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.list(limit=zeroLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
 
     def test_users_get_by_id(helpers):
         swimUser = pytest.swimlane_instance.users.get(id=pytest.tempUser['id'])
@@ -48,19 +66,17 @@ class TestUserAdaptor:
             pytest.swimlane_instance.users.get(id=randomID)
         assert str(excinfo.value) == 'Unable to find user with ID "%s"' % randomID
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for randomID as empty does not give formal response (attributeError)")
     def test_users_get_by_empty_id(helpers):
         emptyID = ''
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.get(id=emptyID)
-        assert str(excinfo.value) == 'Unable to find user with ID "%s"' % emptyID
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for display_Name as None givesValueError: Unable to find user with ID \"None\"")
     def test_users_get_by_null_id(helpers):
         noneID = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.get(id=noneID)
-        assert str(excinfo.value) == 'Unable to find user with ID "%s"' % noneID
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_users_get_by_display_name(helpers):
         swimUser = pytest.swimlane_instance.users.get(
@@ -74,19 +90,19 @@ class TestUserAdaptor:
         assert str(
             excinfo.value) == 'Unable to find user with display name "%s"' % randomDisplayName
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for display_Name as an empty string should fail")
     def test_users_get_by_empty_display_name(helpers):
         emptyDisplayName = ""
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.users.get(display_name=emptyDisplayName)
         assert str(
-            excinfo.value) == 'Unable to find user with display name "%s"' % emptyDisplayName
+            excinfo.value) == 'The value provided for the key "display_name" cannot be empty or None'
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for display_Name as None gives  TypeError: argument of type 'NoneType' is not iterable")
     def test_users_get_by_null_display_name(helpers):
-        randomDisplayName = None
-        # we should be catchiong an exception for the display_name being an invalid type.
-        pytest.swimlane_instance.users.get(display_name=randomDisplayName)
+        noneDisplayName = None
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.users.get(display_name=noneDisplayName)
+        assert str(
+            excinfo.value) == 'The value provided for the key "display_name" cannot be empty or None'
 
     def test_users_get_no_params(helpers):
         with pytest.raises(TypeError) as excinfo:
@@ -115,37 +131,52 @@ class TestGroupAdaptor:
         swimGroups = pytest.swimlane_instance.groups.list(limit=maxGroups)
         assert len(swimGroups) == maxGroups
 
-    @pytest.mark.xfail(reason="SPT-6031: Sending a string for the max count should throw an error.")
     def test_groups_list_count_limit_not_valid_string(helpers):
-        invalidMaxGroups = 'Hello'
-        swimGroups = pytest.swimlane_instance.users.list(
-            limit=invalidMaxGroups)
-        assert len(swimGroups) == invalidMaxGroups
+        stringLimit = 'Hello'
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.groups.list(limit=stringLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
 
-    @pytest.mark.xfail(reason="SPT-6031: Sending a floating point for the max count should throw an error.")
+    def test_groups_list_count_limit_not_valid_empty_string(helpers):
+        stringLimit = ''
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.groups.list(limit=stringLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
+
     def test_groups_list_count_limit_not_valid_float(helpers):
-        floatMaxGroups = 1.75
-        swimGroups = pytest.swimlane_instance.users.list(limit=floatMaxGroups)
-        assert len(swimGroups) == floatMaxGroups
+        floatLimit = 5.5
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.groups.list(limit=floatLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
+
+    def test_groups_list_count_limit_not_valid_zero(helpers):
+        zeroLimit = 0
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.groups.list(limit=zeroLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
+
+    def test_groups_list_count_limit_not_valid_negative_int(helpers):
+        negativeIntLimit = -3
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.groups.list(limit=negativeIntLimit)
+        assert str(excinfo.value) == 'Limit should be a positive whole number greater than 0'
 
     def test_grouprs_get_by_id(helpers):
         swimGroup = pytest.swimlane_instance.groups.get(
             id=pytest.tempGroup['id'])
         assert swimGroup.for_json()["name"] == pytest.tempGroup['name']
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for randomID as empty does not give formal response (attributeError)")
     def test_groups_get_by_empty_id(helpers):
         emptyID = ''
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(id=emptyID)
-        assert str(excinfo.value) == 'Unable to find group with ID "%s"' % emptyID
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for ID as None givesValueError: Unable to find group with ID \"None\"")
     def test_groups_get_by_null_id(helpers):
         noneID = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(id=noneID)
-        assert str(excinfo.value) == 'Unable to find group with ID "%s"' % noneID
+        assert str(excinfo.value) == 'The value provided for the key "id" cannot be empty or None'
 
     def test_groups_get_by_name(helpers):
         swimGroup = pytest.swimlane_instance.groups.get(
@@ -159,21 +190,19 @@ class TestGroupAdaptor:
         assert str(
             excinfo.value) == 'Unable to find group with name "%s"' % randomName
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for name as empty string does error out")
     def test_groups_get_by_empty_name(helpers):
         emptyName = ""
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(name=emptyName)
         assert str(
-            excinfo.value) == 'Unable to find group with name "%s"' % emptyName
+            excinfo.value) == 'The value provided for the key "name" cannot be empty or None'
 
-    @pytest.mark.xfail(reason="SPT-6030: Testing for Name as None gives  TypeError: argument of type 'NoneType' is not iterable")
     def test_groups_get_by_null_name(helpers):
         noneName = None
         with pytest.raises(ValueError) as excinfo:
             pytest.swimlane_instance.groups.get(name=noneName)
         assert str(
-            excinfo.value) == 'Unable to find group with name "%s"' % noneName
+            excinfo.value) == 'The value provided for the key "name" cannot be empty or None'
 
     def test_groups_get_no_params(helpers):
         with pytest.raises(TypeError) as excinfo:
