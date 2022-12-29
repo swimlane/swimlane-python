@@ -159,8 +159,8 @@ class TestReportFilteringAdaptor:
     def test_reporting_filter_bad_value_type(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
-        report.filter('Numeric', 'equals', 'Hello')
-        assert len(report) == 0
+        with pytest.raises(ValueError) as excinfo:
+            report.filter('Numeric', 'equals', 'Hello')
 
     def test_reporting_invalid_field_name_type_None(helpers):
         report = pytest.app.reports.build(
