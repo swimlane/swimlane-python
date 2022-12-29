@@ -1,3 +1,5 @@
+import math
+
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.record_revision import RecordRevision
 
@@ -27,9 +29,15 @@ class RecordRevisionAdapter(AppResolver):
 
         Returns:
             RecordRevision: The RecordRevision for the given revision number.
+            Raises: When revision is not an integer, a float NOT ending in ".0", or is less than 1
         """
-        record_revision_raw = self._swimlane.request('get',
-                                                     'app/{0}/record/{1}/history/{2}'.format(self._app.id,
-                                                                                             self.record.id,
-                                                                                             revision_number)).json()
-        return RecordRevision(self._app, record_revision_raw)
+        if isinstance(revision_number, (int, float)):
+            if revision_number > 0 and revision_number % math.floor(revision_number) == 0:
+                record_revision_raw = self._swimlane.request('get',
+                                                             'app/{0}/record/{1}/history/{2}'.format(self._app.id,
+                                                                                                     self.record.id,
+                                                                                                     revision_number)).json()
+                return RecordRevision(self._app, record_revision_raw)
+
+
+        raise ValueError('The revision number must be a positive whole number greater than 0')
