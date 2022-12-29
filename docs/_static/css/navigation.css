@@ -1,0 +1,14 @@
+
+body {
+  height: 100%;
+}
+
+.sphinxsidebar {
+  height: 100%;
+  overflow-y: hidden;
+}
+
+.sphinxsidebarwrapper {
+  height: calc(100% - 30px - 18px - 18px);
+  overflow-y: scroll;
+}
