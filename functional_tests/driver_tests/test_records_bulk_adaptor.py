@@ -137,15 +137,12 @@ class TestRecordAdaptorBulkDelete:
             pytest.app.name, pytest.app.acronym, randomFieldName)
         assert len(pytest.app.records.search()) == startRecordCount
 
-    @pytest.mark.xfail(reason="SPT-6028: When the field and comparison values are not the same type, an error should be thrown.")
     def test_record_bulk_delete_filter_invalid_value(helpers):
         randomFieldName = 'Numeric'
-        with pytest.raises(exceptions.UnknownField) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             records = pytest.app.records.bulk_delete(
                 (randomFieldName, 'equals', 'Hello world'))
             pytest.waitOnJobByID(records)
-        assert str(excinfo.value) == '"<App: %s (%s)> has no field \'%s\'"' % (
-            pytest.app.name, pytest.app.acronym, randomFieldName)
 
     def test_record_bulk_delete_list_twice(helpers):
         textValue = str(uuid.uuid4())
@@ -235,15 +232,12 @@ class TestRecordAdaptorBulkModify:
         assert len(pytest.app.records.search(
             ('Numeric', 'equals', 9999))) == initialRecords
 
-    @pytest.mark.xfail(reason="SPT-6028: When the field and comparison values are not the same type, an error should be thrown.")
     def test_record_bulk_modify_filter_invalid_value(helpers):
         randomValue = 'Fun with numbers'
-        with pytest.raises(exceptions.UnknownField) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             records = pytest.app.records.bulk_modify(
                 ('Numeric', 'equals', randomValue), values={'Numeric': 4444})
             pytest.waitOnJobByID(records)
-        assert str(excinfo.value) == '"<App: %s (%s)> has no field \'%s\'"' % (
-            pytest.app.name, pytest.app.acronym, randomValue)
 
     def test_record_bulk_modify_list(helpers):
         i = random.randint(0,99)

@@ -116,3 +116,17 @@ def one_of_keyword_only(*valid_keywords):
 
     return decorator
 
+
+def validate_type(field, value):
+    """Type validation for filters and fields from bulk_modify, bulk_delete and filter"""
+    accepted_values_to_check = (int, str, float, list, bool, tuple)
+    should_check_value_type = not value == None and type(value) in accepted_values_to_check
+    if should_check_value_type:
+        value_list = value if isinstance(value, list) else [value]
+        for v in value_list:
+            wrong_type = not any(
+                    [isinstance(v, field_type) for field_type in field.supported_types]
+            ) if len(field.supported_types) > 0 else False
+
+            if wrong_type:
+                raise ValueError("Value must be one of {}".format(", ".join([str(f) for f in field.supported_types])))

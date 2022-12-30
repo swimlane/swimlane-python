@@ -5,6 +5,7 @@ from swimlane.core.fields.list import ListField
 from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ, LT, GT, LTE, GTE, ASC, DESC
+from swimlane.utils import validate_type
 
 
 class Report(APIResource, PaginatedCursor):
@@ -101,7 +102,8 @@ class Report(APIResource, PaginatedCursor):
         """Adds a filter to report
 
         Notes:
-            All filters are currently AND'ed together
+            1. All filters are currently AND'ed together.
+            2. None values work like a wildcard and will skip type verification.
 
         Args:
             field_name (str): Target field name to filter on
@@ -112,6 +114,8 @@ class Report(APIResource, PaginatedCursor):
             raise ValueError('Operand must be one of {}'.format(', '.join(self._FILTER_OPERANDS)))
 
         field = self._get_stub_field(field_name)
+        
+        validate_type(field, value)
 
         value = self.parse_field_value(field, value)
 
