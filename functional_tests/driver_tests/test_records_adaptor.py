@@ -142,13 +142,10 @@ class TestRecordAdaptorSearch:
         assert str(excinfo.value) == '"<App: %s (%s)> has no field \'%s\'"' % (
             pytest.app.name, pytest.app.acronym, randomFieldName)
 
-    @pytest.mark.xfail(reason="SPT-6028: When the field and comparison values are not the same type, an error should be thrown.")
     def test_record_search_invalid_value(helpers):
         randomFieldName = 'Numeric'
-        with pytest.raises(exceptions.UnknownField) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             pytest.app.records.search((randomFieldName, 'equals', 'Blah'))
-        assert str(excinfo.value) == '"<App: %s (%s)> has no field \'%s\'"' % (
-            pytest.app.name, pytest.app.acronym, randomFieldName)
 
 
 class TestRecordAdaptorDelete:

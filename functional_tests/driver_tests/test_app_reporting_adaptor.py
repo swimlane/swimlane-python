@@ -159,32 +159,40 @@ class TestReportFilteringAdaptor:
     def test_reporting_filter_bad_value_type(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
-        report.filter('Numeric', 'equals', 'Hello')
-        assert len(report) == 0
+        with pytest.raises(ValueError) as excinfo:
+            report.filter('Numeric', 'equals', 'Hello')
 
-    @pytest.mark.xfail(reason="SPT-6305: Pydriver should verify that the filedName should be a valid value")
-    def test_reporting_invalid_field_name_type(helpers):
+    def test_reporting_invalid_field_name_type_None(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         fieldName = None
-        report.filter(fieldName, 'equals', 'Hello')
-        assert len(report) == 0
+        with pytest.raises(ValueError) as excinfo:
+            report.filter(fieldName, 'equals', 'Hello')
+        assert str(excinfo.value) == "field_name is of an invalid format, expected non-empty string"
 
-    @pytest.mark.xfail(reason="SPT-6305: Pydriver should verify that the filedName should be a valid value")
     def test_reporting_invalid_field_name_type_number(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         fieldName = 1234
-        report.filter(fieldName, 'equals', 'Hello')
-        assert len(report) == 0
+        with pytest.raises(ValueError) as excinfo:
+            report.filter(fieldName, 'equals', 'Hello')
+        assert str(excinfo.value) == "field_name is of an invalid format, expected non-empty string"
 
-    @pytest.mark.xfail(reason="SPT-6305: Pydriver should verify that the filedName should be a valid value")
     def test_reporting_invalid_field_name_type_object(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         fieldName = {"Name": "Text"}
-        report.filter(fieldName, 'equals', 'Hello')
-        assert len(report) == 0
+        with pytest.raises(ValueError) as excinfo:
+            report.filter(fieldName, 'equals', 'Hello')
+        assert str(excinfo.value) == "field_name is of an invalid format, expected non-empty string"
+    
+    def test_reporting_invalid_field_name_empty(helpers):
+        report = pytest.app.reports.build(
+            'report-%s' % pytest.fake.word(), limit=0)
+        fieldName = ''
+        with pytest.raises(ValueError) as excinfo:
+            report.filter(fieldName, 'equals', 'Hello')
+        assert str(excinfo.value) == "field_name is of an invalid format, expected non-empty string"
 
     def test_reporting_missing_params(helpers):
         report = pytest.app.reports.build(

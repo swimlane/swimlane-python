@@ -5,7 +5,7 @@ from swimlane.core.cache import check_cache
 from swimlane.core.resolver import AppResolver
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.core.resources.report import Report
-from swimlane.utils import random_string, one_of_keyword_only
+from swimlane.utils import random_string, one_of_keyword_only, validate_type
 from swimlane.utils.version import requires_swimlane_version
 
 
@@ -292,6 +292,10 @@ class RecordAdapter(AppResolver):
             filters = []
             for filter_tuples in filters_or_records:
                 field_name = record_stub.get_field(filter_tuples[0])
+
+                value = filter_tuples[2]
+                validate_type(field_name, value)
+
                 filters.append({
                     "fieldId": field_name.id,
                     "filterType": filter_tuples[1],
@@ -384,6 +388,10 @@ class RecordAdapter(AppResolver):
             record_stub = record_factory(self._app)
             for filter_tuples in filters_or_records:
                 field = record_stub.get_field(filter_tuples[0])
+
+                value = filter_tuples[2]
+                validate_type(field, value)
+
                 filters.append({
                     "fieldId": field.id,
                     "filterType": filter_tuples[1],

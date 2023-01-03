@@ -1,3 +1,5 @@
+import math
+
 import mock
 
 from swimlane.core.resources.app_revision import AppRevision
@@ -26,10 +28,12 @@ class TestAppRevisionAdapter(object):
         mock_response.status_code = 200
 
         with mock.patch.object(mock_swimlane, 'request', return_value=mock_response):
-            revision = mock_revision_app.revisions.get(raw_revision['revisionNumber'])
+            revision_as_int = math.floor(raw_revision['revisionNumber']);
+
+            revision = mock_revision_app.revisions.get(revision_as_int)
 
             mock_swimlane.request.assert_called_with('get', 'app/{0}/history/{1}'.format(mock_revision_app.id,
-                                                                                         raw_revision['revisionNumber']))
+                                                                                         revision_as_int))
 
             assert isinstance(revision, AppRevision)
             assert revision.revision_number is raw_revision['revisionNumber']
