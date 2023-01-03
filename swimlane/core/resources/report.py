@@ -168,7 +168,7 @@ class Report(APIResource, PaginatedCursor):
     def parse_field_value(self, field, value):
         if isinstance(field, ListField):
             type = self.get_field_list_type(field.input_type)
-        if isinstance(field, ListField) and not isinstance(value, list):
+        if isinstance(field, ListField) and not isinstance(value, list) and value is not None:
             self.validate_type(value, type, field.input_type)
             return [value]
         elif isinstance(field, ListField) and isinstance(value, list) and any(not isinstance(elem, type) for elem in value):
