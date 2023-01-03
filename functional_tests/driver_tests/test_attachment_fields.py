@@ -37,47 +37,34 @@ class TestAttachmentField:
         fileName = '277kb.jpg'
         theRecord = pytest.app.records.create(**{})
         theFile = pytest.helpers.loadFileStream(fileName)
-        with pytest.raises(TypeError) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             theRecord['Attachment'].add(None, theFile)
-        assert str(excinfo.value) == 'expected {}'.format('string or buffer' if (
-            pytest.helpers.py_ver() == 2) else 'str, bytes or os.PathLike object, not NoneType')
+        assert str(excinfo.value) == 'filename must be a string value.'
         theRecord.save()
         updatedRecord = pytest.app.records.get(id=theRecord.id)
         assert len(updatedRecord['Attachment']) == 0
 
-    @pytest.mark.xfail(reason="SPT-6351: Should make sure the name is not empty, gets 500 from API call")
     def test_attachment_field_add_file_empty_name(helpers):
         fileName = '277kb.jpg'
         theRecord = pytest.app.records.create(**{})
         theFile = pytest.helpers.loadFileStream(fileName)
-        # with pytest.raises(TypeError) as excinfo:
-        theRecord['Attachment'].add('', theFile)
-        # assert str(excinfo.value) == 'expected string or buffer'
-        theRecord.save()
-        updatedRecord = pytest.app.records.get(id=theRecord.id)
-        assert len(updatedRecord['Attachment']) == 0
+        with pytest.raises(ValueError) as excinfo:
+            theRecord['Attachment'].add('', theFile)
+        assert str(excinfo.value) == 'filename must not be an empty string value.'
 
-    @pytest.mark.xfail(reason="SPT-6351: Should make sure the file is not empty, gets 500 from API call")
     def test_attachment_field_add_file_no_file(helpers):
         fileName = '277kb.jpg'
         theRecord = pytest.app.records.create(**{})
-        # with pytest.raises(TypeError) as excinfo:
-        theRecord['Attachment'].add(fileName, None)
-        # assert str(excinfo.value) == 'expected string or buffer'
-        theRecord.save()
-        updatedRecord = pytest.app.records.get(id=theRecord.id)
-        assert len(updatedRecord['Attachment']) == 0
+        with pytest.raises(ValueError) as excinfo:
+            theRecord['Attachment'].add(fileName, None)
+        assert str(excinfo.value) == 'stream must be a stream value.'
 
-    @pytest.mark.xfail(reason="SPT-6351: Should make sure the file is not empty, gets 500 from API call")
     def test_attachment_field_add_file_empty_file(helpers):
         fileName = '277kb.jpg'
         theRecord = pytest.app.records.create(**{})
-        # with pytest.raises(TypeError) as excinfo:
-        theRecord['Attachment'].add(fileName, BytesIO())
-        # assert str(excinfo.value) == 'expected string or buffer'
-        theRecord.save()
-        updatedRecord = pytest.app.records.get(id=theRecord.id)
-        assert len(updatedRecord['Attachment']) == 1
+        with pytest.raises(ValueError) as excinfo:
+            theRecord['Attachment'].add(fileName, BytesIO())
+        assert str(excinfo.value) == 'stream must not be an empty stream value.'
 
     def test_attachment_field_add_file_just_file(helpers):
         fileName = '277kb.jpg'
