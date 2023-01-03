@@ -46,21 +46,6 @@ class AttachmentCursor(FieldCursor):
         if not isinstance(stream, io.IOBase):
             raise ValueError('{} must be a stream value.'.format(key))
 
-        data = self.get_data(stream)
-
-        if not data or not data.strip() :
-            raise ValueError('{} must not be an empty stream value.'.format(key))
-
-    def get_data(self, stream):
-        if(isinstance(stream, typing.BinaryIO)):
-            return stream.read()
-        elif(isinstance(stream, io.FileIO) or isinstance(stream, io.BufferedRandom)):
-            return stream.read().decode("utf-8")
-        elif(isinstance(stream,io.TextIOWrapper)):
-            return stream.buffer.read().decode("utf-8")
-        else:
-            return stream.getvalue()
-
 
 class AttachmentsField(MultiSelectField):
 
