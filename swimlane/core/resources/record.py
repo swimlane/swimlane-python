@@ -168,17 +168,18 @@ class Record(APIResource):
              ValidationError: If any fields fail formatting or required validation
         """
 
-        fieldErrors = []
+        field_errors = []
         for field in six.itervalues(self._fields):
-            validationResult = validate_text_field_subtype(field)
-            if isinstance(validationResult, str):
-                fieldErrors.append(validationResult)
-            # extra required check for any missed input types not explicitly validated in validate_text_field_subtype
             if field.required and field.get_swimlane() is None:
-                fieldErrors.append("Required field '{}'' is not set".format(field.name))
+                field_errors.append("Required field '{}'' is not set".format(field.name))
+                continue
+            validation_result = validate_text_field_subtype(field)
+            if isinstance(validation_result, str):
+                field_errors.append(validation_result)
 
-        if len(fieldErrors) > 0:
-            raise ValidationError(self, "The following fields contain errors: [{}]".format(', '.join(map(str, fieldErrors))))
+
+        if len(field_errors) > 0:
+            raise ValidationError(self, "The following fields contain errors: [{}]".format(', '.join(map(str, field_errors))))
 
 
     def __request_and_reinitialize(self, method, endpoint, data):
