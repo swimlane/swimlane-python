@@ -67,7 +67,15 @@ class MultiSelectField(CursorField):
             value = value or []
             elements = []
 
-            if not isinstance(value, (list, MultiSelectCursor, SortedSet)):
+            if not isinstance(
+                value,
+                (
+                    list,
+                    MultiSelectCursor,
+                    SortedSet,
+                    dict,
+                ),
+            ):
                 value = [value]
 
             for element in value:
