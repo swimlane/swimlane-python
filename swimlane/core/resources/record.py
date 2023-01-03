@@ -165,7 +165,7 @@ class Record(APIResource):
             Called automatically during save call before sending data to server
 
         Raises:
-             ValidationError: If any fields fail validation
+             ValidationError: If any fields fail formatting or required validation
         """
 
         fieldErrors = []
@@ -173,6 +173,9 @@ class Record(APIResource):
             validationResult = validate_text_field_subtype(field)
             if isinstance(validationResult, str):
                 fieldErrors.append(validationResult)
+            # extra required check for any missed input types not explicitly validated in validate_text_field_subtype
+            if field.required and field.get_swimlane() is None:
+                fieldErrors.append("Required field '{}'' is not set".format(field.name))
 
         if len(fieldErrors) > 0:
             raise ValidationError(self, "The following fields contain errors: [{}]".format(', '.join(map(str, fieldErrors))))

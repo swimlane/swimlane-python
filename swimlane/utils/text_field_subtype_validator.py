@@ -6,7 +6,6 @@ class TextFieldType:
     URL = 'url'
     EMAIL = 'email'
     IP = 'ip'
-    TELEPHONE = 'telephone'
     TEXT = 'text'
 
 
