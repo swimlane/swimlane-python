@@ -1,7 +1,10 @@
+import io
 import mimetypes
+import typing
 
 from swimlane.core.fields.base import MultiSelectField, FieldCursor
 from swimlane.core.resources.attachment import Attachment
+from swimlane.utils.str_validator import validate_str
 
 
 class AttachmentCursor(FieldCursor):
@@ -13,6 +16,9 @@ class AttachmentCursor(FieldCursor):
         Can optionally manually set the content_type, will be guessed by provided filename extension and default to 
         application/octet-stream if it cannot be guessed
         """
+        validate_str(filename, 'filename')
+        self.validate_stream(stream, 'stream')
+
         # Guess file Content-Type or default
         content_type = content_type or mimetypes.guess_type(
             filename)[0] or 'application/octet-stream'
@@ -34,6 +40,11 @@ class AttachmentCursor(FieldCursor):
         self._sync_field()
 
         return attachment
+
+
+    def validate_stream(self, stream, key):
+        if not isinstance(stream, io.IOBase):
+            raise ValueError('{} must be a stream value.'.format(key))
 
 
 class AttachmentsField(MultiSelectField):
