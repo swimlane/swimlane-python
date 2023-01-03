@@ -85,7 +85,7 @@ def test_all_fields_empty_value(mock_record, field_class):
     # Does not guarantee full scope of all field subtypes function as expected
     for field in mock_record._fields.values():
         not_editable_input_types = ['firstCreated', 'lastUpdated', 'createdBy', 'lastUpdatedBy']
-        if isinstance(field, field_class) and not field.readonly and field.input_type in not_editable_input_types:
+        if isinstance(field, field_class) and not field.readonly and not field.input_type in not_editable_input_types:
             del mock_record[field.name]
 
             swimlane = field.get_swimlane()
