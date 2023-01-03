@@ -76,45 +76,41 @@ class TestHelpersAddCommentAdaptor:
                 pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText, 123)
         assert str(excinfo.value) == "rich_text must be a boolean value."
 
-    @pytest.mark.xfail(reason="SPT-6196: Message Value is not checked for valid test.")
     def test_comment_empty(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
         commentText = ''
-        pytest.swimlane_instance.helpers.add_comment(
-            pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert editedRecord['Comments'][-1].message == commentText
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_comment(
+                pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText)
+        assert str(excinfo.value) == "message must not be an empty string value."
 
-    @pytest.mark.xfail(reason="SPT-6195: Message Value is not checked for valid test.")
     def test_comment_none(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
         commentText = None
-        pytest.swimlane_instance.helpers.add_comment(
-            pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert editedRecord['Comments'][-1].message == commentText
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_comment(
+                pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText)
+        assert str(excinfo.value) == "message must be a string value."
 
-    @pytest.mark.xfail(reason="SPT-6195: Message Value is not checked for valid test.")
     def test_comment_number(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
         commentText = 123
-        pytest.swimlane_instance.helpers.add_comment(
-            pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert editedRecord['Comments'][-1].message == commentText
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_comment(
+                pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText)
+        assert str(excinfo.value) == "message must be a string value."
 
-    @pytest.mark.xfail(reason="SPT-6195: Message Value is not checked for valid test.")
     def test_comment_object(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
         commentText = {'Name': 'Fred'}
-        pytest.swimlane_instance.helpers.add_comment(
-            pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert editedRecord['Comments'][-1].message == commentText
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_comment(
+                pytest.app.id, sourceRecord.id, pytest.CommentFieldID, commentText)
+        assert str(excinfo.value) == "message must be a string value."
 
     def test_comment_missing(helpers):
         sourceRecord = pytest.app.records.create(
@@ -125,38 +121,35 @@ class TestHelpersAddCommentAdaptor:
         assert str(excinfo.value) == 'add_comment() {}'.format(
             pytest.helpers.py_ver_missing_param(5, 4, "message", "at least"))
 
-    @pytest.mark.xfail(reason="SPT-6196: Pydriver should verify that the commentFieldID should be a valid value")
     def test_comment_empty_fieldId(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
         commentText = pytest.fake.sentence()
         commendFieldId = ''
-        pytest.swimlane_instance.helpers.add_comment(
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_comment(
             pytest.app.id, sourceRecord.id, commendFieldId, commentText)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert editedRecord['Comments'][-1].message == commentText
+        assert str(excinfo.value) == "field_id must not be an empty string value."
 
-    @pytest.mark.xfail(reason="SPT-6196: Pydriver should verify that the recordID should be a valid value")
     def test_comment_empty_recordId(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
         commentText = pytest.fake.sentence()
         recordId = ''
-        pytest.swimlane_instance.helpers.add_comment(
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_comment(
             pytest.app.id, recordId, pytest.CommentFieldID, commentText)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert editedRecord['Comments'][-1].message == commentText
+        assert str(excinfo.value) == "record_id must not be an empty string value."
 
-    @pytest.mark.xfail(reason="SPT-6196: Pydriver should verify that the appID should be a valid value")
     def test_comment_empty_appId(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
         commentText = pytest.fake.sentence()
         appId = ''
-        pytest.swimlane_instance.helpers.add_comment(
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_comment(
             appId, sourceRecord.id, pytest.CommentFieldID, commentText)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert len(editedRecord['Comments']) == 0
+        assert str(excinfo.value) == "app_id must not be an empty string value."
 
     def test_comment_missmatch_appid(helpers):
         sourceRecord = pytest.app.records.create(
@@ -188,25 +181,23 @@ class TestHelpersAddCommentAdaptor:
         editedRecord = pytest.app.records.get(id=sourceRecord.id)
         assert len(editedRecord['Comments']) == 0
 
-    @pytest.mark.xfail(reason="SPT-6196: Pydriver should verify the IDs are valid input.")
     def test_comment_app_object(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
         commentText = pytest.fake.sentence()
-        pytest.swimlane_instance.helpers.add_comment(
-            pytest.app, sourceRecord.id, pytest.CommentFieldID, commentText)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert len(editedRecord['Comments']) == 0
-
-    @pytest.mark.xfail(reason="SPT-6196: Pydriver should verify the IDs are valid input.")
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_comment(
+                pytest.app, sourceRecord.id, pytest.CommentFieldID, commentText)
+        assert str(excinfo.value) == "app_id must be a string value."
+    
     def test_comment_record_object(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
         commentText = pytest.fake.sentence()
-        pytest.swimlane_instance.helpers.add_comment(
-            pytest.app.id, sourceRecord, pytest.CommentFieldID, commentText)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert len(editedRecord['Comments']) == 0
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_comment(
+                pytest.app.id, sourceRecord, pytest.CommentFieldID, commentText)
+        assert str(excinfo.value) == "record_id must be a string value."
 
 
 class TestHelpersAddRefernceAdaptor:
@@ -221,31 +212,52 @@ class TestHelpersAddRefernceAdaptor:
         assert editedRecord['Reference'][-1] == pytest.targetRecord
         assert len(editedRecord['Reference']) == currentRefCount + 1
 
-    @pytest.mark.xfail(reason="SPT-6241: Verify record to add to ref field.")
     def test_addReference_empty_list(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
-        currentRefCount = len(pytest.app.records.get(
-            id=sourceRecord.id)['Reference'])
         recordsToAddRef = []
-        pytest.swimlane_instance.helpers.add_record_references(
-            pytest.app.id, sourceRecord.id, pytest.refFieldID, recordsToAddRef)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert len(editedRecord['Reference']) == currentRefCount
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_record_references(
+                pytest.app.id, sourceRecord.id, pytest.refFieldID, recordsToAddRef)
+        assert str(excinfo.value) == "target_record_ids must be a non-empty list value"
 
-    @pytest.mark.xfail(reason="SPT-6241, SPT-6242: Verify record to add to ref field.  Actually added another reference.")
     def test_addReference_list_empty_str(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
-        currentRefCount = len(pytest.app.records.get(
-            id=sourceRecord.id)['Reference'])
         recordsToAddRef = ['']
-        pytest.swimlane_instance.helpers.add_record_references(
-            pytest.app.id, sourceRecord.id, pytest.refFieldID, recordsToAddRef)
-        editedRecord = pytest.app.records.get(id=sourceRecord.id)
-        assert len(editedRecord['Reference']) == currentRefCount
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_record_references(
+                pytest.app.id, sourceRecord.id, pytest.refFieldID, recordsToAddRef)
+        assert str(excinfo.value) == "target_record_ids must contain non-empty string values"
+    
+    def test_addReference_list_int(helpers):
+        sourceRecord = pytest.app.records.create(
+            **{'Text': pytest.fake.sentence()})
+        recordsToAddRef = [123]
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_record_references(
+                pytest.app.id, sourceRecord.id, pytest.refFieldID, recordsToAddRef)
+        assert str(excinfo.value) == "target_record_ids must contain non-empty string values"
 
-    @pytest.mark.xfail(reason="SPT-6241, SPT-6242: Verify record to add to ref field. Bombs out on the assert line.")
+    def test_addReference_list_dict(helpers):
+        sourceRecord = pytest.app.records.create(
+            **{'Text': pytest.fake.sentence()})
+        recordsToAddRef = [{'test':'dict'}]
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_record_references(
+                pytest.app.id, sourceRecord.id, pytest.refFieldID, recordsToAddRef)
+        assert str(excinfo.value) == "target_record_ids must contain non-empty string values"
+    
+    def test_addReference_not_list(helpers):
+        sourceRecord = pytest.app.records.create(
+            **{'Text': pytest.fake.sentence()})
+        recordsToAddRef = 123
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.add_record_references(
+                pytest.app.id, sourceRecord.id, pytest.refFieldID, recordsToAddRef)
+        assert str(excinfo.value) == "target_record_ids must be a non-empty list value"
+
+    @pytest.mark.xfail(reason="SPT-6242: Verify record to add to ref field. Bombs out on the assert line.")
     def test_addReference_record_from_wrong_app(helpers):
         sourceRecord = pytest.app.records.create(
             **{'Text': pytest.fake.sentence()})
@@ -318,19 +330,20 @@ class TestHelpersBulkJobStatusAdaptor:
             bulkJobID)
         assert len(loggingStuff) > 0
 
-    @pytest.mark.xfail(reason="SPT-6233: Should verify the bulkJobID is a non-empty string.")
     def test_check_bulk_status_null_id(helpers):
         bulkJobID = None
-        loggingStuff = pytest.swimlane_instance.helpers.check_bulk_job_status(
-            bulkJobID)
-        assert len(loggingStuff) == 0
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.check_bulk_job_status(
+                bulkJobID)
+        assert str(excinfo.value) == "job_id must be a string value."
 
     @pytest.mark.xfail(reason="SPT-6233: Should verify the bulkJobID is a non-empty string.")
     def test_check_bulk_status_empty_id(helpers):
         bulkJobID = ''
-        loggingStuff = pytest.swimlane_instance.helpers.check_bulk_job_status(
-            bulkJobID)
-        assert len(loggingStuff) == 0
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.check_bulk_job_status(
+                bulkJobID)
+        assert str(excinfo.value) == "job_id must not be an empty string value."
 
     def test_check_bulk_status_no_params(helpers):
         with pytest.raises(TypeError) as excinfo:
@@ -344,16 +357,17 @@ class TestHelpersBulkJobStatusAdaptor:
             bulkJobID)
         assert len(loggingStuff) == 0
 
-    @pytest.mark.xfail(reason="SPT-6233: Should verify the bulkJobID is a non-empty string.")
+    
     def test_check_bulk_status_numeric_id(helpers):
         bulkJobID = 1.5
-        loggingStuff = pytest.swimlane_instance.helpers.check_bulk_job_status(
-            bulkJobID)
-        assert len(loggingStuff) == 0
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.check_bulk_job_status(
+                bulkJobID)
+        assert str(excinfo.value) == "job_id must be a string value."
 
-    @pytest.mark.xfail(reason="SPT-6233: Should verify the bulkJobID is a non-empty string.")
     def test_check_bulk_status_object_id(helpers):
         bulkJobID = {'name': 'bob'}
-        loggingStuff = pytest.swimlane_instance.helpers.check_bulk_job_status(
-            bulkJobID)
-        assert len(loggingStuff) == 0
+        with pytest.raises(ValueError) as excinfo:
+            pytest.swimlane_instance.helpers.check_bulk_job_status(
+                bulkJobID)
+        assert str(excinfo.value) == "job_id must be a string value."

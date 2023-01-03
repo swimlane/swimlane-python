@@ -2,6 +2,8 @@ import pendulum
 
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.utils.version import requires_swimlane_version
+from swimlane.utils.list_validator import validate_str_list
+from swimlane.utils.str_validator import validate_str
 
 
 class HelperAdapter(SwimlaneResolver):
@@ -20,6 +22,7 @@ class HelperAdapter(SwimlaneResolver):
             field_id (str): Full field ID to target reference field on parent Record string
             target_record_ids (List(str)): List of full target reference Record ID strings
         """
+        validate_str_list(target_record_ids, "target_record_ids")
 
         self._swimlane.request(
             'post',
@@ -43,6 +46,11 @@ class HelperAdapter(SwimlaneResolver):
             message (str): New comment message body
             rich_text (bool): Declare the message as being rich text, default is False
         """
+        validate_str(app_id, 'app_id')
+        validate_str(record_id, 'record_id')
+        validate_str(field_id, 'field_id')
+        validate_str(message, 'message')
+        
         if not isinstance(rich_text, bool):
             raise ValueError("rich_text must be a boolean value.")
 
@@ -70,5 +78,7 @@ class HelperAdapter(SwimlaneResolver):
             :class:`list` of :class:`dict`: List of dictionaries containing job history
 
         """
+        
+        validate_str(job_id, 'job_id')
 
         return self._swimlane.request('get', "logging/job/{0}".format(job_id)).json()
