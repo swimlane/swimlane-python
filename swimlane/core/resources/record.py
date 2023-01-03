@@ -171,7 +171,7 @@ class Record(APIResource):
         field_errors = []
         for field in six.itervalues(self._fields):
             if field.required and field.get_swimlane() is None:
-                field_errors.append("Required field '{}'' is not set".format(field.name))
+                field_errors.append("Required field '{}' is not set".format(field.name))
                 continue
             validation_result = validate_text_field_subtype(field)
             if isinstance(validation_result, str):
