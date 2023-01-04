@@ -535,7 +535,6 @@ class TestRecordAdaptorBulkModifyAppend:
         assert len(pytest.app.records.search(
             ('Multi-select', 'contains', ["two"]))) == initialRecords
 
-    @pytest.mark.xfail(reason="SPT-7933: IS the bulk modify not working for text list")
     def test_record_bulk_modify_append_text_list(helpers):
         pytest.app.records.bulk_create({'Text List': ['hello']}, {'Text List': ['hello', 'goodbye']}, {
                                        'Text List': ['goodbye']}, {'Text List': ['hello', 'goodbye', 'fred']})
