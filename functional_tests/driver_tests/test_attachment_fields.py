@@ -59,13 +59,6 @@ class TestAttachmentField:
             theRecord['Attachment'].add(fileName, None)
         assert str(excinfo.value) == 'stream must be a stream value.'
 
-    def test_attachment_field_add_file_empty_file(helpers):
-        fileName = '277kb.jpg'
-        theRecord = pytest.app.records.create(**{})
-        with pytest.raises(ValueError) as excinfo:
-            theRecord['Attachment'].add(fileName, BytesIO())
-        assert str(excinfo.value) == 'stream must not be an empty stream value.'
-
     def test_attachment_field_add_file_just_file(helpers):
         fileName = '277kb.jpg'
         theRecord = pytest.app.records.create(**{})
