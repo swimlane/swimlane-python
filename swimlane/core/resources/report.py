@@ -1,6 +1,7 @@
 import pendulum
 
 from swimlane.core.cursor import PaginatedCursor
+from swimlane.core.fields.list import ListField
 from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ, LT, GT, LTE, GTE, ASC, DESC
@@ -116,6 +117,8 @@ class Report(APIResource, PaginatedCursor):
         
         validate_type(field, value)
 
+        value = self.parse_field_value(field, value)
+
         self._raw['filters'].append({
             "fieldId": field.id,
             "filterType": operand,
@@ -161,6 +164,28 @@ class Report(APIResource, PaginatedCursor):
         # Use temp Record instance for target app to translate values into expected API format
         record_stub = record_factory(self._app)
         return record_stub.get_field(field_name)
+
+    def parse_field_value(self, field, value):
+        if isinstance(field, ListField):
+            type = self.get_field_list_type(field.input_type)
+        if isinstance(field, ListField) and not isinstance(value, list) and value is not None:
+            self.validate_type(value, type, field.input_type)
+            return [value]
+        elif isinstance(field, ListField) and isinstance(value, list) and any(not isinstance(elem, type) for elem in value):
+            raise TypeError('Field item must be a {}.'.format(field.input_type))
+        return value
+
+    def validate_type(self, value, type, type_name=None):
+        if(not type_name):
+            type_name = type
+        if not isinstance(value, type):
+            raise TypeError('Field must be a {}.'.format(type_name))
+
+    def get_field_list_type(self, field_type):
+        if field_type == 'text':
+            return str
+        elif field_type == 'numeric':
+            return (int, float)
 
 def report_factory(app, report_name, **kwargs):
     """Report instance factory populating boilerplate raw data

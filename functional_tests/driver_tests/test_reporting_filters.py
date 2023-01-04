@@ -132,6 +132,22 @@ class TestAppReportsTextListFiltering():
             assert (set(record['Text List']) &
                     set(['a', 'b'])) == set(['a', 'b'])
 
+    def test_text_list_contains_using_string(helpers):
+        report = pytest.app.reports.build(
+            'report-%s' % pytest.fake.word(), limit=0)
+        report.filter('Text List', 'contains', 'b')
+        assert len(report) == 3
+        for record in report:
+            assert (set(record['Text List']) &
+                    set(['a', 'b'])) == set(['a', 'b'])
+
+    def test_text_list_contains_using_number(helpers):
+        report = pytest.app.reports.build(
+            'report-%s' % pytest.fake.word(), limit=0)
+        with pytest.raises(TypeError) as excinfo:
+            report.filter('Text List', 'contains', 1)
+        assert str(excinfo.value) == "Field must be a text."
+
     def test_text_list_excludes(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
@@ -262,6 +278,19 @@ class TestAppReportsNumericListFiltering():
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=0)
         report.filter('Numeric List', 'contains', [10, 20])
+        assert len(report) == 3
+
+    def test_numeric_list_contains_using_string(helpers):
+        report = pytest.app.reports.build(
+            'report-%s' % pytest.fake.word(), limit=0)
+        with pytest.raises(TypeError) as excinfo:
+            report.filter('Numeric List', 'contains', 'b')
+        assert str(excinfo.value) == "Field must be a numeric."
+
+    def test_numeric_list_contains_using_number(helpers):
+        report = pytest.app.reports.build(
+            'report-%s' % pytest.fake.word(), limit=0)
+        report.filter('Numeric List', 'contains', 10)
         assert len(report) == 3
 
     def test_numeric_list_excludes(helpers):
