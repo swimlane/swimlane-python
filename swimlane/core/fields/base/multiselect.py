@@ -1,5 +1,7 @@
 from sortedcontainers import SortedSet
 
+from swimlane.core.resources.usergroup import User
+
 from .cursor import CursorField, FieldCursor
 
 
@@ -73,7 +75,7 @@ class MultiSelectField(CursorField):
                     list,
                     MultiSelectCursor,
                     SortedSet,
-                    dict,
+                    User,
                 ),
             ):
                 value = [value]

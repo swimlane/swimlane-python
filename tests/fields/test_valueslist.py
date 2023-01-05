@@ -69,7 +69,12 @@ def test_values_list_multi_select_field(mock_record):
     assert len(mock_record['Values List']) == 2
 
 def test_set_not_iterable_value(mock_record):
-    mock_record["Values List"] = "Option 1"
+    # this can be done in a single line,
+    # I'm just being explicit here
+    try:
+        mock_record["Values List"] = "Option 1"
+    except Exception:
+        pytest.fail(Exception)
 
 
 def test_cursor_repr(mock_record):
