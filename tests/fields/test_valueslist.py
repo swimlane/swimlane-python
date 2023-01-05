@@ -74,7 +74,7 @@ def test_set_not_iterable_value(mock_record):
     try:
         mock_record["Values List"] = "Option 1"
     except Exception:
-        pytest.fail(Exception)
+        raise RuntimeError
 
 
 def test_cursor_repr(mock_record):
