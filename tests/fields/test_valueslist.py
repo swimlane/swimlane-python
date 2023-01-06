@@ -68,12 +68,12 @@ def test_values_list_multi_select_field(mock_record):
     mock_record['Values List'] = vl_original_values
     assert len(mock_record['Values List']) == 2
 
-    # Attempt to directly set to a non-iterable value
+def test_set_not_iterable_value(mock_record):
+    # this can be done in a single line,
+    # I'm just being explicit here
     try:
-        mock_record['Values List'] = 'Option 1'
-    except ValueError:
-        pass
-    else:
+        mock_record["Values List"] = "Option 1"
+    except Exception:
         raise RuntimeError
 
 
