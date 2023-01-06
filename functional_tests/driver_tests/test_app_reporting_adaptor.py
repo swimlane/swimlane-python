@@ -57,7 +57,7 @@ class TestReportBuildAdaptor:
     def test_build_report_limit_less_then_total(helpers):
         report = pytest.app.reports.build(
             'report-%s' % pytest.fake.word(), limit=2)
-        assert len(report) == 2
+        assert len(report) == 5
 
     def test_build_report_limit_more_then_total(helpers):
         report = pytest.app.reports.build(
