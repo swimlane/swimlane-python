@@ -53,6 +53,6 @@ class ReportAdapter(SwimlaneResolver):
         Returns:
             Report: Newly created local Report instance
         """
-        if (kwargs.pop('limit', 50) < 0):
+        if (kwargs["limit"] < 0):
             raise ValueError('The limit value must be a whole number of zero or above')
         return report_factory(self._app, name, **kwargs)
