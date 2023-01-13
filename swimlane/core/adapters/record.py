@@ -223,13 +223,13 @@ class RecordAdapter(AppResolver):
 
     # pylint: disable=too-many-branches
     @requires_swimlane_version('2.17')
-    def bulk_modify(self, *filters_or_records, **kwargs):
+    def bulk_modify(self, *filters_or_records_or_ids, **kwargs):
         """Shortcut to bulk modify records
         
         .. versionadded:: 2.17.0
         
         Args:
-            *filters_or_records (tuple) or (Record): Either a list of Records, or a list of filters.
+            *filters_or_records (tuple), (Record), or (string): a list of Records, a list of recordIds, or a list of filters.
 
         Keyword Args:
             values (dict): Dictionary of one or more 'field_name': 'new_value' pairs to update
@@ -264,6 +264,9 @@ class RecordAdapter(AppResolver):
 
                 app.records.bulk_modify(record1, record2, record3, values={"Field_Name": 'new value'})
 
+                # Using recordIds
+                app.records.bulk_modify("adtDzpdDRv9zM8C4o", "aHlAFdBBjE020Jrzb", "aAR67lIcEnLknaURw", values={"Field Name": "New Value"})
+
         Returns:
             :class:`string`: Bulk Modify Job ID
         """
@@ -278,19 +281,21 @@ class RecordAdapter(AppResolver):
         if not isinstance(values, dict):
             raise ValueError("values parameter must be dict of {'field_name': 'update_value'} pairs")
 
-        _type = validate_filters_or_records(filters_or_records)
+        _type = validate_filters_or_records_or_ids(filters_or_records_or_ids)
 
         request_payload = {}
         record_stub = record_factory(self._app)
 
         # build record_id list
         if _type is Record:
-            request_payload['recordIds'] = [record.id for record in filters_or_records]
+            request_payload['recordIds'] = [record.id for record in filters_or_records_or_ids]
 
+        elif _type is str:
+            request_payload["recordIds"] = filters_or_records_or_ids
         # build filters
         else:
             filters = []
-            for filter_tuples in filters_or_records:
+            for filter_tuples in filters_or_records_or_ids:
                 field_name = record_stub.get_field(filter_tuples[0])
 
                 value = filter_tuples[2]
@@ -334,7 +339,7 @@ class RecordAdapter(AppResolver):
 
         # Update records if instances were used to submit bulk modify request after request was successful
         if _type is Record:
-            for record in filters_or_records:
+            for record in filters_or_records_or_ids:
                 for field_name, modification_operation in six.iteritems(values):
                     record[field_name] = modification_operation.value
 
@@ -372,7 +377,7 @@ class RecordAdapter(AppResolver):
             :class:`string`: Bulk Modify Job ID
         """
 
-        _type = validate_filters_or_records(filters_or_records)
+        _type = validate_filters_or_records_or_ids(filters_or_records)
         data_dict = {}
 
         # build record_id list
@@ -402,18 +407,18 @@ class RecordAdapter(AppResolver):
         return self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict).text
 
 
-def validate_filters_or_records(filters_or_records):
+def validate_filters_or_records_or_ids(filters_or_records):
     """Validation for filters_or_records variable from bulk_modify and bulk_delete"""
     # If filters_or_records is empty, fail
     if not filters_or_records:
         raise ValueError('Must provide at least one filter tuples or Records')
-    # If filters_or_records is not list of Record or tuple, fail
-    if not isinstance(filters_or_records[0], (Record, tuple)):
-        raise ValueError('Cannot provide both filter tuples and Records')
-    # If filters_or_records is not list of either Record or only tuple, fail
+    # If filters_or_records is not list of Record, tuple, or string, fail
+    if not isinstance(filters_or_records[0], (Record, tuple, str)):
+        raise ValueError('Cannot provide both filter tuples and Records or IDs')
+    # If filters_or_records is not list of Record, string, or only tuple, fail
     _type = type(filters_or_records[0])
     for item in filters_or_records:
         if not isinstance(item, _type):
-            raise ValueError("Expected filter tuple or Record, received {0}".format(item))
+            raise ValueError("Expected filter tuple, Record, or string, received {0}".format(item))
 
     return _type
