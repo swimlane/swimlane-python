@@ -6,7 +6,7 @@ import six
 
 from swimlane.core.bulk import Clear, Replace
 from swimlane.exceptions import UnknownField
-from swimlane.core.adapters.record import validate_filters_or_records
+from swimlane.core.adapters.record import validate_filters_or_records_or_ids
 
 
 def test_get(mock_swimlane, mock_app, mock_record):
@@ -196,17 +196,17 @@ def test_filters_type_check(mock_swimlane, mock_app, mock_record):
                 assert mock_app.records.search(('Numeric', 'equals', '7'))
 
 
-def test_filters_or_records_validation(mock_record):
+def test_filters_ids_or_records_validation(mock_record):
     # No values provided should raise ValueError
     with pytest.raises(ValueError):
-        validate_filters_or_records([])
+        validate_filters_or_records_or_ids([])
 
     # Invalid type should raise ValueError
     with pytest.raises(ValueError):
-        validate_filters_or_records(["not supported type"])
+        validate_filters_or_records_or_ids([1, 2, 3])
     #
     with pytest.raises(ValueError):
-        validate_filters_or_records([mock_record, ('Number', 'equals', 1)])
+        validate_filters_or_records_or_ids([mock_record, ('Number', 'equals', 1)])
 
 
 def test_bulk_modify_by_filter(mock_swimlane, mock_app):

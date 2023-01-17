@@ -407,17 +407,17 @@ class RecordAdapter(AppResolver):
         return self._swimlane.request('DELETE', "app/{0}/record/batch".format(self._app.id), json=data_dict).text
 
 
-def validate_filters_or_records_or_ids(filters_or_records):
+def validate_filters_or_records_or_ids(filters_or_records_or_ids):
     """Validation for filters_or_records variable from bulk_modify and bulk_delete"""
     # If filters_or_records is empty, fail
-    if not filters_or_records:
-        raise ValueError('Must provide at least one filter tuples or Records')
+    if not filters_or_records_or_ids:
+        raise ValueError('Must provide at least one filter tuples, Records, or list of Ids')
     # If filters_or_records is not list of Record, tuple, or string, fail
-    if not isinstance(filters_or_records[0], (Record, tuple, str)):
+    if not isinstance(filters_or_records_or_ids[0], (Record, tuple, str)):
         raise ValueError('Cannot provide both filter tuples and Records or IDs')
     # If filters_or_records is not list of Record, string, or only tuple, fail
-    _type = type(filters_or_records[0])
-    for item in filters_or_records:
+    _type = type(filters_or_records_or_ids[0])
+    for item in filters_or_records_or_ids:
         if not isinstance(item, _type):
             raise ValueError("Expected filter tuple, Record, or string, received {0}".format(item))
 
