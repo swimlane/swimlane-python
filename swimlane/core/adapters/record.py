@@ -229,7 +229,7 @@ class RecordAdapter(AppResolver):
         .. versionadded:: 2.17.0
         
         Args:
-            *filters_or_records (tuple), (Record), or (string): a list of Records, a list of recordIds, or a list of filters.
+            *filters_or_records_or_ids (tuple), (Record), or (string): a list of Records, a list of recordIds, a list of filters, or a list of both records and recordIds.
 
         Keyword Args:
             values (dict): Dictionary of one or more 'field_name': 'new_value' pairs to update
@@ -267,6 +267,10 @@ class RecordAdapter(AppResolver):
                 # Using recordIds
                 app.records.bulk_modify("adtDzpdDRv9zM8C4o", "aHlAFdBBjE020Jrzb", "aAR67lIcEnLknaURw", values={"Field Name": "New Value"})
 
+                # Bulk modify by mixing record instances and record ids
+                record1 = app.records.get(tracking_id='APP-1')
+                app.records.bulk_modify(record1, "aHlAFdBBjE020Jrzb", "aAR67lIcEnLknaURw", values={"Field Name": "New Value"})
+
         Returns:
             :class:`string`: Bulk Modify Job ID
         """
@@ -286,12 +290,16 @@ class RecordAdapter(AppResolver):
         request_payload = {}
         record_stub = record_factory(self._app)
 
-        # build record_id list
-        if _type is Record:
-            request_payload['recordIds'] = [record.id for record in filters_or_records_or_ids]
+        if _type is Record or _type is str:
+            the_record_ids = []
+            for record_or_id in filters_or_records_or_ids:
+                if isinstance(record_or_id, Record):
+                    the_record_ids.append(record_or_id.id)
+                else:
+                    the_record_ids.append(record_or_id)
 
-        elif _type is str:
-            request_payload["recordIds"] = filters_or_records_or_ids
+            request_payload["recordIds"] = [item for item in the_record_ids]
+
         # build filters
         else:
             filters = []
@@ -338,21 +346,29 @@ class RecordAdapter(AppResolver):
         response = self._swimlane.request('put', "app/{0}/record/batch".format(self._app.id), json=request_payload)
 
         # Update records if instances were used to submit bulk modify request after request was successful
-        if _type is Record:
+        if _type is Record or _type is str:
             for record in filters_or_records_or_ids:
+                # if value is an ID, get the record instance
+                if type(record) is str:
+                    record = self.get(id=record)
                 for field_name, modification_operation in six.iteritems(values):
                     record[field_name] = modification_operation.value
 
         return response.text
 
+
+
+
+
+
     @requires_swimlane_version('2.17')
-    def bulk_delete(self, *filters_or_records):
+    def bulk_delete(self, *filters_or_records_or_ids):
         """Shortcut to bulk delete records
         
         .. versionadded:: 2.17.0
         
         Args:
-            *filters_or_records (tuple) or (Record): Either a list of Records, or a list of filters.
+            *filters_or_records_or_ids (tuple) or (Record): Either a list of Records, a list of filters, a list of recordIds, or a list of both records and recordIds.
             
         Notes:
             Requires Swimlane 2.17+
@@ -373,25 +389,35 @@ class RecordAdapter(AppResolver):
                 record3 = app.records.get(tracking_id='APP-3')
                 app.records.bulk_delete(record1, record2, record3)
 
+                # Bulk delete by record ids
+                app.records.bulk_delete("adtDzpdDRv9zM8C4o", "aHlAFdBBjE020Jrzb", "aAR67lIcEnLknaURw", values={"Field Name": "New Value"})
+
+                # Bulk delete by mixing record instances and record ids
+                record1 = app.records.get(tracking_id='APP-1')
+                app.records.bulk_delete(record1, "aHlAFdBBjE020Jrzb", "aAR67lIcEnLknaURw", values={"Field Name": "New Value"})
+
         Returns:
             :class:`string`: Bulk Modify Job ID
         """
 
-        _type = validate_filters_or_records_or_ids(filters_or_records)
+        _type = validate_filters_or_records_or_ids(filters_or_records_or_ids)
         data_dict = {}
 
         # build record_id list
-        if _type is Record:
+        if _type is Record or _type is str:
             record_ids = []
-            for record in filters_or_records:
-                record_ids.append(record.id)
+            for item in filters_or_records_or_ids:
+                if isinstance(item, Record):
+                    record_ids.append(item.id)
+                else:
+                    record_ids.append(item)
             data_dict['recordIds'] = record_ids
 
         # build filters
         else:
             filters = []
             record_stub = record_factory(self._app)
-            for filter_tuples in filters_or_records:
+            for filter_tuples in filters_or_records_or_ids:
                 field = record_stub.get_field(filter_tuples[0])
 
                 value = filter_tuples[2]
@@ -412,13 +438,26 @@ def validate_filters_or_records_or_ids(filters_or_records_or_ids):
     # If filters_or_records is empty, fail
     if not filters_or_records_or_ids:
         raise ValueError('Must provide at least one filter tuples, Records, or list of Ids')
-    # If filters_or_records is not list of Record, tuple, or string, fail
-    if not isinstance(filters_or_records_or_ids[0], (Record, tuple, str)):
-        raise ValueError('Cannot provide both filter tuples and Records or IDs')
-    # If filters_or_records is not list of Record, string, or only tuple, fail
-    _type = type(filters_or_records_or_ids[0])
-    for item in filters_or_records_or_ids:
-        if not isinstance(item, _type):
-            raise ValueError("Expected filter tuple, Record, or string, received {0}".format(item))
 
-    return _type
+    _types = [type(item) for item in filters_or_records_or_ids]
+
+    types_dict = {
+        "record": 0,
+        "str": 0,
+        "tuple": 0
+    }
+
+    for _type in _types:
+        if _type is tuple:
+            types_dict["tuple"] = types_dict["tuple"] + 1
+        elif _type is Record:
+            types_dict["record"] = types_dict["tuple"] + 1
+        elif _type is str:
+            types_dict["str"] = types_dict["tuple"] + 1
+        else:
+            raise ValueError("Expected filter tuple, Record, or string, received {0}".format(_type))
+
+    if types_dict["tuple"] > 0 and (types_dict["record"] > 0 or types_dict["str"] > 0):
+        raise ValueError('Cannot mix filter tuples with records or ids')
+
+    return _types[0]
