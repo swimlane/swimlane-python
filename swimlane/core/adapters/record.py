@@ -435,7 +435,7 @@ class RecordAdapter(AppResolver):
 
 def validate_filters_or_records_or_ids(filters_or_records_or_ids):
     """Validation for filters_or_records variable from bulk_modify and bulk_delete"""
-    # If filters_or_records is empty, fail
+    # If filters_or_records_or_ids is empty, fail
     if not filters_or_records_or_ids:
         raise ValueError('Must provide at least one filter tuples, Records, or list of Ids')
 
@@ -460,4 +460,5 @@ def validate_filters_or_records_or_ids(filters_or_records_or_ids):
     if types_dict["tuple"] > 0 and (types_dict["record"] > 0 or types_dict["str"] > 0):
         raise ValueError('Cannot mix filter tuples with records or ids')
 
+    # either all tuples or a mix of record and str, which is handled together
     return _types[0]
