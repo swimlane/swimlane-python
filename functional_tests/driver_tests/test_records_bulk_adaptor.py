@@ -33,7 +33,7 @@ class TestRecordAdaptorBulkCreate:
         pytest.app.records.bulk_create({},{},{},{})
         emptyRecords = pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', None))
-        assert len(emptyRecords) == 4+initialEmptyRecords
+        assert len(emptyRecords) == 4 + initialEmptyRecords
 
     def test_record_bulk_create_check_TrackingIds(helpers):
         initialEmptyRecords = len(pytest.app.records.search(
@@ -105,7 +105,7 @@ class TestRecordAdaptorBulkDelete:
             records = pytest.app.records.bulk_delete()
             pytest.waitOnJobByID(records)
         assert str(
-            excinfo.value) == 'Must provide at least one filter tuples or Records'
+            excinfo.value) == 'Must provide at least one filter tuples, Records, or list of Ids'
 
     def test_record_bulk_delete_list_records_already_deleted(helpers):
         emptyRecord = pytest.app.records.create(**{})
@@ -169,6 +169,28 @@ class TestRecordAdaptorBulkDelete:
                     assert eachError["message"] in recordIdsRemoved
                     recordIdsRemoved.remove(eachError["message"])
 
+    def test_record_bulk_delete_list_records_and_record_ids(helpers):
+        i = random.randint(0, 1000)
+        pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
+            'Numeric': i}, {'Numeric': i}, {'Numeric': i}, {'Numeric': i}, {'Numeric': i})
+
+        records = pytest.app.records.search(
+            ('Numeric', 'equals', i))
+
+        assert len(records) > 0
+
+        record_id_one = records.pop()
+        record_id_two = records.pop()
+
+        records_and_ids = records
+        records_and_ids.append(record_id_one.id)
+        records_and_ids.append(record_id_two.id)
+
+        records = pytest.app.records.bulk_delete(*records_and_ids)
+        pytest.waitOnJobByID(records)
+        assert len(pytest.app.records.search(
+            ('Numeric', 'equals', i))) == 0
+
 
 class TestRecordAdaptorBulkModify:
     def test_record_bulk_modify_filter(helpers):
@@ -202,7 +224,7 @@ class TestRecordAdaptorBulkModify:
             records = pytest.app.records.bulk_modify(values={'Numeric': i1})
             pytest.waitOnJobByID(records)
         assert str(
-            excinfo.value) == 'Must provide at least one filter tuples or Records'
+            excinfo.value) == 'Must provide at least one filter tuples, Records, or list of Ids'
         assert len(pytest.app.records.search(('Text', 'equals', None),
                                              ('Numeric', 'equals', i))) == 4 + initial99Records
         assert len(pytest.app.records.search(
@@ -942,3 +964,104 @@ class TestRecordAdaptorBulkModifyRemove:
             listDiff = list(
                 set(recordedListValues[record.id]) - set(list(record['Numeric List'])))
             assert (all(elem in [1, 4] for elem in listDiff))
+
+
+class TestRecordAdaptorBulkModifyRecordIds:
+    def test_record_bulk_modify_list_record_ids(helpers):
+        i = random.randint(0,99)
+        initial66Records = len(pytest.app.records.search(
+            ('Text', 'equals', None), ('Numeric', 'equals', i)))
+        i1 = random.randint(0,9999)
+        initial4321Records = len(pytest.app.records.search(
+            ('Text', 'equals', None), ('Numeric', 'equals', i1)))
+        pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
+                                       'Numeric': i}, {'Numeric': i})
+        recordList = pytest.app.records.search(
+            ('Text', 'equals', None), ('Numeric', 'equals', i))
+
+        record_ids = [record.id for record in recordList]
+        records = pytest.app.records.bulk_modify(
+            *record_ids, values={'Numeric': i1})
+        pytest.waitOnJobByID(records)
+
+        assert len(pytest.app.records.search(('Text', 'equals', None),
+                                             ('Numeric', 'equals', i))) == initial66Records
+        assert len(pytest.app.records.search(('Text', 'equals', None),
+                                             ('Numeric', 'equals', i1))) == 4 + initial4321Records
+
+    def test_record_bulk_modify_list_record_type_not_tuple_ids_or_records_list(helpers):
+        original_value = random.randint(0, 100)
+        updated_value = 77777
+        pytest.app.records.bulk_create({'Numeric': original_value}, {'Numeric': original_value}, {
+            'Numeric': original_value}, {'Numeric': original_value})
+
+        records = pytest.app.records.search(('Numeric', 'equals', original_value))
+        record_id_ints = [1, 2, 3, 4]
+
+        with pytest.raises(ValueError) as excinfo:
+            records = pytest.app.records.bulk_modify(
+                *record_id_ints, values={'Numeric': updated_value})
+            pytest.waitOnJobByID(records)
+        assert str(
+            excinfo.value) == "Expected filter tuple, Record, or string, received {0}".format(type(record_id_ints[0]))
+
+    def test_record_bulk_modify_list_record_no_args(helpers):
+        original_value = random.randint(0, 100)
+        updated_value = 77777
+        pytest.app.records.bulk_create({'Numeric': original_value}, {'Numeric': original_value}, {
+            'Numeric': original_value}, {'Numeric': original_value})
+
+        records = pytest.app.records.search(('Numeric', 'equals', original_value))
+        with pytest.raises(ValueError) as excinfo:
+            records = pytest.app.records.bulk_modify(values={'Numeric': updated_value})
+            pytest.waitOnJobByID(records)
+        assert str(
+            excinfo.value) == "Must provide at least one filter tuples, Records, or list of Ids"
+
+    def test_record_bulk_modify_list_record_too_many_args(helpers):
+        original_value = random.randint(0, 100)
+        updated_value = 77777
+        pytest.app.records.bulk_create({'Numeric': original_value}, {'Numeric': original_value}, {
+            'Numeric': original_value}, {'Numeric': original_value})
+
+        records = pytest.app.records.search(('Numeric', 'equals', original_value))
+        record_ids = ["fgsdfgsdfgsdfgdsg", "sdfgsdfgsdfgf"]
+        other = ["string1", "string2"]
+
+        with pytest.raises(ValueError) as excinfo:
+            records = pytest.app.records.bulk_modify(
+                *record_ids, other, values={'Numeric': updated_value})
+            pytest.waitOnJobByID(records)
+        assert str(
+            excinfo.value) == "Expected filter tuple, Record, or string, received {0}".format(type(other))
+
+
+class TestRecordAdaptorBulkModifyMixRecordsAndRecordIds:
+    def test_record_bulk_modify_list_records_and_record_ids(helpers):
+        i = random.randint(0,99)
+        initial66Records = len(pytest.app.records.search(
+            ('Text', 'equals', None), ('Numeric', 'equals', i)))
+        i1 = random.randint(0,9999)
+        initial4321Records = len(pytest.app.records.search(
+            ('Text', 'equals', None), ('Numeric', 'equals', i1)))
+        pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
+                                       'Numeric': i}, {'Numeric': i})
+        recordList = pytest.app.records.search(
+            ('Text', 'equals', None), ('Numeric', 'equals', i))
+
+        record_instance_one = recordList.pop()
+        record_instance_two = recordList.pop()
+        records_and_ids = [record.id for record in recordList]
+
+        records_and_ids.append(record_instance_one)
+        records_and_ids.append(record_instance_two)
+
+        records = pytest.app.records.bulk_modify(
+            *records_and_ids, values={'Numeric': i1})
+        pytest.waitOnJobByID(records)
+
+        assert len(pytest.app.records.search(('Text', 'equals', None),
+                                             ('Numeric', 'equals', i))) == initial66Records
+        assert len(pytest.app.records.search(('Text', 'equals', None),
+                                             ('Numeric', 'equals', i1))) == 4 + initial4321Records
+
