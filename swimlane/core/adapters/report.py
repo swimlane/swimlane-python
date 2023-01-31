@@ -53,4 +53,10 @@ class ReportAdapter(SwimlaneResolver):
         Returns:
             Report: Newly created local Report instance
         """
+        valid = lambda input: input is not None and isinstance(input, int) and input >= 0
+        limit = kwargs.get('limit', None)
+    
+        if "limit" in kwargs and not valid(limit):
+            raise ValueError('The limit value must be a whole number of zero or above')
+
         return report_factory(self._app, name, **kwargs)
