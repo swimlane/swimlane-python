@@ -69,17 +69,17 @@ class TestReportBuildAdaptor:
             'report-%s' % pytest.fake.word(), limit=0)
         assert len(report) == 5
 
-    @pytest.mark.xfail(reason="SPT-6308: The limit value should be a whole number of at least zero")
     def test_build_report_limit_below_zero(helpers):
-        report = pytest.app.reports.build(
-            'report-%s' % pytest.fake.word(), limit=-5)
-        assert len(report) == 1
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.reports.build(
+                'report-%s' % pytest.fake.word(), limit=-5)
+        assert str(excinfo.value) == 'The limit value must be a whole number of zero or above'
 
-    @pytest.mark.xfail(reason="SPT-6308: The limit value should be a whole number of at least zero")
     def test_build_report_limit_fraction(helpers):
-        report = pytest.app.reports.build(
-            'report-%s' % pytest.fake.word(), limit=2.5)
-        assert len(report) == 2
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.reports.build(
+                'report-%s' % pytest.fake.word(), limit=2.5)
+        assert str(excinfo.value) == 'The limit value must be a whole number of zero or above'
 
 
 class TestReportFilteringAdaptor:
