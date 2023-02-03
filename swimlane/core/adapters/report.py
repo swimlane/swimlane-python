@@ -2,7 +2,7 @@ import weakref
 
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.core.resources.report import Report, report_factory
-
+from swimlane.utils.str_validator import validate_str, validate_str_format
 
 class ReportAdapter(SwimlaneResolver):
     """Handles retrieval and creation of Report resources"""
@@ -24,8 +24,8 @@ class ReportAdapter(SwimlaneResolver):
             :class:`list` of :class:`~swimlane.core.resources.report.Report`: List of all returned reports
         """
         raw_reports = self._swimlane.request('get', "reports/app/{}".format(self._app.id)).json()
-        # Ignore StatsReports for now
-        return [Report(self._app, raw_report) for raw_report in raw_reports if raw_report['$type'] == Report._type]
+
+        return [Report(self._app, raw_report) for raw_report in raw_reports]
 
     def get(self, report_id):
         """Retrieve report by ID
@@ -36,6 +36,9 @@ class ReportAdapter(SwimlaneResolver):
         Returns:
             Report: Corresponding Report instance
         """
+        validate_str(report_id, 'report_id')
+        validate_str_format(report_id, 'report_id')
+
         return Report(
             self._app,
             self._swimlane.request('get', "reports/{0}".format(report_id)).json()
