@@ -2404,7 +2404,7 @@ def mock_group(mock_swimlane):
 @pytest.fixture
 def mock_report(mock_app):
     return Report(mock_app, {
-        '$type': 'Core.Models.Search.Report, Core',
+        '$type': 'Core.Models.Search.StatsReport, Core',
         'aggregates': [],
         'allowed': [],
         'applicationIds': ['58e4bb4407637a0e4c4f9873'],

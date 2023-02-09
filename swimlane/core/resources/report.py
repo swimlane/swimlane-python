@@ -48,7 +48,7 @@ class Report(APIResource, PaginatedCursor):
         keywords (list(str)): List of keywords to use in report/search
     """
 
-    _type = "Core.Models.Search.Report, Core"
+    _type = "Core.Models.Search.StatsReport, Core"
 
     _FILTER_OPERANDS = (
         EQ,

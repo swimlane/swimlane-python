@@ -2,7 +2,7 @@ import mock
 
 from swimlane.core.resources.report import Report
 
-raw_report = {'$type': 'Core.Models.Search.Report, Core',
+raw_report = {'$type': 'Core.Models.Search.StatsReport, Core',
               'aggregates': [],
               'allowed': [],
               'applicationIds': ['58de205f07637a0264c0ccbf'],

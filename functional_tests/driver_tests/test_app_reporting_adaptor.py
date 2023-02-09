@@ -215,21 +215,17 @@ class TestAppReportsGet():
         assert str(excinfo.value) == 'get() {}'.format(
             pytest.py_ver_missing_param(2, 1, "report_id", "exactly"))
 
-    # Looks like we are not verifying the valid type for the id?
-    @pytest.mark.xfail(reason="SPT-6297: Pydriver should verify that the reportID should be a valid value")
     def test_get_report_null_id(helpers):
         reportID = None
-        with pytest.raises(TypeError) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             pytest.app.reports.get(reportID)
-        assert str(excinfo.value) == 'get() takes exactly 2 arguments (1 given)'
+        assert str(excinfo.value) == 'report_id must be a string value.'
 
-    # Looks like we are not verifying the valid type for the id?
-    @pytest.mark.xfail(reason="SPT-6297: Pydriver should verify that the reportID should be a valid value")
     def test_get_report_empty_id(helpers):
         reportID = ''
-        with pytest.raises(TypeError) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             pytest.app.reports.get(reportID)
-        assert str(excinfo.value) == 'get() takes exactly 2 arguments (1 given)'
+        assert str(excinfo.value) == 'report_id must not be an empty string value.'
 
     # Is this the proper response for a report ID that does not exist?
     def test_get_report_garbage_id(helpers):
@@ -238,10 +234,20 @@ class TestAppReportsGet():
             pytest.app.reports.get(reportID)
         assert str(excinfo.value) == pytest.py_ver_no_json()
 
-    # Looks like we are not verifying the valid type for the id?
-    @pytest.mark.xfail(reason="SPT-6297: Pydriver should verify that the reportID should be a valid value")
     def test_get_report_with_report_object(helpers):
         reportList = pytest.app.reports.list()
-        with pytest.raises(TypeError) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             pytest.app.reports.get(reportList[0])
-        assert str(excinfo.value) == pytest.py_ver_no_json()
+        assert str(excinfo.value) == 'report_id must be a string value.'
+
+    def test_get_report_with_invalid_id(helpers):
+        reportID = '@#$%^&*()'
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.reports.get(reportID)
+        assert str(excinfo.value) == 'report_id is not of the proper format.'
+
+    def test_get_report_with_numeric_id(helpers):
+        reportID = 123
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.reports.get(reportID)
+        assert str(excinfo.value) == 'report_id must be a string value.'
