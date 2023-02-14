@@ -304,7 +304,6 @@ class TestDefaultCurrentDateTimeField:
 
 
 class TestDefaultSpecificDateTimeField:
-    @pytest.mark.xfail(reason="SPT-6353: Should this have the default value?")
     def test_default_specific_field_value(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})

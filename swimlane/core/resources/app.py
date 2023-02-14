@@ -1,6 +1,7 @@
 from functools import total_ordering
 
 import six
+import pendulum
 
 from swimlane.exceptions import UnknownField
 from .base import APIResource
@@ -51,6 +52,10 @@ class App(APIResource):
                             default = self._defaults.get(field['name'], list())
                             default.extend([value['name']])
                             self._defaults[field['name']] = default
+            if 'fieldType' in field and field['fieldType'] == "date":
+                default_value_type = field['defaultValueType']
+                if default_value_type == 'specific':
+                    self._defaults[field['name']] = pendulum.parse(field['defaultValue'])
 
         self._keys_to_field_names = {}
         for name, field_def in six.iteritems(self._fields_by_name):
