@@ -11,7 +11,7 @@ class CommentCursor(FieldCursor):
         """Add new comment to record comment field"""
         message = str(message)
         if not isinstance(rich_text, bool):
-            raise ValueError("rich_text must be a boolean value.")
+            raise ValueError('rich_text must be a boolean value.')
 
         sw_repr = {
             '$type': 'Core.Models.Record.Comments, Core',

@@ -39,7 +39,7 @@ class Record(APIResource):
         else:
             record_app_id = raw['applicationId']
             if record_app_id != app.id:
-                raise ValueError('Record applicationId `{}` does not match source app id `{}`'.format(
+                raise ValueError('Record applicationId "{}" does not match source app id "{}"'.format(
                     record_app_id,
                     app.id
                 ))
@@ -104,7 +104,7 @@ class Record(APIResource):
 
     def __lt__(self, other):
         if not isinstance(other, self.__class__):
-            raise TypeError("Comparisons not supported between instances of '{}' and '{}'".format(
+            raise TypeError('Comparisons not supported between instances of "{}" and "{}"'.format(
                 other.__class__.__name__,
                 self.__class__.__name__
             ))
@@ -331,7 +331,7 @@ class Record(APIResource):
         for usergroup in usergroups:
             if not isinstance(usergroup, UserGroup):
                 raise TypeError(
-                    'Expected UserGroup, received `{}` instead'.format(usergroup))
+                    'Expected UserGroup, received "{}" instead'.format(usergroup))
 
             selection = usergroup.as_usergroup_selection()
             if selection not in allowed:
@@ -369,12 +369,12 @@ class Record(APIResource):
             for usergroup in usergroups:
                 if not isinstance(usergroup, UserGroup):
                     raise TypeError(
-                        'Expected UserGroup, received `{}` instead'.format(usergroup))
+                        'Expected UserGroup, received "{}" instead'.format(usergroup))
                 try:
                     allowed.remove(usergroup.as_usergroup_selection())
                 except ValueError:
                     raise ValueError(
-                        'UserGroup `{}` not in record `{}` restriction list'.format(usergroup, self))
+                        'UserGroup "{}" not in record "{}" restriction list'.format(usergroup, self))
         else:
             allowed = []
 

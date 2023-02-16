@@ -70,7 +70,7 @@ class UserGroupField(MultiSelectField):
 
         raise ValidationError(
             self.record,
-            'User `{}` is not a valid selection for field `{}`'.format(
+            'User "{}" is not a valid selection for field "{}"'.format(
                 user,
                 self.name
             )
@@ -96,7 +96,7 @@ class UserGroupField(MultiSelectField):
 
         raise ValidationError(
             self.record,
-            'Group `{}` is not a valid selection for field `{}`'.format(
+            'Group "{}" is not a valid selection for field "{}"'.format(
                 group,
                 self.name
             )
@@ -127,7 +127,7 @@ class UserGroupField(MultiSelectField):
         if value is not None:
             if not isinstance(value, UserGroup):
                     raise TypeError(
-                        'Expected UserGroup, received `{}` instead'.format(value))
+                        'Expected UserGroup, received "{}" instead'.format(value))
             value = value.as_usergroup_selection()
 
         return value

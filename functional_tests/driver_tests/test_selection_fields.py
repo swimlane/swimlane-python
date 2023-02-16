@@ -51,7 +51,7 @@ class TestSingleSelectField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Single-select": "a", "Single-select": ["two", "three"]})
-        assert str(excinfo.value) == "Validation failed for <Record: {} - New>. Reason: Field 'Single-select' expects one of '{}', got 'list' instead".format(
+        assert str(excinfo.value) == 'Validation failed for <Record: {} - New>. Reason: Field "Single-select" expects one of \'{}\', got "list" instead'.format(
             pytest.app.acronym, ("str", "basestring")[pytest.py_ver() == 2])
 
     def test_single_select_field_multiple_on_save(helpers):
@@ -59,7 +59,7 @@ class TestSingleSelectField:
             **{"Required Single-select": "a"})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Single-select"] = ["two", "three"]
-        assert str(excinfo.value) == "Validation failed for <Record: {}>. Reason: Field 'Single-select' expects one of '{}', got 'list' instead".format(
+        assert str(excinfo.value) == 'Validation failed for <Record: {}>. Reason: Field "Single-select" expects one of \'{}\', got "list" instead'.format(
             theRecord.tracking_id, ("str", "basestring")[pytest.py_ver() == 2])
 
     def test_single_select_field_empty(helpers):
@@ -107,7 +107,7 @@ class TestSingleSelectField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Single-select": "a", "Single-select": 1})
-        assert str(excinfo.value) == "Validation failed for <Record: {} - New>. Reason: Field 'Single-select' expects one of '{}', got 'int' instead".format(
+        assert str(excinfo.value) == 'Validation failed for <Record: {} - New>. Reason: Field "Single-select" expects one of \'{}\', got "int" instead'.format(
             pytest.app.acronym, ("str", "basestring")[pytest.py_ver() == 2])
 
     def test_single_select_field_int_on_save(helpers):
@@ -115,7 +115,7 @@ class TestSingleSelectField:
             **{"Required Single-select": "a"})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Single-select"] = 123
-        assert str(excinfo.value) == "Validation failed for <Record: {}>. Reason: Field 'Single-select' expects one of '{}', got 'int' instead".format(
+        assert str(excinfo.value) == 'Validation failed for <Record: {}>. Reason: Field "Single-select" expects one of \'{}\', got "int" instead'.format(
             theRecord.tracking_id, ("str", "basestring")[pytest.py_ver() == 2])
 
 
@@ -177,7 +177,7 @@ class TestMultiSelectField:
             **{"Required Single-select": "a", "Multi-select": ["first", "second"]})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Multi-select"].select(2)
-        assert str(excinfo.value) == "Validation failed for <Record: {}>. Reason: Field 'Multi-select' expects one of '{}', got 'int' instead".format(
+        assert str(excinfo.value) == 'Validation failed for <Record: {}>. Reason: Field "Multi-select" expects one of \'{}\', got "int" instead'.format(
             theRecord.tracking_id, ("str", "basestring")[pytest.py_ver() == 2])
 
     def test_multi_select_field_deselect_value_int_on_save(helpers):
@@ -193,14 +193,14 @@ class TestReadOnlySelectField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Single-select": "a", "Read-only Single-select": "aa"})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Cannot set readonly field \'Read-only Single-select\'' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Cannot set readonly field "Read-only Single-select"' % pytest.app.acronym
 
     def test_read_only_field_on_save(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Single-select": "a"})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Read-only Single-select"] = "aa"
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field \'Read-only Single-select\'' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field "Read-only Single-select"' % theRecord.tracking_id
 
 
 class TestDefaultSelectField:

@@ -24,7 +24,7 @@ class Test_SPT_4287_readonly_override:
         assert len(fullRecord.revisions.get_all()) == 1
         with pytest.raises(exceptions.ValidationError) as excinfo:
             fullRecord['Read Only Numeric'] = 5
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field \'Read Only Numeric\'' % fullRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field "Read Only Numeric"' % fullRecord.tracking_id
 
     def test_readonly_override_set(helpers):
         new_instance = pytest.helpers.reconnect_swimlane(

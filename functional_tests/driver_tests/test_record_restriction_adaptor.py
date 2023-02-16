@@ -99,7 +99,7 @@ class TestRecordRestrictByUser:
         with pytest.raises(ValueError) as excinfo:
             tempRecord.remove_restriction(
                 pytest.swimlane_instance.users.get(id=pytest.newUser1['id']))
-        assert str(excinfo.value) == 'UserGroup `%s` not in record `%s` restriction list' % (
+        assert str(excinfo.value) == 'UserGroup "%s" not in record "%s" restriction list' % (
             pytest.newUser1['name'], tempRecord.tracking_id)
         assert len(restrictionsList) == 1
         assert restrictionsList == tempRecord.restrictions
@@ -110,7 +110,7 @@ class TestRecordRestrictByUser:
         users = None
         with pytest.raises(TypeError) as excinfo:
             tempRecord.add_restriction(users)
-        assert str(excinfo.value) == "Expected UserGroup, received `None` instead"
+        assert str(excinfo.value) == 'Expected UserGroup, received "None" instead'
         assert len(tempRecord.restrictions) == 0
 
     def test_restriction_add_duplicate_user(helpers):
@@ -194,7 +194,7 @@ class TestRecordRestrictByGroup:
             id=pytest.newGroup2['id'])
         with pytest.raises(ValueError) as excinfo:
             tempRecord.remove_restriction(swimGroup2)
-        assert str(excinfo.value) == 'UserGroup `%s` not in record `%s` restriction list' % (
+        assert str(excinfo.value) == 'UserGroup "%s" not in record "%s" restriction list' % (
             pytest.newGroup2['name'], tempRecord.tracking_id)
         assert len(tempRecord.restrictions) == 1
         assert restrictionsList == tempRecord.restrictions

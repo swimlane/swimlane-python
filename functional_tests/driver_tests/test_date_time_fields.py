@@ -46,27 +46,27 @@ class TestDateTimeField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Date & Time": pendulum.now(), "Date & Time": pendulum.now().date()})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Date & Time\' expects one of \'datetime\', got \'Date\' instead' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Date & Time" expects one of \'datetime\', got "Date" instead' % pytest.app.acronym
 
     def test_datetime_field_date_on_save(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Date & Time"] = pendulum.now().date()
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Date & Time\' expects one of \'datetime\', got \'Date\' instead' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Date & Time" expects one of \'datetime\', got "Date" instead' % theRecord.tracking_id
 
     def test_datetime_field_time(helpers):
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Date & Time": pendulum.now(), "Date & Time": pendulum.now().time()})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Date & Time\' expects one of \'datetime\', got \'Time\' instead' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Date & Time" expects one of \'datetime\', got "Time" instead' % pytest.app.acronym
 
     def test_datetime_field_time_on_save(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Date & Time"] = pendulum.now().time()
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Date & Time\' expects one of \'datetime\', got \'Time\' instead' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Date & Time" expects one of \'datetime\', got "Time" instead' % theRecord.tracking_id
 
 
 class TestDateField:
@@ -98,27 +98,27 @@ class TestDateField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Date & Time": pendulum.now(), "Date": pendulum.now().to_date_string()})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Date\' expects one of \'datetime\', \'date\', got \'str\' instead' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Date" expects one of \'datetime\', \'date\', got "str" instead' % pytest.app.acronym
 
     def test_date_field_string_on_save(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Date"] = pendulum.now().to_date_string()
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Date\' expects one of \'datetime\', \'date\', got \'str\' instead' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Date" expects one of \'datetime\', \'date\', got "str" instead' % theRecord.tracking_id
 
     def test_date_field_time(helpers):
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Date & Time": pendulum.now(), "Date": pendulum.now().time()})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Date\' expects one of \'datetime\', \'date\', got \'Time\' instead' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Date" expects one of \'datetime\', \'date\', got "Time" instead' % pytest.app.acronym
 
     def test_date_field_time_on_save(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Date"] = pendulum.now().time()
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Date\' expects one of \'datetime\', \'date\', got \'Time\' instead' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Date" expects one of \'datetime\', \'date\', got "Time" instead' % theRecord.tracking_id
 
 
 class TestTimeField:
@@ -150,14 +150,14 @@ class TestTimeField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Date & Time": pendulum.now(), "Time": pendulum.now().date()})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Time\' expects one of \'datetime\', \'time\', got \'Date\' instead' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Time" expects one of \'datetime\', \'time\', got "Date" instead' % pytest.app.acronym
 
     def test_time_field_date_on_save(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Time"] = pendulum.now().date()
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Time\' expects one of \'datetime\', \'time\', got \'Date\' instead' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Time" expects one of \'datetime\', \'time\', got "Date" instead' % theRecord.tracking_id
 
 
 class TestFirstCreatedField:
@@ -228,27 +228,27 @@ class TestTimespanField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Date & Time": pendulum.now(), "Timespan": pendulum.now()})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Timespan\' expects one of \'timedelta\', got \'DateTime\' instead' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Timespan" expects one of \'timedelta\', got "DateTime" instead' % pytest.app.acronym
 
     def test_timespan_field_datetime_on_save(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Timespan"] = pendulum.now()
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Timespan\' expects one of \'timedelta\', got \'DateTime\' instead' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Timespan" expects one of \'timedelta\', got "DateTime" instead' % theRecord.tracking_id
 
     def test_timespan_field_number(helpers):
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Date & Time": pendulum.now(), "Timespan": 123})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Timespan\' expects one of \'timedelta\', got \'int\' instead' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Timespan" expects one of \'timedelta\', got "int" instead' % pytest.app.acronym
 
     def test_timespan_field_number_on_save(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Timespan"] = 123
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Timespan\' expects one of \'timedelta\', got \'int\' instead' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Timespan" expects one of \'timedelta\', got "int" instead' % theRecord.tracking_id
 
     def test_timespan_field_pendulum_interval(helpers):
         delta = pendulum.duration(days=15)
@@ -271,14 +271,14 @@ class TestReadOnlyDateTimeField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Date & Time": pendulum.now(), "Read-only Date & Time": pendulum.now()})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Cannot set readonly field \'Read-only Date & Time\'' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Cannot set readonly field "Read-only Date & Time"' % pytest.app.acronym
 
     def test_readonly_datetime_on_save(helpers):
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Read-only Date & Time"] = pendulum.now()
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field \'Read-only Date & Time\'' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field "Read-only Date & Time"' % theRecord.tracking_id
 
 
 class TestDefaultCurrentDateTimeField:

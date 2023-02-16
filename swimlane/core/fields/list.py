@@ -28,14 +28,14 @@ class _ListFieldCursor(FieldCursor):
             if len(target) < min_items:
                 raise ValidationError(
                     self._record,
-                    "Field '{}' must have a minimum of {} item(s)".format(self._field.name, min_items)
+                    'Field "{}" must have a minimum of {} item(s)'.format(self._field.name, min_items)
                 )
 
         if max_items is not None:
             if len(target) > max_items:
                 raise ValidationError(
                     self._record,
-                    "Field '{}' can only have a maximum of {} item(s)".format(self._field.name, max_items)
+                    'Field "{}" can only have a maximum of {} item(s)'.format(self._field.name, max_items)
                 )
 
         # Individual item validation
@@ -82,7 +82,7 @@ class _ListFieldCursor(FieldCursor):
             return wrapper
         except AttributeError:
             # Raise separate AttributeError with correct class reference instead of list
-            raise AttributeError("{} object has no attribute {}".format(self.__class__, item))
+            raise AttributeError('{} object has no attribute {}'.format(self.__class__, item))
 
 
 class TextListFieldCursor(_ListFieldCursor):
@@ -93,7 +93,7 @@ class TextListFieldCursor(_ListFieldCursor):
         if not isinstance(item, six.string_types):
             raise ValidationError(
                 self._record,
-                "Text list field items must be strings, not '{}'".format(item.__class__)
+                'Text list field items must be strings, not "{}"'.format(item.__class__)
             )
 
         words = item.split(' ')
@@ -108,7 +108,7 @@ class TextListFieldCursor(_ListFieldCursor):
                     if len(words) > item_max_length:
                         raise ValidationError(
                             self._record,
-                            "Field '{}' items cannot contain more than {} words".format(
+                            'Field "{}" items cannot contain more than {} words'.format(
                                 self._field.name,
                                 item_max_length
                             )
@@ -117,7 +117,7 @@ class TextListFieldCursor(_ListFieldCursor):
                     if len(words) < item_min_length:
                         raise ValidationError(
                             self._record,
-                            "Field '{}' items must contain at least {} words".format(
+                            'Field "{}" items must contain at least {} words'.format(
                                 self._field.name,
                                 item_min_length
                             )
@@ -129,7 +129,7 @@ class TextListFieldCursor(_ListFieldCursor):
                     if len(item) > item_max_length:
                         raise ValidationError(
                             self._record,
-                            "Field '{}' items cannot contain more than {} characters".format(
+                            'Field "{}" items cannot contain more than {} characters'.format(
                                 self._field.name,
                                 item_max_length
                             )
@@ -138,7 +138,7 @@ class TextListFieldCursor(_ListFieldCursor):
                     if len(item) < item_min_length:
                         raise ValidationError(
                             self._record,
-                            "Field '{}' items must contain at least {} characters".format(
+                            'Field "{}" items must contain at least {} characters'.format(
                                 self._field.name,
                                 item_min_length
                             )
@@ -152,7 +152,7 @@ class NumericListFieldCursor(_ListFieldCursor):
         if not isinstance(item, Number):
             raise ValidationError(
                 self._record,
-                "Numeric list field items must be numbers, not '{}'".format(item.__class__)
+                'Numeric list field items must be numbers, not "{}"'.format(item.__class__)
             )
 
         # range restrictions
@@ -163,7 +163,7 @@ class NumericListFieldCursor(_ListFieldCursor):
             if item > item_max:
                 raise ValidationError(
                     self._record,
-                    "Field '{}' items cannot be greater than {}".format(
+                    'Field "{}" items cannot be greater than {}'.format(
                         self._field.name,
                         item_max
                     )
@@ -173,7 +173,7 @@ class NumericListFieldCursor(_ListFieldCursor):
             if item < item_min:
                 raise ValidationError(
                     self._record,
-                    "Field '{}' items cannot be less than {}".format(
+                    'Field "{}" items cannot be less than {}'.format(
                         self._field.name,
                         item_min
                     )
@@ -226,7 +226,7 @@ class ListField(CursorField):
         if not isinstance(value, (list, type(None))):
             raise ValidationError(
                 self.record,
-                "Field '{}' must be set to a list, not '{}'".format(
+                'Field "{}" must be set to a list, not "{}"'.format(
                     self.name,
                     value.__class__
                 )

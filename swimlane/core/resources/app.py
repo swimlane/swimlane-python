@@ -79,7 +79,7 @@ class App(APIResource):
 
     def __lt__(self, other):
         if not isinstance(other, self.__class__):
-            raise TypeError("Comparisons not supported between instances of '{}' and '{}'".format(
+            raise TypeError('Comparisons not supported between instances of "{}" and "{}"'.format(
                 other.__class__.__name__,
                 self.__class__.__name__
             ))

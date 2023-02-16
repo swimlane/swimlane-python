@@ -283,7 +283,7 @@ class RecordAdapter(AppResolver):
             raise ValueError('Must provide "values" as keyword argument')
 
         if not isinstance(values, dict):
-            raise ValueError("values parameter must be dict of {'field_name': 'update_value'} pairs")
+            raise ValueError('values parameter must be dict of {"field_name": "update_value"} pairs')
 
         _type = validate_filters_or_records_or_ids(filters_or_records_or_ids)
 
@@ -329,7 +329,7 @@ class RecordAdapter(AppResolver):
             # Lookup target field
             modification_field = record_stub.get_field(field_name)
             if not modification_field.bulk_modify_support:
-                raise ValueError("Field '{}' of Type '{}', is not supported for bulk modify".format(
+                raise ValueError('Field "{}" of Type "{}", is not supported for bulk modify'.format(
                     field_name,
                     modification_field.__class__.__name__
                 ))
@@ -455,7 +455,7 @@ def validate_filters_or_records_or_ids(filters_or_records_or_ids):
         elif _type is str:
             types_dict["str"] = types_dict["tuple"] + 1
         else:
-            raise ValueError("Expected filter tuple, Record, or string, received {0}".format(_type))
+            raise ValueError('Expected filter tuple, Record, or string, received {0}'.format(_type))
 
     if types_dict["tuple"] > 0 and (types_dict["record"] > 0 or types_dict["str"] > 0):
         raise ValueError('Cannot mix filter tuples with records or ids')
