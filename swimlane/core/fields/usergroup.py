@@ -55,6 +55,10 @@ class UserGroupField(MultiSelectField):
 
     def _validate_user(self, user):
         """Validate a User instance against allowed user IDs or membership in a group"""
+        if user._raw['groups'] == []:
+           result = self._swimlane.request('get', "user/{0}".format(user.id))
+           user._raw['groups'] = result.json()['groups']
+
         # All users allowed
         if self._show_all_users:
             return
