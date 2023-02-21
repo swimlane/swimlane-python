@@ -241,9 +241,9 @@ class Helpers:
             if (True in (ele['status'] == 'completed' for ele in loggingStuff)):
                 break
             elif (True in (ele['status'] == 'failed' for ele in loggingStuff)):
-                raise Exception("Batch Job failed")
+                raise Exception('Batch Job failed')
             elif (sleepTime > 30):
-                raise Exception("Timed out waiting for the job to complete")
+                raise Exception('Timed out waiting for the job to complete')
             else:
                 time.sleep(0.1)
                 sleepTime += 0.1

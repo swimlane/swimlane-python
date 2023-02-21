@@ -73,7 +73,7 @@ class ResourcesCache(object):
     def cache(self, resource):
         """Insert a resource instance into appropriate resource cache"""
         if not isinstance(resource, APIResource):
-            raise TypeError('Cannot cache `{!r}`, can only cache APIResource instances'.format(resource))
+            raise TypeError('Cannot cache "{!r}", can only cache APIResource instances'.format(resource))
 
         # Disable inserts to cache when disabled
         if self.__cache_max_size == 0:
@@ -84,7 +84,7 @@ class ResourcesCache(object):
             cache_index_keys = resource.get_cache_index_keys().items()
         except NotImplementedError:
             logger.warning(
-                'Not caching `{!r}`, resource did not provide all necessary cache details'.format(resource)
+                'Not caching "{!r}", resource did not provide all necessary cache details'.format(resource)
             )
         else:
             resource_type = type(resource)
@@ -94,7 +94,7 @@ class ResourcesCache(object):
 
             self.__caches[resource_type][cache_internal_key] = resource
 
-            logger.debug('Cached `{!r}`'.format(resource))
+            logger.debug('Cached "{!r}"'.format(resource))
 
     def clear(self, *resource_types):
         """Clear cache for each provided APIResource class, or all resources if no classes are provided"""
@@ -122,10 +122,10 @@ def get_cache_index_key(resource):
         key = tuple(resource)
 
     if len(key) != 3:
-        raise TypeError('Cache key must be tuple of (class, key, value), got `{!r}` instead'.format(key))
+        raise TypeError('Cache key must be tuple of (class, key, value), got "{!r}" instead'.format(key))
 
     if not issubclass(key[0], APIResource):
-        raise TypeError('First value of cache key must be a subclass of APIResource, got `{!r}` instead'.format(key[0]))
+        raise TypeError('First value of cache key must be a subclass of APIResource, got "{!r}" instead'.format(key[0]))
 
     return key
 
@@ -153,9 +153,9 @@ def check_cache(resource_type):
                 try:
                     cached_record = adapter._swimlane.resources_cache[index_key]
                 except KeyError:
-                    logger.debug('Cache miss: `{!r}`'.format(index_key))
+                    logger.debug('Cache miss: "{!r}"'.format(index_key))
                 else:
-                    logger.debug('Cache hit: `{!r}`'.format(cached_record))
+                    logger.debug('Cache hit: "{!r}"'.format(cached_record))
                     return cached_record
 
             # Fallback to default function call

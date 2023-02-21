@@ -129,4 +129,4 @@ def validate_type(field, value):
             ) if len(field.supported_types) > 0 else False
 
             if wrong_type:
-                raise ValueError("Value must be one of {}".format(", ".join([str(f) for f in field.supported_types])))
+                raise ValueError('Value must be one of {}'.format(", ".join([str(f) for f in field.supported_types])))

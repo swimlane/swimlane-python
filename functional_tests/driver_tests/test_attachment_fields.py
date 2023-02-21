@@ -109,7 +109,7 @@ class TestReadOnlyAttachmentField:
         theFile = pytest.helpers.loadFileStream(fileName)
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord['ReadOnly Attachment'].add(fileName, theFile)
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field \'ReadOnly Attachment\'' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field "ReadOnly Attachment"' % theRecord.tracking_id
         theRecord.save()
         updatedRecord = pytest.app.records.get(id=theRecord.id)
         assert len(updatedRecord['Attachment']) == 0

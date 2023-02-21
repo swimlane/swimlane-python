@@ -24,14 +24,14 @@ class NumberField(Field):
 
         if value is not None:
             if self.min is not None and value < self.min:
-                raise ValidationError(self.record, "Field '{}' minimum value '{}', received '{}'".format(
+                raise ValidationError(self.record, 'Field "{}" minimum value "{}", received "{}"'.format(
                     self.name,
                     self.min,
                     value
                 ))
 
             if self.max is not None and value > self.max:
-                raise ValidationError(self.record, "Field '{}' maximum value '{}', received '{}'".format(
+                raise ValidationError(self.record, 'Field "{}" maximum value "{}", received "{}"'.format(
                     self.name,
                     self.max,
                     value

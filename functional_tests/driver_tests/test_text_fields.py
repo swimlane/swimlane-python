@@ -269,7 +269,7 @@ class TestJSONTextField:
             pytest.app.records.create(
                 **{"Required Text": "required", "JSON": textValue})
         assert str(
-            excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Cannot set readonly field \'JSON\'' % pytest.app.acronym
+            excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Cannot set readonly field "JSON"' % pytest.app.acronym
 
     # @pytest.mark.xfail(reason="SPT-6362: SHOULD JSON be writable from pydriver??")
     def test_json_text_field_on_save(helpers):
@@ -278,7 +278,7 @@ class TestJSONTextField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord['JSON'] = textValue
         assert str(
-            excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field \'JSON\'' % theRecord.tracking_id
+            excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field "JSON"' % theRecord.tracking_id
 
 
 class TestListTextField:
@@ -318,7 +318,7 @@ class TestListTextField:
             **{"Required Text": "required", "Text List": textValue})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord['Text List'].insert(2, newValue)
-        assert str(excinfo.value) == "Validation failed for <Record: {}>. Reason: Text list field items must be strings, not '<{} 'int'>'".format(
+        assert str(excinfo.value) == 'Validation failed for <Record: {}>. Reason: Text list field items must be strings, not "<{} \'int\'>"'.format(
             theRecord.tracking_id, ("class", "type")[pytest.helpers.py_ver() == 2])
 
     def test_list_text_field_on_save_append(helpers):
@@ -338,7 +338,7 @@ class TestListTextField:
             **{"Required Text": "required", "Text List": textValue})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord['Text List'].append(newValue)
-        assert str(excinfo.value) == "Validation failed for <Record: {}>. Reason: Text list field items must be strings, not '<{} 'int'>'".format(
+        assert str(excinfo.value) == 'Validation failed for <Record: {}>. Reason: Text list field items must be strings, not "<{} \'int\'>"'.format(
             theRecord.tracking_id, ("class", "type")[pytest.helpers.py_ver() == 2])
 
 

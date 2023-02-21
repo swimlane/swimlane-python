@@ -76,7 +76,7 @@ class TestRecordAdaptorBulkCreate:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.bulk_create({randomFieldName: 'Frank did it'}, {
                                            randomFieldName: 123456}, {randomFieldName: 123456}, {randomFieldName: 123456})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'%s\' expects one of \'Number\', got \'str\' instead' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "%s" expects one of \'Number\', got "str" instead' % (
             pytest.app.acronym, randomFieldName)
         emptyRecords = pytest.app.records.search(
             (randomFieldName, 'equals', 123456))
@@ -475,7 +475,7 @@ class TestRecordAdaptorBulkModifyClear:
             pytest.app.records.bulk_modify(
                 ('Text', 'equals', baseText), values={'Attachment': Clear()})
         assert str(
-            excinfo.value) == 'Field \'Attachment\' of Type \'AttachmentsField\', is not supported for bulk modify'
+            excinfo.value) == 'Field "Attachment" of Type "AttachmentsField", is not supported for bulk modify'
 
     def test_record_bulk_modify_clear_comments(helpers):
         baseText = "Has Comment"
@@ -488,7 +488,7 @@ class TestRecordAdaptorBulkModifyClear:
             pytest.app.records.bulk_modify(
                 ('Text', 'equals', baseText), values={'Attachment': Clear()})
         assert str(
-            excinfo.value) == 'Field \'Attachment\' of Type \'AttachmentsField\', is not supported for bulk modify'
+            excinfo.value) == 'Field "Attachment" of Type "AttachmentsField", is not supported for bulk modify'
 
     def test_record_bulk_modify_clear_references(helpers):
         baseText = "Has Reference"
@@ -696,7 +696,7 @@ class TestRecordAdaptorBulkModifyAppend:
             pytest.app.records.bulk_modify(('Text', 'equals', baseText), values={
                                            'Attachment': Append(theFile)})
         assert str(
-            excinfo.value) == 'Field \'Attachment\' of Type \'AttachmentsField\', is not supported for bulk modify'
+            excinfo.value) == 'Field "Attachment" of Type "AttachmentsField", is not supported for bulk modify'
 
     def test_record_bulk_modify_append_comments(helpers):
         baseText = str(uuid.uuid4())
@@ -706,7 +706,7 @@ class TestRecordAdaptorBulkModifyAppend:
             pytest.app.records.bulk_modify(('Text', 'equals', baseText), values={
                                            'Attachment': Append(baseText)})
         assert str(
-            excinfo.value) == 'Field \'Attachment\' of Type \'AttachmentsField\', is not supported for bulk modify'
+            excinfo.value) == 'Field "Attachment" of Type "AttachmentsField", is not supported for bulk modify'
 
     @pytest.mark.xfail(reason="SPT-7932: There was no error about the field type, but the passed in targetRecord, which is a record class, thinks it is a tuple??")
     def test_record_bulk_modify_append_references(helpers):
@@ -890,7 +890,7 @@ class TestRecordAdaptorBulkModifyRemove:
             pytest.app.records.bulk_modify(('Text', 'equals', baseText), values={
                 'Attachment': Remove(theFile)})
         assert str(
-            excinfo.value) == 'Field \'Attachment\' of Type \'AttachmentsField\', is not supported for bulk modify'
+            excinfo.value) == 'Field "Attachment" of Type "AttachmentsField", is not supported for bulk modify'
 
     def test_record_bulk_modify_remove_comments(helpers):
         baseText = str(uuid.uuid4())
@@ -900,7 +900,7 @@ class TestRecordAdaptorBulkModifyRemove:
             pytest.app.records.bulk_modify(('Text', 'equals', baseText), values={
                 'Attachment': Remove(baseText)})
         assert str(
-            excinfo.value) == 'Field \'Attachment\' of Type \'AttachmentsField\', is not supported for bulk modify'
+            excinfo.value) == 'Field "Attachment" of Type "AttachmentsField", is not supported for bulk modify'
 
     @pytest.mark.xfail(reason="SPT-7932: There was no error about the field type, but the passed in targetRecord, which is a record class, thinks it is a tuple??")
     def test_record_bulk_modify_remove_references(helpers):

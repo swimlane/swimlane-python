@@ -101,7 +101,7 @@ class TestListNumericField:
             **{"Required Numeric": 101, "Numeric List": NumericValue})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord['Numeric List'].insert(2, newValue)
-        assert str(excinfo.value) == "Validation failed for <Record: %s>. Reason: Numeric list field items must be numbers, not '%s'" % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Numeric list field items must be numbers, not "%s"' % (
             theRecord.tracking_id, pytest.py_ver_string_type())
 
     def test_list_Numeric_field_on_save_append(helpers):
@@ -121,7 +121,7 @@ class TestListNumericField:
             **{"Required Numeric": 101, "Numeric List": NumericValue})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord['Numeric List'].append(newValue)
-        assert str(excinfo.value) == "Validation failed for <Record: %s>. Reason: Numeric list field items must be numbers, not '%s'" % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Numeric list field items must be numbers, not "%s"' % (
             theRecord.tracking_id, pytest.py_ver_string_type())
 
 
@@ -150,13 +150,13 @@ class TestMinValueNumericField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Numeric": 101, "Min Numeric": 2})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Min Numeric\' minimum value \'3.0\', received \'2\'' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Min Numeric" minimum value "3.0", received "2"' % pytest.app.acronym
 
     def test_min_count_on_save_too_low(helpers):
         theRecord = pytest.app.records.create(**{"Required Numeric": 101})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Min Numeric"] = 2
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Min Numeric\' minimum value \'3.0\', received \'2\'' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Min Numeric" minimum value "3.0", received "2"' % theRecord.tracking_id
 
 
 class TestMaxValueNumericField:
@@ -184,13 +184,13 @@ class TestMaxValueNumericField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Numeric": 101, "Max Numeric": 102})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Max Numeric\' maximum value \'100.0\', received \'102\'' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Max Numeric" maximum value "100.0", received "102"' % pytest.app.acronym
 
     def test_max_value_on_save_too_high(helpers):
         theRecord = pytest.app.records.create(**{"Required Numeric": 101})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Max Numeric"] = 102
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Max Numeric\' maximum value \'100.0\', received \'102\'' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Max Numeric" maximum value "100.0", received "102"' % theRecord.tracking_id
 
 
 class TestMinMaxValueNumericField:
@@ -228,22 +228,22 @@ class TestMinMaxValueNumericField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Numeric": 101, "Min Max Numeric": 2})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Min Max Numeric\' minimum value \'3.0\', received \'2\'' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Min Max Numeric" minimum value "3.0", received "2"' % pytest.app.acronym
 
     def test_min_count_on_save_too_low(helpers):
         theRecord = pytest.app.records.create(**{"Required Numeric": 101})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Min Max Numeric"] = 2
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Min Max Numeric\' minimum value \'3.0\', received \'2\'' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Min Max Numeric" minimum value "3.0", received "2"' % theRecord.tracking_id
 
     def test_max_value_too_high(helpers):
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required Numeric": 101, "Min Max Numeric": 102})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field \'Min Max Numeric\' maximum value \'100.0\', received \'102\'' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Field "Min Max Numeric" maximum value "100.0", received "102"' % pytest.app.acronym
 
     def test_max_value_on_save_too_high(helpers):
         theRecord = pytest.app.records.create(**{"Required Numeric": 101})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Min Max Numeric"] = 102
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'Min Max Numeric\' maximum value \'100.0\', received \'102\'' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "Min Max Numeric" maximum value "100.0", received "102"' % theRecord.tracking_id

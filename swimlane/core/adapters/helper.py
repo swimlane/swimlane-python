@@ -52,7 +52,7 @@ class HelperAdapter(SwimlaneResolver):
         validate_str(message, 'message')
         
         if not isinstance(rich_text, bool):
-            raise ValueError("rich_text must be a boolean value.")
+            raise ValueError('rich_text must be a boolean value.')
 
         self._swimlane.request(
             'post',

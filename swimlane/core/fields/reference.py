@@ -28,7 +28,7 @@ class ReferenceCursor(FieldCursor):
                 self._elements[record_id] = records_get
                 return records_get
             except SwimlaneHTTP400Error:
-                logger.debug("Received 400 response retrieving record '{}', ignoring assumed orphaned record")
+                logger.debug('Received 400 response retrieving record "{}", ignoring assumed orphaned record')
         else:
             return record
 
@@ -40,7 +40,7 @@ class ReferenceCursor(FieldCursor):
                     self._elements[record_id] = records_get
                     yield records_get
                 except SwimlaneHTTP400Error:
-                    logger.debug("Received 400 response retrieving record '{}', ignoring assumed orphaned record")
+                    logger.debug('Received 400 response retrieving record "{}", ignoring assumed orphaned record')
             else:
                 yield record
 
@@ -83,7 +83,7 @@ class ReferenceField(CursorField):
             if value.app != self.target_app:
                 raise ValidationError(
                     self.record,
-                    "Reference field '{}' has target app '{}', cannot reference record '{}' from app '{}'".format(
+                    'Reference field "{}" has target app "{}", cannot reference record "{}" from app "{}"'.format(
                         self.name,
                         self.target_app,
                         value,

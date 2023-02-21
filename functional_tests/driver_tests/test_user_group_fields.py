@@ -62,7 +62,7 @@ class TestUserGroupField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "User/Groups": swimGroup})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `User/Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "User/Groups"' % (
             pytest.app.acronym, swimGroup.name)
 
     def test_user_group_field_on_save_bad_type_group(helpers):
@@ -73,7 +73,7 @@ class TestUserGroupField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["User/Groups"] = swimGroup
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `User/Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "User/Groups"' % (
             theRecord.tracking_id, swimGroup.name)
 
 
@@ -101,7 +101,7 @@ class TestGroupsOnlyField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Groups Only": swimUser2})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User `%s` is not a valid selection for field `Groups Only`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User "%s" is not a valid selection for field "Groups Only"' % (
             pytest.app.acronym, swimUser2.username)
 
     def test_groups_only_field_on_save_bad_type_user(helpers):
@@ -112,7 +112,7 @@ class TestGroupsOnlyField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Groups Only"] = swimUser2
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User `%s` is not a valid selection for field `Groups Only`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User "%s" is not a valid selection for field "Groups Only"' % (
             theRecord.tracking_id, swimUser2.username)
 
 
@@ -124,7 +124,7 @@ class TestReadOnlyUserGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Read-only User/Groups": swimUser2})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Cannot set readonly field \'Read-only User/Groups\'' % pytest.app.acronym
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Cannot set readonly field "Read-only User/Groups"' % pytest.app.acronym
 
     def test_read_only_user_groups_field_on_save(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
@@ -134,7 +134,7 @@ class TestReadOnlyUserGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Read-only User/Groups"] = swimUser2
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field \'Read-only User/Groups\'' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Cannot set readonly field "Read-only User/Groups"' % theRecord.tracking_id
 
 
 class TestCreatedByField:
@@ -236,7 +236,7 @@ class TestAllUsersAndGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["All Users and Groups"] = {"name": swimGroup}
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field \'All Users and Groups\' expects one of \'UserGroup\', got \'dict\' instead' % theRecord.tracking_id
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Field "All Users and Groups" expects one of \'UserGroup\', got "dict" instead' % theRecord.tracking_id
 
 
 class TestSelectedGroupsField:
@@ -262,7 +262,7 @@ class TestSelectedGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Selected Groups": swimGroup})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Selected Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Selected Groups"' % (
             pytest.app.acronym, swimGroup.name)
 
     def test_selected_groups_field_wrong_group_on_save(helpers):
@@ -273,7 +273,7 @@ class TestSelectedGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Selected Groups"] = swimGroup
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Selected Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Selected Groups"' % (
             theRecord.tracking_id, swimGroup.name)
 
     def test_selected_groups_field_bad_type_user(helpers):
@@ -283,7 +283,7 @@ class TestSelectedGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Selected Groups": swimUser2})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User `%s` is not a valid selection for field `Selected Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User "%s" is not a valid selection for field "Selected Groups"' % (
             pytest.app.acronym, swimUser2.username)
 
     def test_selected_groups_field_on_save_bad_type_user(helpers):
@@ -294,7 +294,7 @@ class TestSelectedGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Selected Groups"] = swimUser2
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User `%s` is not a valid selection for field `Selected Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User "%s" is not a valid selection for field "Selected Groups"' % (
             theRecord.tracking_id, swimUser2.username)
 
 
@@ -323,7 +323,7 @@ class TestSelectedUsersField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Selected Users": swimUser2})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User `%s` is not a valid selection for field `Selected Users`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User "%s" is not a valid selection for field "Selected Users"' % (
             pytest.app.acronym, swimUser2.username)
 
     def test_selected_users_field_wrong_user_on_save(helpers):
@@ -334,7 +334,7 @@ class TestSelectedUsersField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Selected Users"] = swimUser2
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User `%s` is not a valid selection for field `Selected Users`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User "%s" is not a valid selection for field "Selected Users"' % (
             theRecord.tracking_id, swimUser2.username)
 
     def test_selected_users_field_bad_type_group(helpers):
@@ -344,7 +344,7 @@ class TestSelectedUsersField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Selected Users": swimGroup})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Selected Users`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Selected Users"' % (
             pytest.app.acronym, swimGroup.name)
 
     def test_selected_users_field_on_save_bad_type_group(helpers):
@@ -355,7 +355,7 @@ class TestSelectedUsersField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Selected Users"] = swimGroup
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Selected Users`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Selected Users"' % (
             theRecord.tracking_id, swimGroup.name)
 
 
@@ -382,7 +382,7 @@ class TestSubgroupsOfGroupField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Sub-groups of Group": swimGroup})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Sub-groups of Group`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Sub-groups of Group"' % (
             pytest.app.acronym, swimGroup.name)
 
     def test_sub_groups_of_group_field_parent_group_on_save(helpers):
@@ -393,7 +393,7 @@ class TestSubgroupsOfGroupField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Sub-groups of Group"] = swimGroup
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Sub-groups of Group`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Sub-groups of Group"' % (
             theRecord.tracking_id, swimGroup.name)
 
     def test_sub_groups_of_group_field_other_group(helpers):
@@ -403,7 +403,7 @@ class TestSubgroupsOfGroupField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Sub-groups of Group": swimGroup})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Sub-groups of Group`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Sub-groups of Group"' % (
             pytest.app.acronym, swimGroup.name)
 
     def test_sub_groups_of_group_field_other_group_on_save(helpers):
@@ -414,7 +414,7 @@ class TestSubgroupsOfGroupField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Sub-groups of Group"] = swimGroup
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Sub-groups of Group`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Sub-groups of Group"' % (
             theRecord.tracking_id, swimGroup.name)
 
     def test_sub_groups_of_group_field_user(helpers):
@@ -424,7 +424,7 @@ class TestSubgroupsOfGroupField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Sub-groups of Group": swimUser2})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User `%s` is not a valid selection for field `Sub-groups of Group`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User "%s" is not a valid selection for field "Sub-groups of Group"' % (
             pytest.app.acronym, swimUser2.username)
 
     def test_sub_groups_of_group_field_user_on_save(helpers):
@@ -435,7 +435,7 @@ class TestSubgroupsOfGroupField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Sub-groups of Group"] = swimUser2
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User `%s` is not a valid selection for field `Sub-groups of Group`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User "%s" is not a valid selection for field "Sub-groups of Group"' % (
             theRecord.tracking_id, swimUser2.username)
 
 
@@ -466,7 +466,7 @@ class TestUsersMembersOfGroupField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Users Members of Group": swimUser2})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User `%s` is not a valid selection for field `Users Members of Group`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User "%s" is not a valid selection for field "Users Members of Group"' % (
             pytest.app.acronym, swimUser2.username)
 
     def test_users_members_of_group_field_not_member_on_save(helpers):
@@ -477,7 +477,7 @@ class TestUsersMembersOfGroupField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Users Members of Group"] = swimUser2
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User `%s` is not a valid selection for field `Users Members of Group`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User "%s" is not a valid selection for field "Users Members of Group"' % (
             theRecord.tracking_id, swimUser2.username)
 
     def test_users_members_of_group_field_user_parent_group(helpers):
@@ -486,7 +486,7 @@ class TestUsersMembersOfGroupField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Users Members of Group": swimGroup})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Users Members of Group`' % (pytest.app.acronym, swimGroup.name)
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Users Members of Group"' % (pytest.app.acronym, swimGroup.name)
 
     def test_users_members_of_group_field_parent_group_on_save(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
@@ -495,7 +495,7 @@ class TestUsersMembersOfGroupField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Users Members of Group"] = swimGroup
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Users Members of Group`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Users Members of Group"' % (
             theRecord.tracking_id, swimGroup.name)
 
 
@@ -547,7 +547,7 @@ class TestMultiSelectUsersField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Multi-select User/Groups": [swimGroup]})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Multi-select User/Groups`' % (pytest.app.acronym, swimGroup.name)
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Multi-select User/Groups"' % (pytest.app.acronym, swimGroup.name)
 
     def test_multi_select_users_field_group_on_save(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
@@ -557,7 +557,7 @@ class TestMultiSelectUsersField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Multi-select User/Groups"] = [swimGroup]
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Multi-select User/Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Multi-select User/Groups"' % (
             theRecord.tracking_id, swimGroup.name)
 
     def test_multi_select_users_field_mix_users_groups(helpers):
@@ -569,7 +569,7 @@ class TestMultiSelectUsersField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Multi-select User/Groups": [swimUser2, swimGroup]})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Multi-select User/Groups`' % (pytest.app.acronym, swimGroup.name)
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Multi-select User/Groups"' % (pytest.app.acronym, swimGroup.name)
 
     def test_multi_select_users_field_mix_users_groups_on_save(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
@@ -581,7 +581,7 @@ class TestMultiSelectUsersField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Multi-select User/Groups"] = [swimUser2, swimGroup]
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Multi-select User/Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Multi-select User/Groups"' % (
             theRecord.tracking_id, swimGroup.name)
 
     @pytest.mark.xfail(reason="SPT-6354: This works for the adminuser, but not the others..")
@@ -659,7 +659,7 @@ class TestMultiSelectUsersField:
             **{"Required User/Groups": swimUser, "Multi-select User/Groups": [swimUser, swimUser2]})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Multi-select User/Groups"].select(swimGroup)
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Multi-select User/Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Multi-select User/Groups"' % (
             theRecord.tracking_id, swimGroup.name)
         theRecord.save()
         updatedRecord = pytest.app.records.get(id=theRecord.id)
@@ -709,7 +709,7 @@ class TestMultiSelectSpecificUsersAndGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Multi-select Specific Users and Groups": [swimGroup, swimUser2]})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User `%s` is not a valid selection for field `Multi-select Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User "%s" is not a valid selection for field "Multi-select Specific Users and Groups"' % (
             pytest.app.acronym, swimUser2.username)
 
     def test_multi_select_specific_users_groups_field_user_and_group_invalid_group_create(helpers):
@@ -721,7 +721,7 @@ class TestMultiSelectSpecificUsersAndGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Multi-select Specific Users and Groups": [swimGroup, swimUser2]})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Multi-select Specific Users and Groups`' % (pytest.app.acronym, swimGroup.name)
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Multi-select Specific Users and Groups"' % (pytest.app.acronym, swimGroup.name)
 
     def test_multi_select_specific_users_groups_field_invalid_group_create(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
@@ -730,7 +730,7 @@ class TestMultiSelectSpecificUsersAndGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Multi-select Specific Users and Groups": [swimGroup]})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Multi-select Specific Users and Groups`' % (pytest.app.acronym, swimGroup.name)
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Multi-select Specific Users and Groups"' % (pytest.app.acronym, swimGroup.name)
 
     def test_multi_select_specific_users_groups_field_invalid_group_subgroup_create(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
@@ -739,7 +739,7 @@ class TestMultiSelectSpecificUsersAndGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Multi-select Specific Users and Groups": [swimGroup]})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Multi-select Specific Users and Groups`' % (pytest.app.acronym, swimGroup.name)
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Multi-select Specific Users and Groups"' % (pytest.app.acronym, swimGroup.name)
 
     def test_multi_select_specific_users_groups_field_invalid_user_create(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
@@ -748,7 +748,7 @@ class TestMultiSelectSpecificUsersAndGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Multi-select Specific Users and Groups": [swimUser2]})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User `%s` is not a valid selection for field `Multi-select Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User "%s" is not a valid selection for field "Multi-select Specific Users and Groups"' % (
             pytest.app.acronym, swimUser2.username)
 
     def test_multi_select_specific_users_groups_field_invalid_user_group_member_create(helpers):
@@ -758,7 +758,7 @@ class TestMultiSelectSpecificUsersAndGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Multi-select Specific Users and Groups": [swimUser2]})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User `%s` is not a valid selection for field `Multi-select Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User "%s" is not a valid selection for field "Multi-select Specific Users and Groups"' % (
             pytest.app.acronym, swimUser2.username)
 
     def test_multi_select_specific_users_groups_field_user_save(helpers):
@@ -796,7 +796,7 @@ class TestMultiSelectSpecificUsersAndGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Multi-select Specific Users and Groups"] = [swimGroup]
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Multi-select Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Multi-select Specific Users and Groups"' % (
             theRecord.tracking_id, swimGroup.name)
 
     def test_multi_select_specific_users_groups_field_invalid_group_subgroup_save(helpers):
@@ -807,7 +807,7 @@ class TestMultiSelectSpecificUsersAndGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Multi-select Specific Users and Groups"] = [swimGroup]
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Multi-select Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Multi-select Specific Users and Groups"' % (
             theRecord.tracking_id, swimGroup.name)
 
     def test_multi_select_specific_users_groups_field_invalid_user_save(helpers):
@@ -818,7 +818,7 @@ class TestMultiSelectSpecificUsersAndGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Multi-select Specific Users and Groups"] = [swimUser2]
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User `%s` is not a valid selection for field `Multi-select Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User "%s" is not a valid selection for field "Multi-select Specific Users and Groups"' % (
             theRecord.tracking_id, swimUser2.username)
 
     def test_multi_select_specific_users_groups_field_invalid_user_group_member_save(helpers):
@@ -829,7 +829,7 @@ class TestMultiSelectSpecificUsersAndGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Multi-select Specific Users and Groups"] = [swimUser2]
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User `%s` is not a valid selection for field `Multi-select Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User "%s" is not a valid selection for field "Multi-select Specific Users and Groups"' % (
             theRecord.tracking_id, swimUser2.username)
 
 
@@ -856,7 +856,7 @@ class TestSelectSpecificUsersAndGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Specific Users and Groups": swimGroup})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Specific Users and Groups`' % (pytest.app.acronym, swimGroup.name)
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Specific Users and Groups"' % (pytest.app.acronym, swimGroup.name)
 
     def test_select_specific_users_groups_field_invalid_group_subgroup_create(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
@@ -865,7 +865,7 @@ class TestSelectSpecificUsersAndGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Specific Users and Groups": swimGroup})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group `%s` is not a valid selection for field `Specific Users and Groups`' % (pytest.app.acronym, swimGroup.name)
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: Group "%s" is not a valid selection for field "Specific Users and Groups"' % (pytest.app.acronym, swimGroup.name)
 
     def test_select_specific_users_groups_field_invalid_user_create(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
@@ -874,7 +874,7 @@ class TestSelectSpecificUsersAndGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Specific Users and Groups": swimUser2})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User `%s` is not a valid selection for field `Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User "%s" is not a valid selection for field "Specific Users and Groups"' % (
             pytest.app.acronym, swimUser2.username)
 
     def test_select_specific_users_groups_field_invalid_user_group_member_create(helpers):
@@ -884,7 +884,7 @@ class TestSelectSpecificUsersAndGroupsField:
         with pytest.raises(exceptions.ValidationError) as excinfo:
             pytest.app.records.create(
                 **{"Required User/Groups": swimUser, "Specific Users and Groups": swimUser2})
-        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User `%s` is not a valid selection for field `Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s - New>. Reason: User "%s" is not a valid selection for field "Specific Users and Groups"' % (
             pytest.app.acronym, swimUser2.username)
 
     def test_select_specific_users_groups_field_user_save(helpers):
@@ -912,7 +912,7 @@ class TestSelectSpecificUsersAndGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Specific Users and Groups"] = swimGroup
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Specific Users and Groups"' % (
             theRecord.tracking_id, swimGroup.name)
 
     def test_select_specific_users_groups_field_invalid_group_subgroup_save(helpers):
@@ -923,7 +923,7 @@ class TestSelectSpecificUsersAndGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Specific Users and Groups"] = swimGroup
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group `%s` is not a valid selection for field `Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: Group "%s" is not a valid selection for field "Specific Users and Groups"' % (
             theRecord.tracking_id, swimGroup.name)
 
     def test_select_specific_users_groups_field_invalid_user_save(helpers):
@@ -934,7 +934,7 @@ class TestSelectSpecificUsersAndGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Specific Users and Groups"] = swimUser2
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User `%s` is not a valid selection for field `Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User "%s" is not a valid selection for field "Specific Users and Groups"' % (
             theRecord.tracking_id, swimUser2.username)
 
     def test_select_specific_users_groups_field_invalid_user_group_member_save(helpers):
@@ -945,5 +945,5 @@ class TestSelectSpecificUsersAndGroupsField:
             **{"Required User/Groups": swimUser})
         with pytest.raises(exceptions.ValidationError) as excinfo:
             theRecord["Specific Users and Groups"] = swimUser2
-        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User `%s` is not a valid selection for field `Specific Users and Groups`' % (
+        assert str(excinfo.value) == 'Validation failed for <Record: %s>. Reason: User "%s" is not a valid selection for field "Specific Users and Groups"' % (
             theRecord.tracking_id, swimUser2.username)
