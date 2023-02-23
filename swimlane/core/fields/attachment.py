@@ -1,8 +1,8 @@
 import io
 import mimetypes
-import typing
 
-from swimlane.core.fields.base import MultiSelectField, FieldCursor
+from swimlane.core.fields.base import  FieldCursor
+from swimlane.core.fields.base.multiselect import MultiSelectField
 from swimlane.core.resources.attachment import Attachment
 from swimlane.utils.str_validator import validate_str
 

@@ -10,7 +10,6 @@ import swimlane.core.adapters.task  # avoid circular reference
 import swimlane.core.adapters.helper  # avoid circular reference
 
 
-
 @total_ordering
 class Record(APIResource):
     """A single Swimlane Record instance
@@ -87,6 +86,9 @@ class Record(APIResource):
         return str(self.tracking_id)
 
     def __setitem__(self, field_name, value):
+        keys = dir(value)
+        if '_elements' in keys:
+            value = value._elements
         self.get_field(field_name).set_python(value)
 
     def __getitem__(self, field_name):
