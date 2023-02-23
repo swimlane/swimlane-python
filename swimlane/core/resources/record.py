@@ -10,6 +10,7 @@ import swimlane.core.adapters.task  # avoid circular reference
 import swimlane.core.adapters.helper  # avoid circular reference
 
 
+
 @total_ordering
 class Record(APIResource):
     """A single Swimlane Record instance
