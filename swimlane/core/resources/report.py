@@ -185,7 +185,6 @@ class Report(APIResource, PaginatedCursor):
     def get_default_value(self, value, field_type):
         if(value == '' and field_type == 'text'):
             value = None
-        print('Value', value)
         return value
 
     def get_field_list_type(self, field_type):
