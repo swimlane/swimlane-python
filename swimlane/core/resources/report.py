@@ -168,6 +168,7 @@ class Report(APIResource, PaginatedCursor):
     def parse_field_value(self, field, value):
         if isinstance(field, ListField):
             type = self.get_field_list_type(field.input_type)
+            value = self.get_default_value(value, field.input_type)
         if isinstance(field, ListField) and not isinstance(value, list) and value is not None:
             self.validate_type(value, type, field.input_type)
             return [value]
@@ -180,6 +181,11 @@ class Report(APIResource, PaginatedCursor):
             type_name = type
         if not isinstance(value, type):
             raise TypeError('Field must be a {}.'.format(type_name))
+        
+    def get_default_value(self, value, field_type):
+        if(value == '' and field_type == 'text'):
+            value = None
+        return value
 
     def get_field_list_type(self, field_type):
         if field_type == 'text':
