@@ -766,7 +766,6 @@ class TestRecordAdaptorBulkModifyRemove:
         assert len(pytest.app.records.search(
             ('Multi-select', 'contains', ["three"]))) == 0
 
-    @pytest.mark.xfail(reason="SPT-7929: IS the bulk modify not removing text list item if it is the last item")
     def test_record_bulk_modify_remove_text_list(helpers):
         pytest.app.records.bulk_create({'Text List': ['bob']}, {'Text List': ['bob', 'goodbye']}, {
                                        'Text List': ['bob']}, {'Text List': ['bob', 'goodbye', 'fred']})
@@ -776,7 +775,6 @@ class TestRecordAdaptorBulkModifyRemove:
         assert len(pytest.app.records.search(
             ('Text List', 'contains', ["bob"]))) == 0
 
-    @pytest.mark.xfail(reason="SPT-7929: IS the bulk modify not removing numeric list item if it is the last item")
     def test_record_bulk_modify_remove_numeric_list(helpers):
         pytest.app.records.bulk_create({'Numeric List': [123]}, {'Numeric List': [123, 456]}, {
                                        'Numeric List': [456, 123]}, {'Numeric List': [123, 456, 789]})
