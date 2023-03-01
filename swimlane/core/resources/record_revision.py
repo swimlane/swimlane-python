@@ -19,7 +19,7 @@ class RecordRevision(RevisionBase):
         self.__app_version = None
         self._app = app
 
-        self.app_revision_number = self._raw_version['applicationRevision']
+        self._app_revision_number = self._raw_version['applicationRevision']
 
     @property
     def app_version(self):
@@ -34,3 +34,11 @@ class RecordRevision(RevisionBase):
         if not self._version:
             self._version = Record(self.app_version, self._raw_version)
         return self._version
+
+    @property
+    def app_revision_number(self):
+        return self._app_revision_number
+    
+    @app_revision_number.setter
+    def app_revision_number(self, value):
+        raise AttributeError("can't set attribute")

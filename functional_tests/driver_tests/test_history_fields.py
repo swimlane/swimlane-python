@@ -45,23 +45,21 @@ class TestHistoryField:
             theRecord["history"][1].version = "400"
         assert str(excinfo.value) == "can't set attribute"
 
-    @pytest.mark.xfail(reason="SPT-6359: No attributes should be editable.")
     def test_history_field_edit_revision_number(helpers):
         theRecord = pytest.app.records.create(**{"Text": "Create"})
         theRecord["Text"] = "First Edit"
         theRecord.save()
-        # with pytest.raises(AttributeError) as excinfo:
-        theRecord["history"][1].revision_number = "400"
-        # assert str(excinfo.value) == "can't set attribute"
+        with pytest.raises(AttributeError) as excinfo:
+            theRecord["history"][1].revision_number = "400"
+        assert str(excinfo.value) == "can't set attribute"
 
-    @pytest.mark.xfail(reason="SPT-6359: No attributes should be editable.")
     def test_history_field_edit_modified_date(helpers):
         theRecord = pytest.app.records.create(**{"Text": "Create"})
         theRecord["Text"] = "First Edit"
         theRecord.save()
-        # with pytest.raises(AttributeError) as excinfo:
-        theRecord["history"][1].modified_date = pendulum.now()
-        # assert str(excinfo.value) == "can't set attribute"
+        with pytest.raises(AttributeError) as excinfo:
+            theRecord["history"][1].modified_date = pendulum.now()
+        assert str(excinfo.value) == "can't set attribute"
 
     def test_history_field_edit_app_version(helpers):
         theRecord = pytest.app.records.create(**{"Text": "Create"})
@@ -71,21 +69,19 @@ class TestHistoryField:
             theRecord["history"][1].app_version = 123
         assert str(excinfo.value) == "can't set attribute"
 
-    @pytest.mark.xfail(reason="SPT-6359: No attributes should be editable.")
     def test_history_field_edit_app_revision_number(helpers):
         theRecord = pytest.app.records.create(**{"Text": "Create"})
         theRecord["Text"] = "First Edit"
         theRecord.save()
-        # with pytest.raises(AttributeError) as excinfo:
-        theRecord["history"][1].app_revision_number = 123
-        # assert str(excinfo.value) == "can't set attribute"
+        with pytest.raises(AttributeError) as excinfo:
+            theRecord["history"][1].app_revision_number = 123
+        assert str(excinfo.value) == "can't set attribute"
 
-    @pytest.mark.xfail(reason="SPT-6359: No attributes should be editable.")
     def test_history_field_edit_user(helpers):
         theRecord = pytest.app.records.create(**{"Text": "Create"})
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
         theRecord["Text"] = "First Edit"
         theRecord.save()
-        # with pytest.raises(AttributeError) as excinfo:
-        theRecord["history"][1].user = swimUser
-        # assert str(excinfo.value) == "can't set attribute"
+        with pytest.raises(AttributeError) as excinfo:
+            theRecord["history"][1].user = swimUser
+        assert str(excinfo.value) == "can't set attribute"
