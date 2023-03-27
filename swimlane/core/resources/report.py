@@ -1,4 +1,6 @@
 import pendulum
+import json 
+
 
 from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.fields.list import ListField
@@ -82,6 +84,9 @@ class Report(APIResource, PaginatedCursor):
         for field_id in self._app._fields_by_id.keys():
             self._raw['columns'].append(field_id)
 
+    def filter_type(self, field_type):
+        self.filter_type = field_type
+
     def __str__(self):
         return self.name
 
@@ -90,6 +95,7 @@ class Report(APIResource, PaginatedCursor):
 
         body['pageSize'] = self.page_size
         body['offset'] = page
+        body['filterType'] = self.filter_type
         body['keywords'] = ', '.join(self.keywords)
 
         response = self._swimlane.request('post', 'search', json=body)

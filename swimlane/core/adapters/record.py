@@ -8,6 +8,7 @@ from swimlane.core.resources.report import Report
 from swimlane.utils import random_string, one_of_keyword_only, validate_type
 from swimlane.utils.version import requires_swimlane_version
 
+ALLOWED_OPERATORS = ['Or', 'And']
 
 class RecordAdapter(AppResolver):
     """Handles retrieval and creation of Swimlane Record resources"""
@@ -44,7 +45,7 @@ class RecordAdapter(AppResolver):
             response = self._swimlane.request('get', "app/{0}/record/tracking/{1}".format(self._app.id, value))
             return Record(self._app, response.json())
 
-    def search(self, *filters, **kwargs):
+    def search(self, *filters, filter_type = 'And', **kwargs):
         """Shortcut to generate a new temporary search report using provided filters and return the resulting records
 
         Args:
@@ -118,9 +119,17 @@ class RecordAdapter(AppResolver):
         columns = kwargs.pop('columns', None)
         if columns:
             report.set_columns(*columns)
+        
+        operator = filter_type.capitalize()
+        self.validateOperator(operator)
+        report.filter_type(operator)     
 
         return list(report)
-
+    
+    def validateOperator(self, operator):
+        if operator not in ALLOWED_OPERATORS:
+            raise ValueError('filter_type value not allowed')
+  
     def create(self, **fields):
         """Create and return a new record in associated app and return the newly created Record instance
 
