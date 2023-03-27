@@ -95,7 +95,8 @@ class Report(APIResource, PaginatedCursor):
 
         body['pageSize'] = self.page_size
         body['offset'] = page
-        body['filterType'] = self.filter_type
+        if(type(self.filter_type) is str):
+            body['filterType'] = self.filter_type
         body['keywords'] = ', '.join(self.keywords)
 
         response = self._swimlane.request('post', 'search', json=body)
