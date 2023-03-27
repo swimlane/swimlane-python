@@ -8,8 +8,6 @@ from swimlane.core.resources.report import Report
 from swimlane.utils import random_string, one_of_keyword_only, validate_type
 from swimlane.utils.version import requires_swimlane_version
 
-ALLOWED_OPERATORS = ['Or', 'And']
-
 class RecordAdapter(AppResolver):
     """Handles retrieval and creation of Swimlane Record resources"""
 
@@ -120,15 +118,10 @@ class RecordAdapter(AppResolver):
         if columns:
             report.set_columns(*columns)
         
-        operator = filter_type.capitalize()
-        self.validateOperator(operator)
-        report.filter_type(operator)     
+        report.filter_type(filter_type)     
 
         return list(report)
     
-    def validateOperator(self, operator):
-        if operator not in ALLOWED_OPERATORS:
-            raise ValueError('filter_type value not allowed')
   
     def create(self, **fields):
         """Create and return a new record in associated app and return the newly created Record instance
