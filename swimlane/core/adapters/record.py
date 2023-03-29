@@ -8,7 +8,6 @@ from swimlane.core.resources.report import Report
 from swimlane.utils import random_string, one_of_keyword_only, validate_type
 from swimlane.utils.version import requires_swimlane_version
 
-
 class RecordAdapter(AppResolver):
     """Handles retrieval and creation of Swimlane Record resources"""
 
@@ -44,7 +43,7 @@ class RecordAdapter(AppResolver):
             response = self._swimlane.request('get', "app/{0}/record/tracking/{1}".format(self._app.id, value))
             return Record(self._app, response.json())
 
-    def search(self, *filters, **kwargs):
+    def search(self, *filters, filter_type = 'And', **kwargs):
         """Shortcut to generate a new temporary search report using provided filters and return the resulting records
 
         Args:
@@ -118,9 +117,12 @@ class RecordAdapter(AppResolver):
         columns = kwargs.pop('columns', None)
         if columns:
             report.set_columns(*columns)
+        
+        report.filter_type(filter_type)     
 
         return list(report)
-
+    
+  
     def create(self, **fields):
         """Create and return a new record in associated app and return the newly created Record instance
 

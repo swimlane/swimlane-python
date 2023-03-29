@@ -1,4 +1,6 @@
 import pendulum
+import json 
+
 
 from swimlane.core.cursor import PaginatedCursor
 from swimlane.core.fields.list import ListField
@@ -6,6 +8,8 @@ from swimlane.core.resources.base import APIResource
 from swimlane.core.resources.record import Record, record_factory
 from swimlane.core.search import CONTAINS, EQ, EXCLUDES, NOT_EQ, LT, GT, LTE, GTE, ASC, DESC
 from swimlane.utils import validate_type
+
+ALLOWED_OPERATORS = ['Or', 'And']
 
 
 class Report(APIResource, PaginatedCursor):
@@ -82,6 +86,15 @@ class Report(APIResource, PaginatedCursor):
         for field_id in self._app._fields_by_id.keys():
             self._raw['columns'].append(field_id)
 
+    def filter_type(self, filter_type):
+        filter_type = filter_type.capitalize()
+        self.validateOperator(filter_type)
+        self.filter_type = filter_type
+
+    def validateOperator(self, operator):
+        if operator not in ALLOWED_OPERATORS:
+            raise ValueError('filter_type value not allowed')
+
     def __str__(self):
         return self.name
 
@@ -90,6 +103,8 @@ class Report(APIResource, PaginatedCursor):
 
         body['pageSize'] = self.page_size
         body['offset'] = page
+        if(type(self.filter_type) is str):
+            body['filterType'] = self.filter_type
         body['keywords'] = ', '.join(self.keywords)
 
         response = self._swimlane.request('post', 'search', json=body)
