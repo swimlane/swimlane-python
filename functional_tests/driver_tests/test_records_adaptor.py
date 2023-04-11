@@ -1,3 +1,4 @@
+import datetime
 import pytest
 from swimlane import exceptions
 
@@ -56,6 +57,12 @@ class TestRecordAdaptorCreate:
             pytest.app.records.create(**{randomFieldName: 123})
         assert str(excinfo.value) == '"<App: %s (%s)> has no field \'%s\'"' % (
             pytest.app.name, pytest.app.acronym, randomFieldName)
+    
+    def test_record_create_with_date_value_set(helpers):
+        date = datetime.date(2022, 12, 25)
+        record = pytest.app.records.create(**{'Date': date})
+        assert record.created == record.modified
+        pytest.records.append(record)
 
 
 class TestRecordAdaptorGet:
@@ -124,11 +131,11 @@ class TestRecordAdaptorGet:
 class TestRecordAdaptorSearch:
     def test_record_search(helpers):
         matchingRecords = pytest.app.records.search(('Text', 'equals', None))
-        assert len(matchingRecords) == 3
+        assert len(matchingRecords) == 4
 
     def test_record_search_no_filters(helpers):
         matchingRecords = pytest.app.records.search()
-        assert len(matchingRecords) == 5
+        assert len(matchingRecords) == 6
 
     def test_record_search_invalid_operand(helpers):
         with pytest.raises(ValueError) as excinfo:
@@ -146,6 +153,11 @@ class TestRecordAdaptorSearch:
         randomFieldName = 'Numeric'
         with pytest.raises(ValueError) as excinfo:
             pytest.app.records.search((randomFieldName, 'equals', 'Blah'))
+    
+    def test_record_search_date_field(helpers):
+        date = datetime.date(2022, 12, 25)
+        matchingRecords = pytest.app.records.search(('Date', 'equals', date))
+        assert len(matchingRecords) == 1
 
 
 class TestRecordAdaptorDelete:

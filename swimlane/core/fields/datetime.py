@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from swimlane.utils.date_validator import is_datetime
 
 from datetime import date, datetime, time, timedelta
 
@@ -78,6 +79,8 @@ class DatetimeField(Field):
     @classmethod
     def format_datetime(cls, target_datetime):
         """Format datetime as expected by Swimlane API"""
+        if not is_datetime(target_datetime):
+            target_datetime = datetime.combine(target_datetime, datetime.min.time())
         return UTC.convert(target_datetime).strftime(cls.datetime_format)
 
     def cast_to_swimlane(self, value):
