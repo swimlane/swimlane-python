@@ -8,6 +8,9 @@ from swimlane.core.bulk import Clear, Append, Remove
 # bulk_delete
 # bulk_modify
 
+random1, random2, random3, random4, random5, random6, random7, random8, random9, random10, random11, random12, random13, random14, random15, random16, random17 = random.sample(
+    range(1, 100), 17)
+
 
 @pytest.fixture(autouse=True, scope='module')
 def my_fixture(helpers):
@@ -30,7 +33,7 @@ class TestRecordAdaptorBulkCreate:
         initialEmptyRecords = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', None)))
 
-        pytest.app.records.bulk_create({},{},{},{})
+        pytest.app.records.bulk_create({}, {}, {}, {})
         emptyRecords = pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', None))
         assert len(emptyRecords) == 4 + initialEmptyRecords
@@ -40,7 +43,7 @@ class TestRecordAdaptorBulkCreate:
             ('Text', 'equals', None), ('Numeric', 'equals', None)))
         joy = str(uuid.uuid4())
         recIds = pytest.app.records.bulk_create({'Text': joy}, {'Text': joy}, {
-                                       'Text': joy}, {'Text': joy})
+            'Text': joy}, {'Text': joy})
         emptyRecords = pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', None))
         assert len(recIds) == 4
@@ -113,7 +116,7 @@ class TestRecordAdaptorBulkDelete:
         pytest.waitOnJobByID(records)
 
     def test_record_bulk_delete_filter(helpers):
-        i = random.randint(0,300)
+        i = random1
         initalRecords = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', i)))
         pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
@@ -170,7 +173,7 @@ class TestRecordAdaptorBulkDelete:
                     recordIdsRemoved.remove(eachError["message"])
 
     def test_record_bulk_delete_list_records_and_record_ids(helpers):
-        i = random.randint(0, 1000)
+        i = random2
         pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
             'Numeric': i}, {'Numeric': i}, {'Numeric': i}, {'Numeric': i}, {'Numeric': i})
 
@@ -194,10 +197,10 @@ class TestRecordAdaptorBulkDelete:
 
 class TestRecordAdaptorBulkModify:
     def test_record_bulk_modify_filter(helpers):
-        i = random.randint(0,100)
+        i = random3
         inital99Records = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', i)))
-        i1 = random.randint(0,100000)
+        i1 = random4
         inital989765Records = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', i1)))
         pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
@@ -212,10 +215,10 @@ class TestRecordAdaptorBulkModify:
                                                                         i1))) == 4 + inital99Records + inital989765Records
 
     def test_record_bulk_modify_no_filter(helpers):
-        i = random.randint(0,100)
+        i = random5
         initial99Records = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', i)))
-        i1 = random.randint(0,9999)
+        i1 = random6
         initial6666Records = len(
             pytest.app.records.search(('Numeric', 'equals', i1)))
         pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
@@ -262,10 +265,10 @@ class TestRecordAdaptorBulkModify:
             pytest.waitOnJobByID(records)
 
     def test_record_bulk_modify_list(helpers):
-        i = random.randint(0,99)
+        i = random7
         initial66Records = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', i)))
-        i1 = random.randint(0,9999)
+        i1 = random8
         initial4321Records = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', i1)))
         pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
@@ -295,7 +298,7 @@ class TestRecordAdaptorBulkModify:
 
 class TestRecordAdaptorBulkModifyClear:
     def test_record_bulk_modify_clear_numeric(helpers):
-        i = random.randint(0,10000000)
+        i = random9
         pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
                                        'Numeric': i}, {'Numeric': i})
         initialRecords = len(pytest.app.records.search(
@@ -368,7 +371,7 @@ class TestRecordAdaptorBulkModifyClear:
             ('Text List', 'equals', None))) == initialRecords + emptyNumericRecords
 
     def test_record_bulk_modify_clear_numeric_list(helpers):
-        i = random.randint(0,99999)
+        i = random10
         pytest.app.records.bulk_create({'Numeric List': [i]}, {'Numeric List': [i]}, {
                                        'Numeric List': [i]}, {'Numeric List': [i]})
         initialRecords = len(pytest.app.records.search(
@@ -400,7 +403,8 @@ class TestRecordAdaptorBulkModifyClear:
 
     def test_record_bulk_modify_clear_date_time(helpers):
         baseTime = pendulum.now()
-        pytest.app.records.bulk_create({'Date & Time': baseTime}, {'Date & Time': baseTime})
+        pytest.app.records.bulk_create({'Date & Time': baseTime}, {
+                                       'Date & Time': baseTime})
         initialRecords = len(pytest.app.records.search(
             ('Date & Time', 'equals', baseTime)))
         emptyNumericRecords = len(pytest.app.records.search(
@@ -492,7 +496,7 @@ class TestRecordAdaptorBulkModifyClear:
 
     def test_record_bulk_modify_clear_references(helpers):
         baseText = "Has Reference"
-        pytest.app.records.bulk_create({'Text': baseText}, {'Text': baseText},{
+        pytest.app.records.bulk_create({'Text': baseText}, {'Text': baseText}, {
                                        'Text': baseText}, {'Text': baseText})
         targetApp = pytest.swimlane_instance.apps.get(
             name="PYTHON-Helpers Target App")
@@ -582,7 +586,7 @@ class TestRecordAdaptorBulkModifyAppend:
                                        'Numeric List': [456]}, {'Numeric List': [123, 456, 789]})
         initialRecords = len(pytest.app.records.search(
             ('Numeric List', 'doesNotEqual', [])))
-        i3 = random.randint(500,600)
+        i3 = random
         records = pytest.app.records.bulk_modify(
             ('Numeric List', 'doesNotEqual', []), values={'Numeric List': Append([543])})
         pytest.waitOnJobByID(records)
@@ -966,10 +970,11 @@ class TestRecordAdaptorBulkModifyRemove:
 
 class TestRecordAdaptorBulkModifyRecordIds:
     def test_record_bulk_modify_list_record_ids(helpers):
-        i = random.randint(0,99)
+        i = random11
+
         initial66Records = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', i)))
-        i1 = random.randint(0,9999)
+        i1 = random12
         initial4321Records = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', i1)))
         pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
@@ -988,12 +993,13 @@ class TestRecordAdaptorBulkModifyRecordIds:
                                              ('Numeric', 'equals', i1))) == 4 + initial4321Records
 
     def test_record_bulk_modify_list_record_type_not_tuple_ids_or_records_list(helpers):
-        original_value = random.randint(0, 100)
+        original_value = random13
         updated_value = 77777
         pytest.app.records.bulk_create({'Numeric': original_value}, {'Numeric': original_value}, {
             'Numeric': original_value}, {'Numeric': original_value})
 
-        records = pytest.app.records.search(('Numeric', 'equals', original_value))
+        records = pytest.app.records.search(
+            ('Numeric', 'equals', original_value))
         record_id_ints = [1, 2, 3, 4]
 
         with pytest.raises(ValueError) as excinfo:
@@ -1004,25 +1010,28 @@ class TestRecordAdaptorBulkModifyRecordIds:
             excinfo.value) == "Expected filter tuple, Record, or string, received {0}".format(type(record_id_ints[0]))
 
     def test_record_bulk_modify_list_record_no_args(helpers):
-        original_value = random.randint(0, 100)
+        original_value = random14
         updated_value = 77777
         pytest.app.records.bulk_create({'Numeric': original_value}, {'Numeric': original_value}, {
             'Numeric': original_value}, {'Numeric': original_value})
 
-        records = pytest.app.records.search(('Numeric', 'equals', original_value))
+        records = pytest.app.records.search(
+            ('Numeric', 'equals', original_value))
         with pytest.raises(ValueError) as excinfo:
-            records = pytest.app.records.bulk_modify(values={'Numeric': updated_value})
+            records = pytest.app.records.bulk_modify(
+                values={'Numeric': updated_value})
             pytest.waitOnJobByID(records)
         assert str(
             excinfo.value) == "Must provide at least one filter tuples, Records, or list of Ids"
 
     def test_record_bulk_modify_list_record_too_many_args(helpers):
-        original_value = random.randint(0, 100)
+        original_value = random15
         updated_value = 77777
         pytest.app.records.bulk_create({'Numeric': original_value}, {'Numeric': original_value}, {
             'Numeric': original_value}, {'Numeric': original_value})
 
-        records = pytest.app.records.search(('Numeric', 'equals', original_value))
+        records = pytest.app.records.search(
+            ('Numeric', 'equals', original_value))
         record_ids = ["fgsdfgsdfgsdfgdsg", "sdfgsdfgsdfgf"]
         other = ["string1", "string2"]
 
@@ -1036,10 +1045,10 @@ class TestRecordAdaptorBulkModifyRecordIds:
 
 class TestRecordAdaptorBulkModifyMixRecordsAndRecordIds:
     def test_record_bulk_modify_list_records_and_record_ids(helpers):
-        i = random.randint(0,99)
+        i = random16
         initial66Records = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', i)))
-        i1 = random.randint(0,9999)
+        i1 = random17
         initial4321Records = len(pytest.app.records.search(
             ('Text', 'equals', None), ('Numeric', 'equals', i1)))
         pytest.app.records.bulk_create({'Numeric': i}, {'Numeric': i}, {
@@ -1062,4 +1071,3 @@ class TestRecordAdaptorBulkModifyMixRecordsAndRecordIds:
                                              ('Numeric', 'equals', i))) == initial66Records
         assert len(pytest.app.records.search(('Text', 'equals', None),
                                              ('Numeric', 'equals', i1))) == 4 + initial4321Records
-
