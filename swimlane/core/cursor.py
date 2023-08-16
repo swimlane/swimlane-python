@@ -29,10 +29,10 @@ class PaginatedCursor(Cursor):
 
     default_limit = 0
     default_page_size = 10
-    default_page_start = -1
-    default_page_end = -1
+    pstart = -1
+    pend = -1
 
-    def __init__(self, limit=default_limit, page_size=default_page_size, page_start=default_page_start, page_end=default_page_end):
+    def __init__(self, limit=default_limit, page_size=default_page_size, page_start=pstart, page_end=pend):
         super(PaginatedCursor, self).__init__()
 
         self.__limit = limit
