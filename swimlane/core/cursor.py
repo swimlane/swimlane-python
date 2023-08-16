@@ -29,15 +29,20 @@ class PaginatedCursor(Cursor):
 
     default_limit = 0
     default_page_size = 10
+    default_page_start = -1
+    default_page_end = -1
 
-    def __init__(self, limit=default_limit, page_size=default_page_size):
+    def __init__(self, limit=default_limit, page_size=default_page_size, page_start=default_page_start, page_end=default_page_end):
         super(PaginatedCursor, self).__init__()
 
         self.__limit = limit
         self.page_size = page_size
+        self.page_start = page_start
+        self.page_end = self.page_start + 1 if page_end == -1 else page_end
 
         if self.__limit:
             self.page_size = min(self.page_size, self.__limit)
+
 
     def _evaluate(self):
         """Lazily retrieve and paginate report results and build Record instances from returned data"""
@@ -45,20 +50,28 @@ class PaginatedCursor(Cursor):
             for element in self._elements:
                 yield element
         else:
-            for page in itertools.count():
+            # Determine pagination range based on parameters
+            if self.__limit == 0 and self.page_start != -1:
+                page_range = range(self.page_start, self.page_end)
+            else:
+                page_range = itertools.count()
+
+            for page in page_range:
                 raw_elements = self._retrieve_raw_elements(page)
 
                 for raw_element in raw_elements:
                     element = self._parse_raw_element(raw_element)
                     self._elements.append(element)
                     yield element
+
                     if self.__limit and len(self._elements) >= self.__limit:
                         break
 
+                # Break conditions for ending pagination
                 if any([
-                    (len(raw_elements) < self.page_size),
-                    (self.__limit and len(self._elements) >= self.__limit),
-                    (self.page_size == 0)
+                    len(raw_elements) < self.page_size,
+                    self.__limit and len(self._elements) >= self.__limit,
+                    self.page_size == 0
                 ]):
                     break
 
