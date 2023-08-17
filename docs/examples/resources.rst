@@ -111,6 +111,8 @@ page_start and page_end are effective only with limit=0. page_start is the start
 page_end is the ending page number for retrieval.
 
 A range of pages is fetched if the "limit" parameter is set to 0 and both page_start and page_end are specified.
+If page_end is either not provided or has a value less than or equal to page_start, the page_end is automatically
+set to page_start + 1, and only one page will be retrieved.
 
 .. code-block:: python
 
