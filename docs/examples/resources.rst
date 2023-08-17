@@ -103,11 +103,34 @@ Available operators are just strings as shown above, but are made available as c
         )
 
 
+limit=0 retrieves all the records and can raise a Timeout Error as the Python IDE within the Swimlane application
+timeouts after 60 seconds. In such cases, page_start and page_end parameters can be leveraged along with the repeat
+functionality in their workflow to cycle through all pages.
+
+page_start and page_end are effective only with limit=0. page_start is the starting page number for retrieval.
+page_end is the ending page number for retrieval.
+
+A range of pages is fetched if the "limit" parameter is set to 0 and both page_start and page_end are specified.
+
+.. code-block:: python
+
+        # retrieve all results
+        records = app.records.search(
+            ('Text Field', 'equals', 'value'),
+            ...
+            limit=0,
+            page_size=10000
+            page_start=5,
+            page_end=8
+        )
+
+The above code retrieves pages 5 to 7 which contains records from 50,001 to 80,000.
 Reports
 ^^^^^^^
 
 To operate on large search results as records are returned from API or retrieve only partial results
-:class:`~swimlane.core.resources.report.Report` should be used instead.
+:class:`~swimlane.core.resources.report.Report` should be used instead. :obj:`app.reports.build` method can also raise a
+Timeout Error if the execution time exceeds 60 seconds. User can make use of :obj:`app.records.search` in such case.
 
 .. code-block:: python
 
@@ -133,7 +156,6 @@ To operate on large search results as records are returned from API or retrieve 
     # Any modifications to records from report are maintained
     for record in report:
         assert record['Test Field'] == 'modified'
-
 
 
 Create New Record

@@ -38,7 +38,7 @@ class PaginatedCursor(Cursor):
         self.__limit = limit
         self.page_size = page_size
         self.page_start = page_start
-        self.page_end = self.page_start + 1 if page_end == -1 else page_end
+        self.page_end = self.page_start + 1 if (page_end == -1 or page_end <= page_start) else page_end
 
         if self.__limit:
             self.page_size = min(self.page_size, self.__limit)
