@@ -105,8 +105,8 @@ class RecordAdapter(AppResolver):
             keywords=kwargs.pop('keywords', []),
             limit=kwargs.pop('limit', Report.default_limit),
             page_size=kwargs.pop('page_size', 1000),
-            page_start=kwargs.pop('page_start', -1),
-            page_end=kwargs.pop('page_end', -1)
+            page_start=kwargs.pop('page_start', None),
+            page_end=kwargs.pop('page_end', None)
         )
 
         for filter_tuples in filters:

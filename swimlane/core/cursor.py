@@ -29,20 +29,32 @@ class PaginatedCursor(Cursor):
 
     default_limit = 0
     default_page_size = 10
-    pstart = -1
-    pend = -1
+    default_page_start = None
+    default_page_end = None
 
-    def __init__(self, limit=default_limit, page_size=default_page_size, page_start=pstart, page_end=pend):
+    def __init__(self, limit=default_limit, page_size=default_page_size,
+                 page_start=default_page_start, page_end=default_page_end):
         super(PaginatedCursor, self).__init__()
 
         self.__limit = limit
         self.page_size = page_size
         self.page_start = page_start
-        self.page_end = self.page_start + 1 if (page_end == -1 or page_end <= page_start) else page_end
+        self.page_end = page_end
 
         if self.__limit:
             self.page_size = min(self.page_size, self.__limit)
 
+        if self.page_start and self.page_start <= 0:
+            raise ValueError('page_start should be greater than 0')
+
+        if self.page_end and self.page_end <= 0:
+            raise ValueError('page_end should be greater than 0')
+
+        if (self.page_start and self.page_end) and (self.page_start > self.page_end):
+            raise ValueError('page_end should be greater than page_end')
+
+        if (self.page_start or self.page_end) and self.__limit != 0:
+            raise ValueError('limit should be 0 when either page_start or page_end is provided')
 
     def _evaluate(self):
         """Lazily retrieve and paginate report results and build Record instances from returned data"""
@@ -51,8 +63,12 @@ class PaginatedCursor(Cursor):
                 yield element
         else:
             # Determine pagination range based on parameters
-            if self.__limit == 0 and self.page_start != -1:
-                page_range = range(self.page_start, self.page_end)
+            if self.page_start and self.page_end:
+                page_range = range(self.page_start-1, self.page_end)
+            elif self.page_start:
+                page_range = itertools.count(self.page_start-1)
+            elif self.page_end:
+                page_range = range(0, self.page_end)
             else:
                 page_range = itertools.count()
 
