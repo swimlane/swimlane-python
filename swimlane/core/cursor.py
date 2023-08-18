@@ -54,7 +54,7 @@ class PaginatedCursor(Cursor):
             raise ValueError('page_end cannot be less than page_start')
 
         if (self.page_start or self.page_end) and self.__limit != 0:
-            raise ValueError('limit should be 0 when either page_start or page_end is provided')
+            raise ValueError(' page_start or page_end param is applicable only when limit is 0')
 
     def _evaluate(self):
         """Lazily retrieve and paginate report results and build Record instances from returned data"""
