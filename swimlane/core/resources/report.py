@@ -71,8 +71,8 @@ class Report(APIResource, PaginatedCursor):
     )
 
     default_limit = 50
-    default_page_start = 0
-    default_page_end = 1
+    default_page_start = None
+    default_page_end = None
 
     def __init__(self, app, raw, **kwargs):
         APIResource.__init__(self, app._swimlane, raw)
