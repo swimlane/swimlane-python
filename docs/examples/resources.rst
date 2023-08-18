@@ -121,12 +121,12 @@ set to page_start + 1, and only one page will be retrieved.
             ('Text Field', 'equals', 'value'),
             ...
             limit=0,
-            page_size=10000
+            page_size=100
             page_start=5,
             page_end=8
         )
 
-The above code retrieves pages 5 to 7 which contains records from 50,001 to 80,000.
+The above code retrieves pages 5 to 8 inclusive, which contains records from 501 to 900.
 Reports
 ^^^^^^^
 
