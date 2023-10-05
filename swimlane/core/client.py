@@ -85,6 +85,8 @@ class Swimlane(object):
     def __init__(
             self,
             host,
+            account_id=None,
+            tenant_id=None,
             username=None,
             password=None,
             verify_ssl=True,
@@ -94,6 +96,8 @@ class Swimlane(object):
             access_token=None,
             write_to_read_only=False
     ):
+        if account_id and tenant_id:
+            Swimlane._api_root = f'/api/account/{account_id}/tenant/{tenant_id}/' 
         self.__verify_auth_params(username, password, access_token)
 
         self.host = URI(host)
@@ -131,6 +135,8 @@ class Swimlane(object):
 
         if verify_server_version:
             self.__verify_server_version()
+
+    
 
     @staticmethod
     def __verify_auth_params(username, password, access_token):
@@ -333,6 +339,7 @@ class SwimlaneJwtAuth(SwimlaneResolver):
 
         self._username = username
         self._password = password
+        self._host = swimlane.host
 
         self.user = None
         self._login_headers = {}
@@ -357,9 +364,10 @@ class SwimlaneJwtAuth(SwimlaneResolver):
 
         # Temporarily remove auth from Swimlane session for auth request to avoid recursive loop during login request
         self._swimlane._session.auth = None
+        login_url = str(self._host) + '/tenant/api/users/login'
         resp = self._swimlane.request(
             'post',
-            'user/login',
+            login_url,
             json={
                 'userName': self._username,
                 'password': self._password

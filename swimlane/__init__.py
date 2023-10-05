@@ -1,7 +1,6 @@
 """Swimlane Python API driver"""
 
-from __future__ import absolute_import
-
+from __future__ import absolute_import 
 import logging
 
 from .core.client import Swimlane
