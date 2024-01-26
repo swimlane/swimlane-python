@@ -68,9 +68,11 @@ class Record(APIResource):
         self.__existing_values = {k: self.get_field(k).get_batch_representation() for (k, v) in self}
         self._comments_modified = False
 
-        self.locked = False
-        self.locking_user = None
-        self.locked_date = None
+        # If record is locked parse the data
+        self.locked = self._raw.get('locked', False)
+        if self.locked:
+            self.locking_user = User(self._swimlane, self._raw.get('locking_user'))
+            self.locked_date = pendulum.parse(self._raw.get('locked_date'))
 
         # avoid circular reference
         from swimlane.core.adapters import RecordRevisionAdapter
@@ -394,7 +396,6 @@ class Record(APIResource):
         """
         Lock the record to the Current User.
 
-
         Notes:
 
         Warnings:
@@ -413,26 +414,25 @@ class Record(APIResource):
         self.locked_date = response['lockedDate']
 
     def unlock(self):
-          """
-          Unlock the record.
+        """
+        Unlock the record.
 
+        Notes:
 
-          Notes:
+        Warnings:
 
-          Warnings:
+        Args:
 
-          Args:
-
-          """
-          self.validate()
-          self._swimlane.request(
-              'post',
-              'app/{}/record/{}/unlock'.format(
-                  self.app.id, self.id)
-          ).json()
-          self.locked = False 
-          self.locking_user = None
-          self.locked_date = None
+        """
+        self.validate()
+        self._swimlane.request(
+            'post',
+            'app/{}/record/{}/unlock'.format(
+                self.app.id, self.id)
+        ).json()
+        self.locked = False 
+        self.locking_user = None
+        self.locked_date = None
     
     def execute_task(self, task_name, timeout=int(20)):
         job_info = swimlane.core.adapters.task.TaskAdapter(self.app._swimlane).execute(task_name, self._raw)
