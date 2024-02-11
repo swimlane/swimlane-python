@@ -12,7 +12,6 @@ class Cursor(object):
     def __iter__(self):
         for element in self._evaluate():
             yield element
-        return
 
     def __getitem__(self, item):
         return self._evaluate()[item]
@@ -62,7 +61,6 @@ class PaginatedCursor(Cursor):
         if self._elements:
             for element in self._elements:
                 yield element
-            return
         else:
             # Determine pagination range based on parameters
             if self.page_start and self.page_end:
