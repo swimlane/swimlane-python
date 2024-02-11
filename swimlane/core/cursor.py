@@ -11,7 +11,10 @@ class Cursor(object):
 
     def __iter__(self):
         for element in self._evaluate():
-            yield element
+            try:
+                yield element
+            except StopIteration:
+                return
 
     def __getitem__(self, item):
         return self._evaluate()[item]
