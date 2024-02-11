@@ -60,7 +60,10 @@ class PaginatedCursor(Cursor):
         """Lazily retrieve and paginate report results and build Record instances from returned data"""
         if self._elements:
             for element in self._elements:
-                yield element
+                try:
+                    yield element
+                except StopIteration:
+                    return
         else:
             # Determine pagination range based on parameters
             if self.page_start and self.page_end:
