@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
-        
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -33,7 +33,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run Tests
-      run: py.test -v --cov=swimlane --cov-report=xml
+      run: python -m pytest -v --cov=swimlane --cov-report=xml
     - name: Run Codacy Coverage
       if: ${{ (github.repository == 'swimlane/swimlane-python') }}
       env:
