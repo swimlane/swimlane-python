@@ -91,8 +91,6 @@ To run all the tests against 10.20.30.40
 
     No preset data is needed beyond the base user.
 
-    These tests are Python 2 and 3 compatible.
-
 Issues
 ------
 
