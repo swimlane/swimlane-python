@@ -60,7 +60,8 @@ Install the required PIP packages with the command
     pip install -r requirements.txt
 
 
-## Executing
+Executing
+---------
 
 The test suite allows for overriding the target server and user parameters via the following arguments:
 
