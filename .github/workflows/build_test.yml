@@ -34,6 +34,7 @@ jobs:
     - name: Run Tests
       run: py.test -v --cov=swimlane --cov-report=xml
     - name: Run Codacy Coverage
+      if: ${{ (github.event_name != 'pull_request') && (github.repository == 'swimlane/swimlane-python') }}
       env:
         CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
       run: python-codacy-coverage -r coverage.xml
