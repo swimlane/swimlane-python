@@ -10,11 +10,11 @@ class Cursor(object):
         return len(list(self._evaluate()))
 
     def __iter__(self):
-        for element in self._evaluate():
-            try:
+        try:
+            for element in self._evaluate():
                 yield element
-            except StopIteration:
-                return
+        except StopIteration:
+            return
 
     def __getitem__(self, item):
         return self._evaluate()[item]
@@ -63,10 +63,7 @@ class PaginatedCursor(Cursor):
         """Lazily retrieve and paginate report results and build Record instances from returned data"""
         if self._elements:
             for element in self._elements:
-                try:
-                    yield element
-                except StopIteration:
-                    return
+                yield element
         else:
             # Determine pagination range based on parameters
             if self.page_start and self.page_end:
