@@ -82,3 +82,5 @@ functional_tests/pydriver-report.html
 # virtual environment
 venv3/
 venv/
+.direnv/
+.envrc
