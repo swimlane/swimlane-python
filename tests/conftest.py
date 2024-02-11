@@ -2,7 +2,7 @@ import random
 import json
 from pathlib import Path
 from shutil import copy as cp
-import mock
+import unittest.mock as mock
 import pytest
 from swimlane.core.client import SwimlaneJwtAuth, Swimlane
 from swimlane.core.resources.app import App

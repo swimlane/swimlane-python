@@ -1,4 +1,5 @@
-import mock
+import unittest.mock as mock
+
 import pytest
 
 from swimlane.core.fields.reference import ReferenceCursor

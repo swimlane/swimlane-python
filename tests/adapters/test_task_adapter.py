@@ -1,6 +1,6 @@
 import json
 import pytest
-import mock
+import unittest.mock as mock
 from requests.models import Response
 from swimlane.core.adapters import TaskAdapter
 from swimlane.core.resources.task import Task
