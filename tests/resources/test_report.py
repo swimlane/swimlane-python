@@ -1,4 +1,4 @@
-import mock
+import unittest.mock as mock
 import pytest
 
 from swimlane.core.resources.report import report_factory

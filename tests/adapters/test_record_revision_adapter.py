@@ -1,4 +1,4 @@
-import mock
+import unittest.mock as mock
 
 from swimlane.core.resources.record_revision import RecordRevision
 

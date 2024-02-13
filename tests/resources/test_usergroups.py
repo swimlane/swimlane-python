@@ -1,6 +1,6 @@
 import pytest
-from mock import patch
-import mock
+from unittest.mock import patch
+import unittest.mock as mock
 import copy
 
 from swimlane.core.cache import ResourcesCache

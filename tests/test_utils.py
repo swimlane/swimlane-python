@@ -2,7 +2,7 @@ import os
 import string
 import sys
 
-import mock
+import unittest.mock as mock
 import pytest
 from pkg_resources import DistributionNotFound
 

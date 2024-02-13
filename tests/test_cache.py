@@ -2,7 +2,7 @@
 
 import copy
 
-import mock
+import unittest.mock as mock
 import pytest
 
 from swimlane.core.cache import ResourcesCache, check_cache
