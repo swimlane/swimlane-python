@@ -1,7 +1,7 @@
 """Core Swimlane client class"""
 
 import logging
-
+import time
 import jwt
 import pendulum
 import requests
@@ -46,6 +46,8 @@ class Swimlane(object):
             caching. Disabled by default
         access_token (str): Authentication token, used in lieu of a username and password
         write_to_read_only (bool): Enable the ability to write to Read-only fields
+        retry_count (int): Number of times to retry the request in case of failure (default: 1)
+        retry_interval (int): Interval between retries in seconds (default: 5)
 
     Attributes:
         host (pyuri.URI): Full RFC-1738 URL pointing to Swimlane host
@@ -92,7 +94,10 @@ class Swimlane(object):
             verify_server_version=True,
             resource_cache_size=0,
             access_token=None,
-            write_to_read_only=False
+            write_to_read_only=False,
+            retry_count=0,
+            retry_interval=5,
+
     ):
         self.__verify_auth_params(username, password, access_token)
 
@@ -116,12 +121,16 @@ class Swimlane(object):
             self._session.auth = SwimlaneJwtAuth(
                 self,
                 username,
-                password
+                password,
+                retry_count,
+                retry_interval
             )
         else:
             self._session.auth = SwimlaneTokenAuth(
                 self,
-                access_token
+                access_token,
+                retry_count,
+                retry_interval
             )
 
         self.apps = AppAdapter(self)
@@ -172,7 +181,7 @@ class Swimlane(object):
             version=self.version
         )
 
-    def request(self, method, api_endpoint, **kwargs):
+    def request(self, method, api_endpoint, retry_count=0, retry_interval=5, **kwargs):
         """Wrapper for underlying :class:`requests.Session`
 
         Handles generating full API URL, session reuse and auth, request defaults, and invalid response status codes
@@ -182,6 +191,8 @@ class Swimlane(object):
         Args:
             method (str): Request method (get, post, put, etc.)
             api_endpoint (str): Portion of URL matching API endpoint route as listed in platform /docs help page
+            retry_count (int): Number of times to retry the request in case of failure (default: 1)
+            retry_interval (int): Interval between retries in seconds (default: 5)
             **kwargs (dict): Remaining arguments passed through to actual request call
 
         Notes:
@@ -215,20 +226,30 @@ class Swimlane(object):
             kwargs['headers'] = headers
 
             kwargs['data'] = json.dumps(json_data, sort_keys=True, separators=(',', ':'))
+        
+        for _ in range(retry_count+1):
+            print(retry_count)
+            print(_)
+            try:
+                response = self._session.request(method, urljoin(str(self.host) + self._api_root, api_endpoint), **kwargs)
+                print(response.status_code)
+                # Roll 400 errors up into SwimlaneHTTP400Errors with specific Swimlane error code support
+                try:
+                    response.raise_for_status()
+                except requests.HTTPError as error:
+                    if error.response.status_code == 401:
+                        raise SwimlaneHTTP400Error(error)
+                    else:
+                        raise error
 
-        response = self._session.request(method, urljoin(str(self.host) + self._api_root, api_endpoint), **kwargs)
+                return response
+            except requests.RequestException:
+                time.sleep(retry_interval)
+                continue
 
-        # Roll 400 errors up into SwimlaneHTTP400Errors with specific Swimlane error code support
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as error:
-            if error.response.status_code == 400:
-                raise SwimlaneHTTP400Error(error)
-            else:
-                raise error
+        raise requests.RequestException(f"Request failed after {retry_count} attempts")
 
-        return response
-
+       
     @property
     def settings(self):
         """Retrieve and cache settings from server"""
@@ -288,11 +309,13 @@ class SwimlaneTokenAuth(SwimlaneResolver):
     .. versionadded:: 4.1.0
     """
 
-    def __init__(self, swimlane, access_token):
+    def __init__(self, swimlane, access_token, retry_count=0, retry_interval=5):
         super(SwimlaneTokenAuth, self).__init__(swimlane)
 
         self._access_token = access_token
         self.user = None
+        self.retry_count = retry_count
+        self.retry_interval = retry_interval
     
     def __call__(self, request):
         """Attach necessary headers to all requests"""
@@ -313,7 +336,9 @@ class SwimlaneTokenAuth(SwimlaneResolver):
         resp = self._swimlane.request(
             'get',
             'user/authorize',
-            headers=headers
+            headers=headers,
+            retry_count=self.retry_count,
+            retry_interval=self.retry_interval
         )
         self._swimlane._session.auth = self
         
@@ -328,11 +353,13 @@ class SwimlaneJwtAuth(SwimlaneResolver):
 
     _token_expiration_buffer = pendulum.Duration(minutes=5)
 
-    def __init__(self, swimlane, username, password):
+    def __init__(self, swimlane, username, password, retry_count=0, retry_interval=5):
         super(SwimlaneJwtAuth, self).__init__(swimlane)
 
         self._username = username
         self._password = password
+        self.retry_count = retry_count
+        self.retry_interval = retry_interval
 
         self.user = None
         self._login_headers = {}
@@ -364,6 +391,8 @@ class SwimlaneJwtAuth(SwimlaneResolver):
                 'userName': self._username,
                 'password': self._password
             },
+            retry_count=self.retry_count,
+            retry_interval=self.retry_interval            
         )
         self._swimlane._session.auth = self
 
