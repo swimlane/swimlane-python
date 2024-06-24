@@ -35,13 +35,9 @@ jobs:
       run: |
         python -m coverage run --source=swimlane -m pytest
         coverage xml
-    - name: Run Codacy Coverage Reporter
+    - name: Run Codacy Coverage
       uses: codacy/codacy-coverage-reporter-action@master
       with:
-        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        api-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: coverage.xml
-    - name: Run Codacy Coverage
-      env:
-        CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-      run: python-codacy-coverage -r coverage.xml
 
