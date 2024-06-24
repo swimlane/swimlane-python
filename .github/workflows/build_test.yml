@@ -33,7 +33,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run Tests
       run: |
-        python -m coverage run -m pytest --source=swimlane
+        python -m coverage run --source=swimlane -m pytest
         coverage xml
     - name: Run Codacy Coverage Reporter
       uses: codacy/codacy-coverage-reporter-action@master
