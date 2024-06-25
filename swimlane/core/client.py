@@ -5,10 +5,12 @@ import logging
 import jwt
 import pendulum
 import requests
+import time
 from pyuri import URI
 from requests.compat import json
 from requests.packages import urllib3
 from requests.structures import CaseInsensitiveDict
+from requests.exceptions import ConnectionError
 from six.moves.urllib.parse import urljoin
 
 from swimlane.core.adapters import GroupAdapter, UserAdapter, AppAdapter, HelperAdapter
@@ -46,6 +48,9 @@ class Swimlane(object):
             caching. Disabled by default
         access_token (str): Authentication token, used in lieu of a username and password
         write_to_read_only (bool): Enable the ability to write to Read-only fields
+        retry (bool): Retry request when error code is >= 500
+        max_retries (int): Maximum number of retry attempts
+        retry_interval (int): Time interval (in seconds) between two retry attempts
 
     Attributes:
         host (pyuri.URI): Full RFC-1738 URL pointing to Swimlane host
@@ -92,7 +97,10 @@ class Swimlane(object):
             verify_server_version=True,
             resource_cache_size=0,
             access_token=None,
-            write_to_read_only=False
+            write_to_read_only: bool=False,
+            retry: bool=True,
+            max_retries: int=5,
+            retry_interval: int=5
     ):
         self.__verify_auth_params(username, password, access_token)
 
@@ -111,6 +119,10 @@ class Swimlane(object):
 
         self._session = WrappedSession()
         self._session.verify = verify_ssl
+        
+        self.retry = retry
+        self.max_retries = max_retries
+        self.retry_interval = retry_interval
 
         if username is not None and password is not None:
             self._session.auth = SwimlaneJwtAuth(
@@ -215,17 +227,41 @@ class Swimlane(object):
             kwargs['headers'] = headers
 
             kwargs['data'] = json.dumps(json_data, sort_keys=True, separators=(',', ':'))
+        
+        # Retry logic
+        req_retry = kwargs.pop('retry', self.retry)
+        
+        req_max_retries = kwargs.pop('max_retries', self.max_retries)
+        if not isinstance(req_max_retries, int):
+            raise TypeError('max_retries should be an integer')
+        if req_max_retries <= 0:
+            raise ValueError('max_retries should be a positive integer')
+        
+        req_retry_interval = kwargs.pop('retry_interval', self.retry_interval)
+        if not isinstance(req_retry_interval, int):
+            raise TypeError('retry_interval should be an integer')
+        if req_retry_interval <= 0:
+            raise ValueError('retry_interval should be a positive integer')
+        
+        while not req_max_retries<0:
+            response = self._session.request(method, urljoin(str(self.host) + self._api_root, api_endpoint), **kwargs)
 
-        response = self._session.request(method, urljoin(str(self.host) + self._api_root, api_endpoint), **kwargs)
-
-        # Roll 400 errors up into SwimlaneHTTP400Errors with specific Swimlane error code support
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as error:
-            if error.response.status_code == 400:
-                raise SwimlaneHTTP400Error(error)
-            else:
-                raise error
+            # Roll 400 errors up into SwimlaneHTTP400Errors with specific Swimlane error code support
+            try:
+                response.raise_for_status()
+                # Exit loop on successful request
+                req_max_retries = -1 
+            except requests.HTTPError as error:
+                if error.response.status_code == 400:
+                    raise SwimlaneHTTP400Error(error)
+                else:
+                    if req_retry and req_max_retries>0 and error.response.status_code>=500:
+                        req_max_retries -= 1
+                        time.sleep(req_retry_interval)
+                        continue
+                    elif req_max_retries == 0:
+                        raise ConnectionError(f'Max retries exceeded. Caused by ({error})')
+                    raise error
 
         return response
 
