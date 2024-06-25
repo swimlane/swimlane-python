@@ -1,5 +1,5 @@
 """Tests for custom Swimlane errors"""
-import unittest.mock as mock
+import mock
 import pytest
 from requests import HTTPError
 

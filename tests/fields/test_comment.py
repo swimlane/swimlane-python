@@ -1,6 +1,6 @@
 from datetime import datetime
 
-import unittest.mock as mock
+import mock
 
 from swimlane.core.fields.comment import CommentCursor
 from swimlane.core.resources.comment import Comment

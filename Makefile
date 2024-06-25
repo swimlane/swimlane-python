@@ -14,4 +14,4 @@ release:
 	python setup.py sdist bdist_wheel upload -r swimlane
 
 build-offline-installer:
-	python2.7 offline_installer/build_installer.py
+	python3 offline_installer/build_installer.py

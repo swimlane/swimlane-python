@@ -1,6 +1,6 @@
 import math
 
-import unittest.mock as mock
+import mock
 
 from swimlane.core.resources.app_revision import AppRevision
 

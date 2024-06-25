@@ -1,6 +1,6 @@
 import numbers
 
-import unittest.mock as mock
+import mock
 import pytest
 import six
 

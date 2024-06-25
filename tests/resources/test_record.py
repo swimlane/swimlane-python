@@ -1,6 +1,6 @@
 import json
 import pendulum
-import unittest.mock as mock
+import mock
 import pytest
 from requests import Response
 from swimlane.core.fields.reference import ReferenceCursor

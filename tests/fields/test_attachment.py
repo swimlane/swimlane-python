@@ -1,7 +1,7 @@
 from datetime import datetime
 from io import BytesIO
 
-import unittest.mock as mock
+import mock
 import pytest
 from swimlane.core.fields.attachment import AttachmentCursor
 from swimlane.core.resources.attachment import Attachment
