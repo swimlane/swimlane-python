@@ -1,4 +1,4 @@
-import mock
+import unittest.mock as mock
 
 app_id = '123'
 record_id = '456'
