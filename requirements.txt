@@ -1,6 +1,7 @@
 cachetools>=4.2.4
 certifi>=2017
-pendulum>=2.1.2
+pendulum==2.1.2; python_version<='3.7'
+pendulum==3.0.0; python_version>='3.8'
 pyjwt>=2.4.0
 pyuri>=0.3,<0.4
 requests[security]>=2,<3
