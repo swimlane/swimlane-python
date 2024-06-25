@@ -11,7 +11,7 @@ docs:
 	cd docs/ && make html
 
 release:
-	python setup.py sdist bdist_wheel upload -r swimlane
+	python3 setup.py sdist bdist_wheel upload -r swimlane
 
 build-offline-installer:
 	python3 offline_installer/build_installer.py
