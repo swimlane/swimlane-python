@@ -100,7 +100,8 @@ The `verify_ssl` parameter is ignored when connecting over HTTP.
 Retry Requests
 ^^^^^^^^^^^^^
 
-Initial client connection and all requests are retried if they are failed with a :class:`HTTP 5XX` error and the :class:`retry` parameter is set to :class:`True`. The default retry options are set as following:
+Initial client connection and all failed requests are retried upon recieving :class:`HTTP 5XX` errors (server errors) if the :class:`retry` parameter is enabled.
+The default retry options are set as following:
     - retry = True
     - max_retries = 5
     - retry_interval = 5 (in seconds)
@@ -119,7 +120,7 @@ To override the default retry options used by all library methods, provide them 
         max_retries=3,
         retry_interval=10 # in seconds
     )
-The :meth:`swimlane.Swimlane.request` method can also accept the optional retry parameters that will override the
+The :meth:`swimlane.Swimlane.request` method can also accept the optional retry options that will override the
 global defaults for the single request.
 
 .. code-block:: python
