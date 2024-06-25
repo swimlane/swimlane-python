@@ -1,7 +1,7 @@
 # This workflow is responsible for publishing  packages to PyPi
 # and creating offline packages
 
-name: "Release new version"
+name: "Release New Version"
 
 on:
   - workflow_call
@@ -12,12 +12,12 @@ jobs:
     name: Publish to PyPi
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.7
+          python-version: 3.12
 
       - name: Update PIP tools
         run: |
