@@ -129,7 +129,6 @@ global defaults for the single request.
 
     swimlane = Swimlane('192.168.1.1', 'username', 'password')
 
-    # Potentially long delay before starting response with 10 minute timeout
     response = swimlane.request(
         'post',
         'some/endpoint',
