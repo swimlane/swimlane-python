@@ -158,6 +158,9 @@ class GroupUsersCursor(SwimlaneResolver, Cursor):
                 yield element
         else:
             for user_id in self.__user_ids:
-                element = self._swimlane.users.get(id=user_id)
-                self._elements.append(element)
-                yield element
+                try:
+                    element = self._swimlane.users.get(id=user_id)
+                    self._elements.append(element)
+                    yield element
+                except StopIteration:
+                    return

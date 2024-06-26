@@ -50,10 +50,6 @@ Install/upgrade to latest release::
 
     pip install -U swimlane
 
-Install/upgrade to latest release for platform v2.x::
-
-    pip install -U "swimlane>=2,<3"
-
 
 Offline Installer
 ^^^^^^^^^^^^^^^^^

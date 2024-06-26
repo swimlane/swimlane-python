@@ -63,27 +63,28 @@ Install the required PIP packages with the command
 ## Executing
 
 The test suite allows for overriding the target server and user parameters via the following arguments:
-
---url default="https://localhost"
---user default="admin"
---pass This is the password for the user defined above.
---skipverify This is for allowing the version of PyDriver to not match the version of Swimlane.
+ ::
+    pytest 
+    --url default="https://localhost"
+    --user default="admin"
+    --pass This is the password for the user defined above.
+    --skipverify This is for allowing the version of PyDriver to not match the version of Swimlane.
 
 To run a specific test and skip the version verification:
 
-pytest driver_tests/test_app_adaptor.py --skipverify
+::
+    pytest driver_tests/test_app_adaptor.py --skipverify
 
 To run all the tests against 10.20.30.40:
-
-pytest --url "https://10.20.30.40"
-
+ ::
+    pytest --url "https://10.20.30.40"
 
 .. NOTE::
     All of the data created for testing purposes is cleaned up.
 
     No preset data is needed beyond the base user.
 
-    These tests are Python 2 and 3 compatible.
+    These tests are Python 3.6+ compatible.
 
 Issues
 ------
