@@ -333,7 +333,7 @@ def mock_app(mock_swimlane):
                     'fieldType': 'date',
                     'helpTextType': 'none',
                     'id': 'aiir8',
-                    'inputType': 'firstCreated',
+                    'inputType': 'dateTime',
                     'name': 'Incident Created'},
                    {'$type': 'Core.Models.Fields.UserGroupField, Core',
                     'controlType': 'select',

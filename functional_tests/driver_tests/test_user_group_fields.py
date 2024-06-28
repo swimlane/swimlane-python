@@ -144,25 +144,24 @@ class TestCreatedByField:
             **{"Required User/Groups": swimUser})
         assert theRecord["Created by"] == swimUser
 
-    @pytest.mark.xfail(reason="SPT-6352: This should fail, that the Created by is read only.")
     def test_created_by_field(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
         swimUser2 = pytest.swimlane_instance.users.get(
             display_name=pytest.testUsers[pytest.fake.random_int(0, len(pytest.testUsers)-1)])
-        theRecord = pytest.app.records.create(
-            **{"Required User/Groups": swimUser, "Created by": swimUser2})
-        assert theRecord["Created by"] == swimUser
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.records.create(
+                **{"Required User/Groups": swimUser, "Created by": swimUser2})
+        assert str(excinfo.value) == 'Input type "createdBy" is not editable'
 
-    @pytest.mark.xfail(reason="SPT-6352: This should fail, that the Created by is read only.")
     def test_created_by_field_on_save(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
         swimUser2 = pytest.swimlane_instance.users.get(
             display_name=pytest.testUsers[pytest.fake.random_int(0, len(pytest.testUsers)-1)])
         theRecord = pytest.app.records.create(
             **{"Required User/Groups": swimUser})
-        theRecord["Created by"] = swimUser2
-        theRecord.save()
-        assert theRecord["Created by"] == swimUser
+        with pytest.raises(ValueError) as excinfo:
+            theRecord["Created by"] = swimUser2
+        assert str(excinfo.value) == 'Input type "createdBy" is not editable'
 
 
 class TestLastUpdatedByField:
@@ -172,25 +171,25 @@ class TestLastUpdatedByField:
             **{"Required User/Groups": swimUser})
         assert theRecord["Last updated by"] == swimUser
 
-    @pytest.mark.xfail(reason="SPT-6352: This should fail, that the last updated by is read only.")
     def test_last_updated_by_field(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
         swimUser2 = pytest.swimlane_instance.users.get(
             display_name=pytest.testUsers[pytest.fake.random_int(0, len(pytest.testUsers)-1)])
-        theRecord = pytest.app.records.create(
-            **{"Required User/Groups": swimUser, "Last updated by": swimUser2})
-        assert theRecord["Last updated by"] == swimUser
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.records.create(
+                **{"Required User/Groups": swimUser, "Last updated by": swimUser2})
+        assert str(excinfo.value) == 'Input type "lastUpdatedBy" is not editable'
 
-    @pytest.mark.xfail(reason="SPT-6352: This should fail, that the Last updated by is read only.")
+
     def test_last_updated_by_field_on_save(helpers):
         swimUser = pytest.swimlane_instance.users.get(display_name="admin")
         swimUser2 = pytest.swimlane_instance.users.get(
             display_name=pytest.testUsers[pytest.fake.random_int(0, len(pytest.testUsers)-1)])
         theRecord = pytest.app.records.create(
             **{"Required User/Groups": swimUser})
-        theRecord["Last updated by"] = swimUser2
-        theRecord.save()
-        assert theRecord["Last updated by"] == swimUser
+        with pytest.raises(ValueError) as excinfo:    
+            theRecord["Last updated by"] = swimUser2
+        assert str(excinfo.value) == 'Input type "lastUpdatedBy" is not editable'
 
 
 class TestAllUsersAndGroupsField:

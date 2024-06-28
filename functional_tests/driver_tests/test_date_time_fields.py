@@ -166,22 +166,20 @@ class TestFirstCreatedField:
             **{"Required Date & Time": pendulum.now()})
         assert theRecord["First Created"] != None
 
-    @pytest.mark.xfail(reason="SPT-6352: The First created should have been blocked from being set.")
     def test_first_created_field(helpers):
         datetimeValue = pendulum.tomorrow()
-        theRecord = pytest.app.records.create(
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.records.create(
             **{"Required Date & Time": pendulum.now(), "First Created": datetimeValue})
-        assert theRecord["First Created"] != datetimeValue
+        assert str(excinfo.value) == 'Input type "firstCreated" is not editable'
 
-    @pytest.mark.xfail(reason="SPT-6352: The First created should have been blocked from being set.")
     def test_first_created_field_on_save(helpers):
         datetimeValue = pendulum.tomorrow()
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
-        theOriginalTimeCreated = theRecord["First Created"]
-        theRecord["First Created"] = datetimeValue
-        theRecord.save()
-        assert theRecord["First Created"] == theOriginalTimeCreated
+        with pytest.raises(ValueError) as excinfo:
+            theRecord["First Created"] = datetimeValue
+        assert str(excinfo.value) == 'Input type "firstCreated" is not editable'
 
 
 class TestLastUpdatedField:
@@ -190,22 +188,20 @@ class TestLastUpdatedField:
             **{"Required Date & Time": pendulum.now()})
         assert theRecord["Last Updated"] >= theRecord["First Created"]
 
-    @pytest.mark.xfail(reason="SPT-6352: The Last updated should have been blocked from being set.")
     def test_last_updated_field(helpers):
         datetimeValue = pendulum.yesterday()
-        theRecord = pytest.app.records.create(
-            **{"Required Date & Time": pendulum.now(), "Last Updated": datetimeValue})
-        assert theRecord["Last Updated"] != datetimeValue
+        with pytest.raises(ValueError) as excinfo:
+            pytest.app.records.create(
+                **{"Required Date & Time": pendulum.now(), "Last Updated": datetimeValue})
+        assert str(excinfo.value) == 'Input type "lastUpdated" is not editable'
 
-    @pytest.mark.xfail(reason="SPT-6352: The Last updated should have been blocked from being set.")
     def test_last_updated_field_on_save(helpers):
         datetimeValue = pendulum.yesterday()
         theRecord = pytest.app.records.create(
             **{"Required Date & Time": pendulum.now()})
-        theRecord["Last Updated"] = datetimeValue
-        theRecord.save()
-        assert theRecord["First Created"] < theRecord["Last Updated"]
-        assert theRecord["Last Updated"] != datetimeValue
+        with pytest.raises(ValueError) as excinfo:
+            theRecord["Last Updated"] = datetimeValue
+        assert str(excinfo.value) == 'Input type "lastUpdated" is not editable'
 
 
 class TestTimespanField:
