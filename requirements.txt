@@ -1,5 +1,5 @@
 cachetools>=4.2.4
-certifi==2024.6.2
+certifi==2024.7.4
 pendulum==2.1.2; python_version<='3.7'
 pendulum==3.0.0; python_version>='3.8'
 pyjwt>=2.4.0
