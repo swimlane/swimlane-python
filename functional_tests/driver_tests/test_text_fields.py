@@ -610,7 +610,8 @@ class TestCommentTextField:
         comments.comment(commentText)
         theRecord.save()
         editedRecord = pytest.app.records.get(id=theRecord.id)
-        assert editedRecord["Comments"] in (None, [])
+        assert editedRecord['Comments'][-1].message == commentText
+        assert editedRecord['Comments'][-1].is_rich_text == False
 
     def test_comment_empty_on_save_exact(helpers):
         theRecord = pytest.app.records.create(**{"Required Text": "required"})
@@ -619,7 +620,8 @@ class TestCommentTextField:
         comments.comment(commentText)
         theRecord.save()
         editedRecord = pytest.app.records.get(id=theRecord.id)
-        assert editedRecord["Comments"] in (None, [])
+        assert editedRecord['Comments'][-1].message == commentText
+        assert editedRecord['Comments'][-1].is_rich_text == False
 
     def test_comment_null_on_save_exact(helpers):
         theRecord = pytest.app.records.create(**{"Required Text": "required"})
@@ -628,7 +630,8 @@ class TestCommentTextField:
         comments.comment(commentText)
         theRecord.save()
         editedRecord = pytest.app.records.get(id=theRecord.id)
-        assert editedRecord["Comments"] in (None, [])
+        assert editedRecord['Comments'][-1].message == 'None'
+        assert editedRecord['Comments'][-1].is_rich_text == False
 
     def test_comment_numeric_on_save_exact(helpers):
         theRecord = pytest.app.records.create(**{"Required Text": "required"})
@@ -637,7 +640,8 @@ class TestCommentTextField:
         comments.comment(commentText)
         theRecord.save()
         editedRecord = pytest.app.records.get(id=theRecord.id)
-        assert editedRecord["Comments"] in (None, [])
+        assert editedRecord['Comments'][-1].message == '1234'
+        assert editedRecord['Comments'][-1].is_rich_text == False
 
     def test_comment_json_on_save_exact(helpers):
         theRecord = pytest.app.records.create(**{"Required Text": "required"})
@@ -646,7 +650,8 @@ class TestCommentTextField:
         comments.comment(commentText)
         theRecord.save()
         editedRecord = pytest.app.records.get(id=theRecord.id)
-        assert editedRecord["Comments"] in (None, [])
+        assert editedRecord['Comments'][-1].message == str(commentText)
+        assert editedRecord['Comments'][-1].is_rich_text == False
 
     def test_comment_object_on_save_exact(helpers):
         theRecord = pytest.app.records.create(**{"Required Text": "required"})
@@ -655,7 +660,8 @@ class TestCommentTextField:
         comments.comment(commentText)
         theRecord.save()
         editedRecord = pytest.app.records.get(id=theRecord.id)
-        assert editedRecord["Comments"] in (None, [])
+        assert editedRecord['Comments'][-1].message == str(commentText)
+        assert editedRecord['Comments'][-1].is_rich_text == False
 
     def test_comment_rich_text_on_save_exact(helpers):
         theRecord = pytest.app.records.create(**{"Required Text": "required"})
@@ -664,7 +670,8 @@ class TestCommentTextField:
         comments.comment(commentText, rich_text=True)
         theRecord.save()
         editedRecord = pytest.app.records.get(id=theRecord.id)
-        assert editedRecord["Comments"] in (None, [])
+        assert editedRecord['Comments'][-1].message == commentText
+        assert editedRecord['Comments'][-1].is_rich_text == True
 
     def test_comment_rich_text_false_on_save_exact(helpers):
         theRecord = pytest.app.records.create(**{"Required Text": "required"})
@@ -673,7 +680,8 @@ class TestCommentTextField:
         comments.comment(commentText, rich_text=False)
         theRecord.save()
         editedRecord = pytest.app.records.get(id=theRecord.id)
-        assert editedRecord["Comments"] in (None, [])
+        assert editedRecord['Comments'][-1].message == commentText
+        assert editedRecord['Comments'][-1].is_rich_text == False
 
     def test_comment_rich_text_not_bool_on_save_exact(helpers):
         theRecord = pytest.app.records.create(**{"Required Text": "required"})
