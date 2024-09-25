@@ -66,10 +66,19 @@ class Field(SwimlaneResolver):
         """Return provided field Python value formatted for use in report filter"""
         if self.multiselect:
             value = value or []
+            try:
+                list_vars = vars(value)
+                if "multiselect" in list_vars:
+                    pass
+            except :
+                if not isinstance(value, list) :
+                    raise TypeError("Value Expected a list, but got something else.")
             children = []
 
             for child in value:
-                children.append(self.cast_to_report(child))
+                id = self.cast_to_report(child)
+                if id:
+                    children.append(id)
 
             return children
 
