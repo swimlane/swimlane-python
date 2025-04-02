@@ -11,15 +11,18 @@ Swimlane Python
     :target: https://travis-ci.org/swimlane/swimlane-python
 .. image:: https://readthedocs.org/projects/swimlane-python-driver/badge/?version=latest
     :target: http://swimlane-python-driver.readthedocs.io/
-.. image:: https://api.codacy.com/project/badge/Grade/215d8281290749bba687a08db1d59d8b
-    :target: https://www.codacy.com/app/Swimlane/swimlane-python?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=swimlane/swimlane-python&amp;utm_campaign=Badge_Grade
-.. image:: https://api.codacy.com/project/badge/Coverage/215d8281290749bba687a08db1d59d8b
-    :target: https://www.codacy.com/app/Swimlane/swimlane-python?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=swimlane/swimlane-python&amp;utm_campaign=Badge_Grade
 
-Python driver for the Swimlane_ API
+
+
+Python driver for the Swimlane_ API.
 
 .. _Swimlane: http://swimlane.com
 
+
+
+
+Note: This package is compatible with Swimlane <= 10.x.  It is not compatible with Turbine.
+------------------------------------------------------------------------------------------
 
 Installation
 ------------
