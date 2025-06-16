@@ -310,6 +310,37 @@ disabled by setting `verify_server_version=False`.
         'password',
         verify_server_version=False
     )
+
+Headers
+^^^^^^^^
+To add custom headers to all requests made by the client, provide a dictionary of headers during client instantiation.
+.. code-block:: python
+
+    from swimlane import Swimlane
+
+    swimlane = Swimlane(
+        '192.168.1.1',  # IP address or hostname
+        'username',
+        'password',
+        headers={ 'X-Custom-Header': 'custom-value' }
+        )
+This will add the specified headers to all requests made by the client, including those made by the preconfigured adapters.
+
+Proxies
+^^^^^^^^
+To use a proxy for all requests made by the client, provide a dictionary of proxies during client instantiation.
+.. code-block:: python
+
+    from swimlane import Swimlane
+
+    swimlane = Swimlane(
+        '192.168.1.1',  # IP address or hostname
+        'username',
+        'password',
+        proxies={ 'http': 'http://10.10.1.10:3128', 'https': 'http://10.10.1.10:1080' }
+        )
+This will use the specified proxies for all requests made by the client, including those made by the preconfigured adapters.
+
 Available Adapters
 ------------------
 
