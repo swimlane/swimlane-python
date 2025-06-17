@@ -20,6 +20,7 @@ setup(
     packages=find_packages(exclude=('tests', 'tests.*')),
     description="Python driver for the Swimlane API",
     long_description=long_description,
+    long_description_content_type="text/x-rst",
     license='AGPLv3',
     install_requires=parse_requirements('./requirements.txt'),
     setup_requires=[
