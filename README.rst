@@ -19,9 +19,11 @@ Python driver for the Swimlane_ API.
 .. _Swimlane: http://swimlane.com
 
 
+.. note::
+
+    This package is compatible with Swimlane 10.x. It is not compatible with Turbine.
 
 
-Note: This package is compatible with Swimlane <= 10.x.  It is not compatible with Turbine.
 ------------------------------------------------------------------------------------------
 
 Installation
