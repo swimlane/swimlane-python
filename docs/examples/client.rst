@@ -3,7 +3,7 @@
 Swimlane Client
 ===============
 
-See :class:`swimlane.core.client.Swimlane` for full client API documentation.
+See ``swimlane.core.client.Swimlane`` for full client API documentation.
 
 
 
@@ -78,7 +78,7 @@ additional requests made by using the client automatically.
 
 .. warning::
 
-    Because it's common to disable SSL verification, the normal :class:`urllib3.exceptions.InsecureRequestWarning`
+    Because it's common to disable SSL verification, the normal ``urllib3.exceptions.InsecureRequestWarning``
     is suppressed automatically when using the Swimlane client. See urllib3_ docs for more information.
 
 .. _urllib3: http://urllib3.readthedocs.io/en/latest/user-guide.html#certificate-verification
@@ -100,11 +100,13 @@ The `verify_ssl` parameter is ignored when connecting over HTTP.
 Retry Requests
 ^^^^^^^^^^^^^
 
-Initial client connection and all failed requests are retried upon recieving :class:`HTTP 5XX` errors (server errors) if the :class:`retry` parameter is enabled.
-The default retry options are set as following:
-    - retry = True
-    - max_retries = 5
-    - retry_interval = 5 (in seconds)
+Initial client connection and all failed requests are retried upon receiving ``HTTP 5XX`` errors (server errors) if the ``retry`` parameter is enabled.
+The default retry options are set as follows:
+
+- ``retry = True``
+- ``max_retries = 5``
+- ``retry_interval = 5`` (in seconds)
+
 
 To override the default retry options used by all library methods, provide them during client instantiation.
 
@@ -120,7 +122,7 @@ To override the default retry options used by all library methods, provide them 
         max_retries=3,
         retry_interval=10 # in seconds
     )
-The :meth:`swimlane.Swimlane.request` method can also accept the optional retry options that will override the
+The ``swimlane.Swimlane.request``` method can also accept the optional retry options that will override the
 global defaults for the single request.
 
 .. code-block:: python
@@ -141,7 +143,7 @@ global defaults for the single request.
 Resource Caching
 ^^^^^^^^^^^^^^^^
 
-.. versionadded:: 2.16.2
+*Added in version 2.16.2*
 
 The Swimlane client supports automatic caching for most API resources. When enabled, requests for resource data will
 first check the client's cache for the requested resource, returning it without making an additional request if found.
@@ -217,7 +219,7 @@ Custom Direct Requests
 Not all API endpoints may be currently supported by internal adapters, or custom arguments may be required in special
 cases not handled by other resources.
 
-To perform a custom request and handle the response directly, use the :meth:`swimlane.Swimlane.request` method.
+To perform a custom request and handle the response directly, use the ``swimlane.Swimlane.request`` method.
 
 .. code-block:: python
 
@@ -236,11 +238,11 @@ To perform a custom request and handle the response directly, use the :meth:`swi
 Underlying connection session will be reused, authentication will be handled automatically, and all default request
 configurations will be applied as normal if not provided explicitly.
 
-All provided keyword arguments will be passed to the underlying :meth:`requests.Session.request` call.
+All provided keyword arguments will be passed to the underlying ``requests.Session.request`` call.
 
 .. note::
 
-    Any 400/500 responses will raise :class:`requests.HTTPError` automatically after Max Retry attempts are exceeded.
+    Any 400/500 responses will raise ``requests.HTTPError`` automatically after Max Retry attempts are exceeded.
 
 
 Request Timeouts
@@ -266,7 +268,7 @@ during client instantiation.
     )
 
 
-The :meth:`swimlane.Swimlane.request` method can also accept an optional `timeout` parameter that will override the
+The ``swimlane.Swimlane.request`` method can also accept an optional `timeout` parameter that will override the
 global default timeout for the single request.
 
 .. code-block:: python
@@ -288,7 +290,7 @@ Server Version Verification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 By default, client will check that the major versions of server and client match, and raise
-:class:`swimlane.exceptions.InvalidServerVersion` if they do not.
+``swimlane.exceptions.InvalidServerVersion` if they do not.
 
 This may require an additional request that may not otherwise be required to retrieve the server version, and and be
 disabled by setting `verify_server_version=False`.
@@ -316,7 +318,7 @@ Available Adapters
 Examples of usage for preconfigured adapters available on client instances, abstracting retrieval and instantiation of
 various resource instances.
 
-See various adapter class documentation :mod:`swimlane.core.adapters` for more information
+See various adapter class documentation ``swimlane.core.adapters`` for more information
 
 Apps
 ^^^^

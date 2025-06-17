@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest                # keep your own runner
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.12]
+        python-version: [3.12]
 
     steps:
       - uses: actions/checkout@v4
@@ -27,22 +27,14 @@ jobs:
       # ──────────────────────────────────────────────────────────
       - name: Install dependencies
         run: |
-          # Py-3.6 needs older tooling
-          if [[ "${{ matrix.python-version }}" == "3.6" ]]; then
-            python -m pip install --upgrade "pip<22" "setuptools<59" wheel
-            python -m pip install "flake8<6" codacy-coverage
-          else
             python -m pip install --upgrade pip setuptools wheel
             python -m pip install flake8 codacy-coverage
-          fi
+            python -m pip install -U -r requirements.txt -r test-requirements.txt
 
-          # project requirements
-          python -m pip install -U -r requirements.txt -r test-requirements.txt
-
-      # - name: Lint with flake8
-      #   run: |
-      #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-      #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Run Tests
         run: python -m pytest

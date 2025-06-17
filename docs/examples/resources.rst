@@ -4,7 +4,7 @@
 Resources
 =========
 
-See :mod:`swimlane.core.resources` for full API docs on all resources
+See ``swimlane.core.resources`` for full API docs on all resources
 
 
 
@@ -70,7 +70,7 @@ provided keywords will be returned
 
 
 Available operators are just strings as shown above, but are made available as constants in the
-:mod:`~swimlane.core.search` module
+``~swimlane.core.search`` module
 
 .. code-block:: python
 
@@ -387,7 +387,7 @@ Saving Changes
 ^^^^^^^^^^^^^^
 
 All changes to a record are only done locally until explicitly persisted to the server with
-:meth:`~swimlane.core.resources.record.Record.save`.
+``~swimlane.core.resources.record.Record.save``.
 
 .. code-block:: python
 
@@ -398,7 +398,7 @@ All changes to a record are only done locally until explicitly persisted to the 
 Delete Record
 ^^^^^^^^^^^^^
 
-Records can be deleted from Swimlane using :meth:`~swimlane.core.resources.record.Record.delete`. Record will be
+Records can be deleted from Swimlane using ``~swimlane.core.resources.record.Record.delete``. Record will be
 removed from server and marked as a new record, but will retain any field data.
 
 .. code-block:: python
@@ -423,7 +423,7 @@ removed from server and marked as a new record, but will retain any field data.
 Field Iteration
 ^^^^^^^^^^^^^^^
 
-Records can be iterated over like :meth:`dict.items()`, yielding `(field_name, field_value)` tuples
+Records can be iterated over like ``dict.items()``, yielding `(field_name, field_value)` tuples
 
 .. code-block:: python
 
@@ -433,8 +433,8 @@ Records can be iterated over like :meth:`dict.items()`, yielding `(field_name, f
 Lock Record
 ^^^^^^^^^^^
 
-Record locks can be modified using :meth:`~swimlane.core.resources.record.Record.lock` and
-:meth:`~swimlane.core.resources.record.Record.unlock` methods.
+Record locks can be modified using ``~swimlane.core.resources.record.Record.lock`` and
+``~swimlane.core.resources.record.Record.unlock`` methods.
 The record is locked to the user making the API call.
 
 .. code-block:: python
@@ -451,7 +451,7 @@ Pretty Iteration + JSON Serialization
 .. versionadded:: 4.1.0
 
 Some field types are not cleanly printed or cannot be easily serialized to JSON. A record can be converted to a
-prettier JSON-safe dict using the :meth:`.for_json()` method.
+prettier JSON-safe dict using the ``.for_json()`` method.
 
 .. code-block:: python
 
@@ -500,8 +500,8 @@ with the invalid field name, as well as potential similar field names in case of
 Restrict Record
 ^^^^^^^^^^^^^^^
 
-Record restrictions can be modified using :meth:`~swimlane.core.resources.record.Record.add_restriction` and
-:meth:`~swimlane.core.resources.record.Record.remove_restriction` methods.
+Record restrictions can be modified using ``~swimlane.core.resources.record.Record.add_restriction`` and
+``~swimlane.core.resources.record.Record.remove_restriction`` methods.
 
 .. code-block:: python
 
@@ -558,7 +558,7 @@ Resolve UserGroups
 
 The base :class:`~swimlane.core.resources.usergroup.UserGroup` instances can be easily resolved into the more specific
 :class:`~swimlane.core.resources.usergroup.User` or :class:`~swimlane.core.resources.usergroup.Group` instances when
-necessary using the :meth:`~swimlane.core.resources.usergroup.UserGroup.resolve` method. This method is not called
+necessary using the ``~swimlane.core.resources.usergroup.UserGroup.resolve`` method. This method is not called
 automatically to avoid additional requests where the base UserGroup is sufficient.
 
 .. code-block:: python
