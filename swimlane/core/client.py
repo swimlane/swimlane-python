@@ -197,7 +197,7 @@ class Swimlane(object):
             **kwargs (dict): Remaining arguments passed through to actual request call
 
         Notes:
-            All other provided kwargs are passed to underlying :meth:`requests.Session.request()` call
+            All other provided kwargs are passed to underlying ``requests.Session.request()`` call
 
         Raises:
             swimlane.exceptions.SwimlaneHTTP400Error: On 400 responses with additional context about the exception
