@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build and Test Driver
-    runs-on: self-hosted                # keep your own runner
+    runs-on: ubuntu-latest                # keep your own runner
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.12]
