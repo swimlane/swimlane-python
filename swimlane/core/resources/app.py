@@ -54,7 +54,7 @@ class App(APIResource):
                             self._defaults[field['name']] = default
             if 'fieldType' in field and field['fieldType'] == "date":
                 default_value_type = field['defaultValueType']
-                if default_value_type == 'specific':
+                if default_value_type == 'specific' and 'defaultValue' in field.keys():
                     self._defaults[field['name']] = pendulum.parse(field['defaultValue'])
 
         self._keys_to_field_names = {}
