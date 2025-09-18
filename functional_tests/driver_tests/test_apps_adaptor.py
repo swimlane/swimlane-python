@@ -1,14 +1,13 @@
 import pytest
-import uuid  # Add this import
 
 
 @pytest.fixture(autouse=True, scope='module')
 def my_fixture(helpers):
     # setup stuff
-    unique_app_name = f"Email Collection {uuid.uuid4()}"
+    defaultApp = 'Email Collection'
     pytest.swimlane_instance = helpers.swimlane_instance
     pytest.py_ver_uni_str = helpers.py_ver_uni_str
-    pytest.app, pytest.appid = helpers.findCreateApp(unique_app_name)
+    pytest.app, pytest.appid = helpers.findCreateApp(defaultApp)
     yield
     # teardown stuff
     helpers.cleanupData()
