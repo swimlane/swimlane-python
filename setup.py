@@ -11,7 +11,7 @@ with open('./README.rst') as f:
 
 
 setup(
-    version="10.18.3",
+    version="10.19.0",
     name="swimlane",
     author="Swimlane",
     author_email="info@swimlane.com",
@@ -20,6 +20,7 @@ setup(
     packages=find_packages(exclude=('tests', 'tests.*')),
     description="Python driver for the Swimlane API",
     long_description=long_description,
+    long_description_content_type="text/x-rst",
     license='AGPLv3',
     install_requires=parse_requirements('./requirements.txt'),
     setup_requires=[

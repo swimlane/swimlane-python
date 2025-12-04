@@ -483,7 +483,7 @@ Example showing adding a request response body as an attachment
 
     Attachment is uploaded, and associated with record locally, immediately.
 
-    Association with attachment on server is not persisted until calling :meth:`record.save`.
+    Association with attachment on server is not persisted until calling ``record.save``.
 
 Clear all attachments
 
@@ -598,7 +598,7 @@ Cursor managing iteration and addition of comments
 
 .. note::
 
-    Like attachments, comments are associated with a record only locally until calling :meth:`record.save`.
+    Like attachments, comments are associated with a record only locally until calling ``record.save``.
 
 
 HistoryField
