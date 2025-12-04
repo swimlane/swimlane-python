@@ -70,14 +70,18 @@ class Swimlane(object):
                 'https://192.168.1.1',
                 'username',
                 'password',
-                verify_ssl=False
+                verify_ssl=False,
+                headers={'Custom-Header': 'value'},
+                proxies={'http': 'http://proxy.example.com:8080', 'https': 'https://proxy.example.com:8080'}
             )
 
             # Or establish connection using personal access token
             swimlane = Swimlane(
                 'https://192.168.1.1',
                 access_token='abcdefg',
-                verify_ssl=False
+                verify_ssl=False,
+                headers={'Custom-Header': 'value'},
+                proxies={'http': 'http://proxy.example.com:8080', 'https': 'https://proxy.example.com:8080'}
             )
 
             # Retrieve an app
@@ -100,7 +104,9 @@ class Swimlane(object):
             write_to_read_only: bool=False,
             retry: bool=True,
             max_retries: int=5,
-            retry_interval: int=5
+            retry_interval: int=5,
+            headers=None,
+            proxies=None
     ):
         self.__verify_auth_params(username, password, access_token)
 
@@ -119,7 +125,15 @@ class Swimlane(object):
 
         self._session = WrappedSession()
         self._session.verify = verify_ssl
-        
+        self._session.headers.update(headers or {})
+        self._session.proxies.update(proxies or {})
+        if self.host.scheme == 'http':
+            # Disable SSL verification for HTTP connections
+            self._session.verify = False
+        else:
+            # Ensure SSL verification is enabled for HTTPS connections
+            self._session.verify = verify_ssl
+
         self.retry = retry
         self.max_retries = max_retries
         self.retry_interval = retry_interval
