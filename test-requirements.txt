@@ -5,4 +5,4 @@ pytest-pythonpath
 tox
 pytz
 pathlib
-setuptools<81
+setuptools>81
