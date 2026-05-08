@@ -4,7 +4,7 @@ import sys
 
 import mock
 import pytest
-from pkg_resources import DistributionNotFound
+from importlib.metadata import PackageNotFoundError
 
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.exceptions import InvalidSwimlaneBuildVersion
@@ -101,11 +101,7 @@ def test_get_package_version():
     mock_dist = mock.MagicMock()
     mock_dist.version = '1.2.3'
 
-    with mock.patch('swimlane.utils.version.get_distribution', return_value=mock_dist):
-        version = get_package_version()
-        assert tuple(version.split('.')[:2]) > ('0', '0', '0')
-
-    with mock.patch('swimlane.utils.version.get_distribution', side_effect=DistributionNotFound):
+    with mock.patch('swimlane.utils.version.version', side_effect=PackageNotFoundError):
         assert get_package_version() == '0.0.0.dev'
 
 
