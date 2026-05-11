@@ -1,7 +1,6 @@
 cachetools>=4.2.4
 certifi==2026.2.25
 importlib-metadata>=4.0; python_version < '3.8'
-importlib-metadata>=4.0; python_version > '3.8'
 pendulum==2.1.2; python_version<='3.7'
 pendulum==3.2.0; python_version>='3.8'
 pyjwt>=2.4.0
