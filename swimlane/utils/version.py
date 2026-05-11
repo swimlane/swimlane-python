@@ -1,7 +1,10 @@
 import functools
 import re
 
-from importlib.metadata import version, PackageNotFoundError
+try:
+    from importlib.metadata import version, PackageNotFoundError
+except ImportError:  # Python < 3.8 (stdlib has no importlib.metadata)
+    from importlib_metadata import version, PackageNotFoundError
 
 from swimlane.exceptions import InvalidSwimlaneBuildVersion
 
