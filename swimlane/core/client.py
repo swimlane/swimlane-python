@@ -6,7 +6,7 @@ import jwt
 import pendulum
 import requests
 import time
-from urllib.parse import urlparse
+from pyuri import URI
 from requests.compat import json
 from requests.packages import urllib3
 from requests.structures import CaseInsensitiveDict
@@ -53,7 +53,7 @@ class Swimlane(object):
         retry_interval (int): Time interval (in seconds) between two retry attempts
 
     Attributes:
-        host (urllib.parse.ParseResult): Parsed RFC-1738 URL pointing to Swimlane host
+        host (pyuri.URI): Full RFC-1738 URL pointing to Swimlane host
         apps (AppAdapter): :class:`~swimlane.core.adapters.app.AppAdapter` configured for current Swimlane instance
         users (UserAdapter): :class:`~swimlane.core.adapters.usergroup.UserAdapter` configured for current
             Swimlane instance
@@ -110,18 +110,9 @@ class Swimlane(object):
     ):
         self.__verify_auth_params(username, password, access_token)
 
-        # urlparse() treats a host without scheme as a path, so normalize first.
-        parsed_host = urlparse(host)
-        if not parsed_host.netloc and parsed_host.path:
-            parsed_host = urlparse('//{}'.format(host), scheme='https')
-
-        self.host = parsed_host._replace(
-            scheme=(parsed_host.scheme or 'https').lower(),
-            path='',
-            params='',
-            query='',
-            fragment=''
-        )
+        self.host = URI(host)
+        self.host.scheme = (self.host.scheme or 'https').lower()
+        self.host.path = None
 
         self.resources_cache = ResourcesCache(resource_cache_size)
 
@@ -203,7 +194,7 @@ class Swimlane(object):
         return '<{cls}: {user} @ {host} v{version}>'.format(
             cls=self.__class__.__name__,
             user=self.user,
-            host=self.host.geturl(),
+            host=self.host,
             version=self.version
         )
 
@@ -267,11 +258,7 @@ class Swimlane(object):
             raise ValueError('retry_interval should be a positive integer')
         
         while not req_max_retries<0:
-            response = self._session.request(
-                method,
-                urljoin(self.host.geturl() + self._api_root, api_endpoint),
-                **kwargs
-            )
+            response = self._session.request(method, urljoin(str(self.host) + self._api_root, api_endpoint), **kwargs)
 
             # Roll 400 errors up into SwimlaneHTTP400Errors with specific Swimlane error code support
             try:

@@ -4,7 +4,10 @@ import sys
 
 import mock
 import pytest
-from importlib.metadata import PackageNotFoundError
+try:
+    from importlib.metadata import  PackageNotFoundError
+except ImportError:  # Python < 3.8 (stdlib has no importlib.metadata)
+    from importlib_metadata import  PackageNotFoundError
 
 from swimlane.core.resolver import SwimlaneResolver
 from swimlane.exceptions import InvalidSwimlaneBuildVersion
