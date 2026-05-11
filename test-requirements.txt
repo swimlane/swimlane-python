@@ -1,5 +1,6 @@
 faker
 mock
+importlib-metadata
 pytest>=6.2.5
 pytest-pythonpath
 tox
