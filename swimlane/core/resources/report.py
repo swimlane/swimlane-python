@@ -118,6 +118,86 @@ class Report(APIResource, PaginatedCursor):
     def _parse_raw_element(self, raw_element):
         return Record(self._app, raw_element)
 
+    def get_raw_json(self):
+        """Get raw JSON data for all search results without converting to Record objects.
+        
+        This method is intended for troubleshooting and integration with external systems
+        that work with raw JSON data rather than parsed Record objects. It provides access to
+        the original JSON response data from the search API before any object conversion,
+        field parsing, or validation.
+        
+        The method will trigger data retrieval if not already performed, but returns
+        the raw JSON elements instead of the parsed Record instances.
+        
+        Returns:
+            list: List of raw JSON dictionaries representing each search result
+            
+        Examples:
+            # Get raw JSON for troubleshooting search results
+            report = app.reports.build('my-report')
+            report.filter('Status', 'equals', 'Open')
+            raw_data = report.get_raw_json()
+            
+            # Inspect the raw structure to understand field mappings
+            if raw_data:
+                print("Raw JSON structure:", raw_data[0].keys())
+                print("Available field values:", raw_data[0].get('values', {}).keys())
+                
+            # Export to external system expecting JSON format
+            import json
+            with open('search_results.json', 'w') as f:
+                json.dump(raw_data, f, indent=2)
+                
+            # Process raw field data for integration
+            for raw_record in raw_data:
+                field_values = raw_record.get('values', {})
+                # Process field_values dict directly without Record object overhead
+                external_system.process(field_values)
+                
+        Notes:
+            - This method will evaluate the search if not already done
+            - Raw data is cached after first retrieval for performance
+            - Useful for debugging field mappings and API response structure
+            - Essential for integrations with systems that expect raw JSON format
+            - Bypasses all Record object creation, field validation, and type conversion
+            - Field values are in their raw API format (e.g., field IDs as keys)
+        """
+        # Store raw elements during evaluation
+        raw_elements = []
+        
+        # Determine pagination range based on parameters (copied from PaginatedCursor logic)
+        if self.page_start and self.page_end:
+            page_range = range(self.page_start-1, self.page_end)
+        elif self.page_start:
+            import itertools
+            page_range = itertools.count(self.page_start-1)
+        elif self.page_end:
+            page_range = range(0, self.page_end)
+        else:
+            import itertools
+            page_range = itertools.count()
+
+        # Retrieve raw data page by page
+        for page in page_range:
+            page_raw_elements = self._retrieve_raw_elements(page)
+            
+            for raw_element in page_raw_elements:
+                raw_elements.append(raw_element)
+                
+                # Respect limit if set
+                if hasattr(self, '_PaginatedCursor__limit') and self._PaginatedCursor__limit and len(raw_elements) >= self._PaginatedCursor__limit:
+                    break
+
+            # Break conditions for ending pagination
+            if any([
+                len(page_raw_elements) < self.page_size,
+                hasattr(self, '_PaginatedCursor__limit') and self._PaginatedCursor__limit and len(raw_elements) >= self._PaginatedCursor__limit,
+                self.page_size == 0
+            ]):
+                break
+        
+        return raw_elements
+
     def filter(self, field_name, operand, value):
         """Adds a filter to report
 
