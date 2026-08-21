@@ -98,14 +98,18 @@ class ReferenceField(CursorField):
     def set_swimlane(self, value):
         """Store record ids in separate location for later use, but ignore initial value"""
 
-        # Values come in as a list of record ids or None
+        # Values come in as a list of record ids, record metadata tuples, or None
         value = value or []
         if isinstance(value, dict):
             value = value["_v"] if "_v" in value else []
 
         records = SortedDict()
 
-        for record_id in value:
+        for record in value:
+            if isinstance(record, (list, tuple)):
+                record_id = record[0]
+            else:
+                record_id = record
             records[record_id] = self._unset
 
         return super(ReferenceField, self).set_swimlane(records)

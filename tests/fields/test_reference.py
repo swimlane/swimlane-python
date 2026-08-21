@@ -121,3 +121,16 @@ class TestReferenceField(object):
     def test_get_report(self, mock_record):
         """All for total coverage"""
         assert mock_record.get_field(self.single_field_name).get_report(mock_record) == mock_record.id
+
+    def test_set_swimlane_with_record_metadata(self, mock_record):
+        """Test reference values returned as list of record metadata tuples (Turbine 26.2.3+)"""
+        field = mock_record.get_field(self.multi_field_name)
+        record_ids = ['aZ586fyJZcSkzyFyt', 'aRA4S8FNol6yI5EXO']
+        value = [
+            [record_ids[0], 'aU31z06zTqVz_dkb5', 'CIM-41919'],
+            [record_ids[1], 'aU31z06zTqVz_dkb5', 'CIM-41920']
+        ]
+
+        field.set_swimlane(value)
+
+        assert set(field._value.keys()) == set(record_ids)
