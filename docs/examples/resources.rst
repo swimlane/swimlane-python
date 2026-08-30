@@ -177,7 +177,7 @@ The newly created record is returned from the create create call after first bei
 Bulk Record Create
 ^^^^^^^^^^^^^^^^^^
 
-Creating multiple records at once can also done withe the :obj:`app.records` adapter using only a single request.
+Creating multiple records at once can also done with the :obj:`app.records` adapter using only a single request.
 
 Any records not passing validation will cause the entire operation to fail.
 
