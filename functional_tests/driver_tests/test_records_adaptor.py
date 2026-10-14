@@ -1,6 +1,7 @@
 import datetime
 import pytest
 from swimlane import exceptions
+from six.moves.urllib.parse import urlunparse
 
 # create
 # get
@@ -95,7 +96,7 @@ class TestRecordAdaptorGet:
         with pytest.raises(exceptions.HTTPError) as excinfo:
             pytest.app.records.get(id=randomID)
         assert str(excinfo.value) == 'RecordNotFound:3002: Bad Request for url: %s/api/app/%s/record/%s' % (
-            pytest.swimlane_instance.host, pytest.appid, randomID)
+            urlunparse(pytest.swimlane_instance.host), pytest.appid, randomID)
 
     def test_record_get_by_empty_id(helpers):
         emptyID = ''
@@ -114,7 +115,7 @@ class TestRecordAdaptorGet:
         with pytest.raises(exceptions.HTTPError) as excinfo:
             pytest.app.records.get(tracking_id=randomID)
         assert str(excinfo.value) == 'RecordNotFound:3002: Bad Request for url: %s/api/app/%s/record/tracking/%s' % (
-            pytest.swimlane_instance.host, pytest.appid, randomID)
+            urlunparse(pytest.swimlane_instance.host), pytest.appid, randomID)
 
     def test_record_get_by_empty_trackingId(helpers):
         emptyTrackingID = ''
@@ -169,7 +170,7 @@ class TestRecordAdaptorDelete:
         with pytest.raises(exceptions.HTTPError) as excinfo:
             pytest.app.records.get(tracking_id=trackingID)
         assert str(excinfo.value) == 'RecordNotFound:3002: Bad Request for url: %s/api/app/%s/record/tracking/%s' % (
-            pytest.swimlane_instance.host, pytest.appid, trackingID)
+            urlunparse(pytest.swimlane_instance.host), pytest.appid, trackingID)
 
     def test_record_delete_twice(helpers):
         deleteRecord = pytest.app.records.create(
