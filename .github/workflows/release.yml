@@ -33,31 +33,19 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: twine upload dist/*
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: false
-          prerelease: false
-
       - name: Build off-line installer
         id: build
         shell: bash
         run: |
           output=$(python offline_installer/build.py)
-          echo "::set-output name=file_name::$output"
+          echo "file_name=$output" >> "$GITHUB_OUTPUT"
 
-      - name: Upload off-line installer
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Replaces actions/create-release@v1 + actions/upload-release-asset@v1 (node12, archived).
+      - name: Create release and upload off-line installer
+        uses: softprops/action-gh-release@v3
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/${{ steps.build.outputs.file_name }}
-          asset_name: ${{ steps.build.outputs.file_name }}
-          asset_content_type: application/zip
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: ./dist/${{ steps.build.outputs.file_name }}
