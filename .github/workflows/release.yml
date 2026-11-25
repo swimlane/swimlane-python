@@ -40,12 +40,22 @@ jobs:
           output=$(python offline_installer/build.py)
           echo "file_name=$output" >> "$GITHUB_OUTPUT"
 
+      # This workflow is dispatched from a branch (master), so github.ref_name is the branch name.
+      # Tag the release with the package version instead (matches existing tags, e.g. 10.19.2).
+      - name: Get package version
+        id: version
+        shell: bash
+        run: |
+          version="$(python setup.py --version | tail -n 1)"
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
       # Replaces actions/create-release@v1 + actions/upload-release-asset@v1 (node12, archived).
       - name: Create release and upload off-line installer
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
           files: ./dist/${{ steps.build.outputs.file_name }}
